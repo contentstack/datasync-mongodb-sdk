@@ -1,0 +1,29 @@
+{
+  "name": "contentstack-mongodb-sdk",
+  "version": "0.0.1",
+  "description": "Contentstack sync utility's Mongodb SDK",
+  "main": "dist/index.js",
+  "scripts": {
+    "clean": "rimraf dist typings coverage",
+    "build-ts": "npm run clean && tsc",
+    "watch-ts": "npm run clean && tsc -w",
+    "compile": "tsc",
+    "prepare": "npm run compile",
+    "start": "dist/index.js",
+    "tslint": "npx tslint -c tslint.json 'src/**/*.ts' --fix"
+  },
+  "author": "Contentstack Ecosystem",
+  "license": "ISC",
+  "dependencies": {
+    "debug": "^4.1.1",
+    "lodash": "^4.17.11",
+    "mongodb": "^3.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^10.12.18",
+    "@types/lodash": "4.14.119",
+    "@types/rimraf": "^2.0.2",
+    "rimraf": "^2.6.3",
+    "typescript": "^3.2.4"
+  }
+}

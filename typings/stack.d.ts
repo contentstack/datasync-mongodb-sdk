@@ -1,0 +1,30 @@
+export declare class Stack {
+    private _query;
+    private config;
+    private client;
+    private collection;
+    private internal;
+    private db;
+    constructor(...stack_arguments: any[]);
+    ascending(field: any): this;
+    descending(field: any): this;
+    connect(overrides?: {}): Promise<{}>;
+    close(): void;
+    contentType(uid: any): this;
+    entry(uid?: any): this;
+    entries(): this;
+    asset(uid?: any): this;
+    assets(): this;
+    limit(no: any): this;
+    skip(no: any): this;
+    query(queryObject?: {}): this;
+    only(fields: any): this;
+    except(fields: any): this;
+    tags(values: any): this;
+    count(): this;
+    includeCount(): this;
+    private preProcess;
+    private postProcess;
+    private cleanup;
+    find(query?: {}): Promise<{}>;
+}
