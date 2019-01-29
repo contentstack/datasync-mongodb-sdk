@@ -59,6 +59,28 @@ class Stack {
         debug('Closing db connection!');
         this.client.close();
     }
+    and(...queries) {
+        if (this._query._query && typeof this._query._query === 'object') {
+            this._query._query = lodash_1.merge(this._query._query, { $and: queries });
+        }
+        else {
+            this._query._query = {
+                $and: queries
+            };
+        }
+        return this;
+    }
+    or(...queries) {
+        if (this._query._query && typeof this._query._query === 'object') {
+            this._query._query = lodash_1.merge(this._query._query, { $or: queries });
+        }
+        else {
+            this._query._query = {
+                $or: queries
+            };
+        }
+        return this;
+    }
     contentType(uid) {
         if (uid && typeof uid === 'string') {
             this._query.content_type_uid = uid;
@@ -154,6 +176,28 @@ class Stack {
         });
         return this;
     }
+    regex(field, pattern, options = 'g') {
+        if (!(field) || !(pattern) || typeof field !== 'string' || typeof pattern !== 'string') {
+            throw new Error('Kindly provide a valid field and pattern value for \'.regex()\'');
+        }
+        else if (this._query.query && typeof this._query.query === 'object') {
+            this._query.query = lodash_1.merge(this._query.query, {
+                [field]: {
+                    $regex: pattern,
+                    $options: options
+                }
+            });
+        }
+        else {
+            this._query.query = {
+                [field]: {
+                    $regex: pattern,
+                    $options: options
+                }
+            };
+        }
+        return this;
+    }
     tags(values) {
         if (!values || typeof values !== 'object' || !(values instanceof Array) || values.length === 0) {
             throw new Error('Kindly provide valid \'field\' values for \'tags()\'');
@@ -165,6 +209,22 @@ class Stack {
         this._query.data.tags = {
             $in: values
         };
+        return this;
+    }
+    where(...expr) {
+        if (!(expr)) {
+            throw new Error('Kindly provide a valid field and expr/fn value for \'.where()\'');
+        }
+        else if (this._query.query && typeof this._query.query === 'object') {
+            this._query.query = lodash_1.merge(this._query.query, {
+                $where: expr
+            });
+        }
+        else {
+            this._query.query = {
+                $where: expr
+            };
+        }
         return this;
     }
     count() {

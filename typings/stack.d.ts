@@ -10,6 +10,8 @@ export declare class Stack {
     descending(field: any): this;
     connect(overrides?: {}): Promise<{}>;
     close(): void;
+    and(...queries: any[]): this;
+    or(...queries: any[]): this;
     contentType(uid: any): this;
     entry(uid?: any): this;
     entries(): this;
@@ -20,7 +22,9 @@ export declare class Stack {
     query(queryObject?: {}): this;
     only(fields: any): this;
     except(fields: any): this;
+    regex(field: any, pattern: any, options?: string): this;
     tags(values: any): this;
+    where(...expr: any[]): this;
     count(): this;
     includeCount(): this;
     private preProcess;

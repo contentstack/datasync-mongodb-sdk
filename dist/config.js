@@ -4,12 +4,7 @@ exports.config = {
     collectionName: 'contents',
     dbName: 'contentstack-persistent-db',
     limit: 100,
-    locales: [
-        {
-            code: 'es-es',
-            relative_url_prefix: '/'
-        }
-    ],
+    locales: [],
     options: {
         autoReconnect: true,
         connectTimeoutMS: 15000,
