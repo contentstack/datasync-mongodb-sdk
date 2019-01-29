@@ -2,10 +2,7 @@ export declare const config: {
     collectionName: string;
     dbName: string;
     limit: number;
-    locales: {
-        code: string;
-        relative_url_prefix: string;
-    }[];
+    locales: any[];
     options: {
         autoReconnect: boolean;
         connectTimeoutMS: number;

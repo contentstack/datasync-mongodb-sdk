@@ -2,7 +2,17 @@ const Contentstack = require('../dist/contentstack')
 
 const Stack = Contentstack.Stack({
   api_key: '***REMOVED***',
-  access_token: '***REMOVED***'
+  access_token: '***REMOVED***',
+  locales: [
+    {
+      code: 'en-us',
+      relative_url_prefix: '/'
+    },
+    {
+      code: 'es-es',
+      relative_url_prefix: '/es/'
+    }
+  ]
 })
 
 function connect () {

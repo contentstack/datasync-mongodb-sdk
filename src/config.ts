@@ -3,10 +3,6 @@ export const config = {
   dbName: 'contentstack-persistent-db',
   limit: 100,
   locales: [
-    {
-      code: 'es-es',
-      relative_url_prefix: '/'
-    }
   ],
   // http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html
   options: {
