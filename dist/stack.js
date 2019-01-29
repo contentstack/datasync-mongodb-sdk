@@ -61,7 +61,9 @@ class Stack {
     }
     and(...queries) {
         if (this._query._query && typeof this._query._query === 'object') {
-            this._query._query = lodash_1.merge(this._query._query, { $and: queries });
+            this._query._query = lodash_1.merge(this._query._query, {
+                $and: queries
+            });
         }
         else {
             this._query._query = {
@@ -72,11 +74,193 @@ class Stack {
     }
     or(...queries) {
         if (this._query._query && typeof this._query._query === 'object') {
-            this._query._query = lodash_1.merge(this._query._query, { $or: queries });
+            this._query._query = lodash_1.merge(this._query._query, {
+                $or: queries
+            });
         }
         else {
             this._query._query = {
                 $or: queries
+            };
+        }
+        return this;
+    }
+    lessThan(key, value) {
+        if (typeof key !== 'string' || typeof value === 'undefined') {
+            throw new Error('Kindly pass valid key and value parameters for \'.lessThan()\'');
+        }
+        else if (this._query.query && typeof this._query.query === 'object') {
+            this._query.query[key] = {
+                $lt: value
+            };
+        }
+        else {
+            this._query = {
+                query: {
+                    [key]: {
+                        $lt: value
+                    }
+                }
+            };
+        }
+        return this;
+    }
+    lessThanOrEqualTo(key, value) {
+        if (typeof key !== 'string' || typeof value === 'undefined') {
+            throw new Error('Kindly pass valid key and value parameters for \'.lessThanOrEqualTo()\'');
+        }
+        else if (this._query.query && typeof this._query.query === 'object') {
+            this._query.query[key] = {
+                $lte: value
+            };
+        }
+        else {
+            this._query = {
+                query: {
+                    [key]: {
+                        $lte: value
+                    }
+                }
+            };
+        }
+        return this;
+    }
+    greaterThan(key, value) {
+        if (typeof key !== 'string' || typeof value === 'undefined') {
+            throw new Error('Kindly pass valid key and value parameters for \'.greaterThan()\'');
+        }
+        else if (this._query.query && typeof this._query.query === 'object') {
+            this._query.query[key] = {
+                $gt: value
+            };
+        }
+        else {
+            this._query = {
+                query: {
+                    [key]: {
+                        $gt: value
+                    }
+                }
+            };
+        }
+        return this;
+    }
+    greaterThanOrEqualTo(key, value) {
+        if (typeof key !== 'string' || typeof value === 'undefined') {
+            throw new Error('Kindly pass valid key and value parameters for \'.greaterThanOrEqualTo()\'');
+        }
+        else if (this._query.query && typeof this._query.query === 'object') {
+            this._query.query[key] = {
+                $gte: value
+            };
+        }
+        else {
+            this._query = {
+                query: {
+                    [key]: {
+                        $gte: value
+                    }
+                }
+            };
+        }
+        return this;
+    }
+    notEqualTo(key, value) {
+        if (typeof key !== 'string' || typeof value === 'undefined') {
+            throw new Error('Kindly pass valid key and value parameters for \'.notEqualTo()\'');
+        }
+        else if (this._query.query && typeof this._query.query === 'object') {
+            this._query.query[key] = {
+                $ne: value
+            };
+        }
+        else {
+            this._query = {
+                query: {
+                    [key]: {
+                        $ne: value
+                    }
+                }
+            };
+        }
+        return this;
+    }
+    containedIn(key, value) {
+        if (typeof key !== 'string' || typeof value !== 'object' || !(value instanceof Array)) {
+            throw new Error('Kindly pass valid key and value parameters for \'.containedIn()\'');
+        }
+        else if (this._query.query && typeof this._query.query === 'object') {
+            this._query.query[key] = {
+                $in: value
+            };
+        }
+        else {
+            this._query = {
+                query: {
+                    [key]: {
+                        $in: value
+                    }
+                }
+            };
+        }
+        return this;
+    }
+    notContainedIn(key, value) {
+        if (typeof key !== 'string' || typeof value !== 'object' || !(value instanceof Array)) {
+            throw new Error('Kindly pass valid key and value parameters for \'.notContainedIn()\'');
+        }
+        else if (this._query.query && typeof this._query.query === 'object') {
+            this._query.query[key] = {
+                $nin: value
+            };
+        }
+        else {
+            this._query = {
+                query: {
+                    [key]: {
+                        $nin: value
+                    }
+                }
+            };
+        }
+        return this;
+    }
+    exists(key) {
+        if (typeof key !== 'string') {
+            throw new Error('Kindly pass valid key for \'.exists()\'');
+        }
+        else if (this._query.query && typeof this._query.query === 'object') {
+            this._query.query[key] = {
+                $exists: true
+            };
+        }
+        else {
+            this._query = {
+                query: {
+                    [key]: {
+                        $exists: true
+                    }
+                }
+            };
+        }
+        return this;
+    }
+    notExists(key) {
+        if (typeof key !== 'string') {
+            throw new Error('Kindly pass valid key for \'.notExists()\'');
+        }
+        else if (this._query.query && typeof this._query.query === 'object') {
+            this._query.query[key] = {
+                $exists: false
+            };
+        }
+        else {
+            this._query = {
+                query: {
+                    [key]: {
+                        $exists: false
+                    }
+                }
             };
         }
         return this;
@@ -235,6 +419,28 @@ class Stack {
         this.internal.includeCount = true;
         return this;
     }
+    includeSchema() {
+        this.internal.includeSchema = true;
+        return this;
+    }
+    schema(uid) {
+        if (uid && typeof uid === 'string') {
+            this._query.content_type_uid = 'contentTypes';
+            this._query.uid = uid;
+        }
+        this.collection = this.db.collection(this.config.collectionName);
+        this.collection = this.collection.limit(1);
+        this.internal.single = true;
+        return this;
+    }
+    schemas() {
+        this._query.content_type_uid = 'contentTypes';
+        this.collection = this.db.collection(this.config.collectionName);
+        return this;
+    }
+    getQuery() {
+        return Object.assign({}, this._query);
+    }
     preProcess(query) {
         if (this._query.query && typeof this._query.query === 'object') {
             this._query.query = lodash_1.merge(this._query.query, query);
@@ -262,10 +468,28 @@ class Stack {
         if (!(this._query.locale)) {
             this._query.locale = this.config.locales[0].code;
         }
+        if (this._query.content_type_uid === 'contentTypes') {
+            debug('Removing \'locale\' filter, since the query is on content types');
+            delete this._query.locale;
+        }
+        if (this.includeSchema) {
+            this._query.query = {
+                $in: [
+                    ...this._query.query,
+                    {
+                        uid: this._query.content_type_uid
+                    }
+                ]
+            };
+        }
     }
     postProcess(result) {
         result = lodash_1.map(result, 'data');
         const count = (result === null) ? 0 : result.length;
+        let contentType;
+        if (this.internal.includeSchema) {
+            contentType = lodash_1.remove(result, { uid: this._query.content_type_uid });
+        }
         switch (this._query.content_type_uid) {
             case '_assets':
                 if (this.internal.limit === 1) {
@@ -309,6 +533,9 @@ class Stack {
         }
         if (this._query.content_type_uid === '_assets') {
             this._query.content_type_uid = 'assets';
+        }
+        if (this.internal.includeSchema) {
+            result.content_type = contentType;
         }
         result.content_type_uid = this._query.content_type_uid;
         result.locale = this._query.locale;

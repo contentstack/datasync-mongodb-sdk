@@ -6,20 +6,17 @@ import { Stack } from './stack'
  * @api public
  */
 class Contentstack {
-	constructor(){
-	}
-
 	/**
 	 * @method Stack
 	 * @description Initialize an instance of ‘Stack’
 	 * @api public
 	 * @example
-	 *const Stack = Contentstack.Stack('api_key', 'delivery_token', 'environment')
-                OR
-	 *const Stack = Contentstack.Stack({
-	 *    'api_key':'stack_api_key',
-	 *    'access_token':'stack_delivery_token',
-	 *    'environment':'environment_name'
+	 * const Stack = Contentstack.Stack('api_key', 'delivery_token', 'environment')
+        OR
+	 * const Stack = Contentstack.Stack({
+	 *  api_key: 'api_key',
+	 *  access_token: 'delivery_token',
+	 *  environment: 'environment_name'
 	 * })
 	 *
 	 * @returns {Stack}

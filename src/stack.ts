@@ -100,10 +100,12 @@ export class Stack {
 
   public and(...queries) {
     if (this._query._query && typeof this._query._query === 'object') {
-      this._query._query = merge(this._query._query, {$and: queries})
+      this._query._query = merge(this._query._query, {
+        $and: queries
+      })
     } else {
-      this._query._query = { 
-        $and: queries 
+      this._query._query = {
+        $and: queries
       }
     }
 
@@ -112,10 +114,192 @@ export class Stack {
 
   public or(...queries) {
     if (this._query._query && typeof this._query._query === 'object') {
-      this._query._query = merge(this._query._query, {$or: queries})
+      this._query._query = merge(this._query._query, {
+        $or: queries
+      })
     } else {
-      this._query._query = { 
-        $or: queries 
+      this._query._query = {
+        $or: queries
+      }
+    }
+
+    return this
+  }
+
+  public lessThan(key, value) {
+    if (typeof key !== 'string' || typeof value === 'undefined') {
+      throw new Error('Kindly pass valid key and value parameters for \'.lessThan()\'')
+    } else if (this._query.query && typeof this._query.query === 'object') {
+      this._query.query[key] = {
+        $lt: value
+      }
+    } else {
+      this._query = {
+        query: {
+          [key]: {
+            $lt: value
+          }
+        }
+      }
+    }
+
+    return this
+  }
+
+  public lessThanOrEqualTo(key, value) {
+    if (typeof key !== 'string' || typeof value === 'undefined') {
+      throw new Error('Kindly pass valid key and value parameters for \'.lessThanOrEqualTo()\'')
+    } else if (this._query.query && typeof this._query.query === 'object') {
+      this._query.query[key] = {
+        $lte: value
+      }
+    } else {
+      this._query = {
+        query: {
+          [key]: {
+            $lte: value
+          }
+        }
+      }
+    }
+
+    return this
+  }
+
+  public greaterThan(key, value) {
+    if (typeof key !== 'string' || typeof value === 'undefined') {
+      throw new Error('Kindly pass valid key and value parameters for \'.greaterThan()\'')
+    } else if (this._query.query && typeof this._query.query === 'object') {
+      this._query.query[key] = {
+        $gt: value
+      }
+    } else {
+      this._query = {
+        query: {
+          [key]: {
+            $gt: value
+          }
+        }
+      }
+    }
+
+    return this
+  }
+
+  public greaterThanOrEqualTo(key, value) {
+    if (typeof key !== 'string' || typeof value === 'undefined') {
+      throw new Error('Kindly pass valid key and value parameters for \'.greaterThanOrEqualTo()\'')
+    } else if (this._query.query && typeof this._query.query === 'object') {
+      this._query.query[key] = {
+        $gte: value
+      }
+    } else {
+      this._query = {
+        query: {
+          [key]: {
+            $gte: value
+          }
+        }
+      }
+    }
+
+    return this
+  }
+
+  public notEqualTo(key, value) {
+    if (typeof key !== 'string' || typeof value === 'undefined') {
+      throw new Error('Kindly pass valid key and value parameters for \'.notEqualTo()\'')
+    } else if (this._query.query && typeof this._query.query === 'object') {
+      this._query.query[key] = {
+        $ne: value
+      }
+    } else {
+      this._query = {
+        query: {
+          [key]: {
+            $ne: value
+          }
+        }
+      }
+    }
+
+    return this
+  }
+
+  public containedIn(key, value) {
+    if (typeof key !== 'string' || typeof value !== 'object' || !(value instanceof Array)) {
+      throw new Error('Kindly pass valid key and value parameters for \'.containedIn()\'')
+    } else if (this._query.query && typeof this._query.query === 'object') {
+      this._query.query[key] = {
+        $in: value
+      }
+    } else {
+      this._query = {
+        query: {
+          [key]: {
+            $in: value
+          }
+        }
+      }
+    }
+
+    return this
+  }
+
+  public notContainedIn(key, value) {
+    if (typeof key !== 'string' || typeof value !== 'object' || !(value instanceof Array)) {
+      throw new Error('Kindly pass valid key and value parameters for \'.notContainedIn()\'')
+    } else if (this._query.query && typeof this._query.query === 'object') {
+      this._query.query[key] = {
+        $nin: value
+      }
+    } else {
+      this._query = {
+        query: {
+          [key]: {
+            $nin: value
+          }
+        }
+      }
+    }
+
+    return this
+  }
+
+  public exists(key) {
+    if (typeof key !== 'string') {
+      throw new Error('Kindly pass valid key for \'.exists()\'')
+    } else if (this._query.query && typeof this._query.query === 'object') {
+      this._query.query[key] = {
+        $exists: true
+      }
+    } else {
+      this._query = {
+        query: {
+          [key]: {
+            $exists: true
+          }
+        }
+      }
+    }
+
+    return this
+  }
+
+  public notExists(key) {
+    if (typeof key !== 'string') {
+      throw new Error('Kindly pass valid key for \'.notExists()\'')
+    } else if (this._query.query && typeof this._query.query === 'object') {
+      this._query.query[key] = {
+        $exists: false
+      }
+    } else {
+      this._query = {
+        query: {
+          [key]: {
+            $exists: false
+          }
+        }
       }
     }
 
@@ -132,7 +316,7 @@ export class Stack {
     throw new Error('Kindly pass the content type\'s uid')
   }
 
-  public entry(uid?) {
+  public entry(uid ? ) {
     if (!(this._query.content_type_uid)) {
       throw new Error('Kindly call \'contentType()\' before \'entry()\'!')
     }
@@ -153,7 +337,7 @@ export class Stack {
     throw new Error('Kindly call \'contentType()\' before \'entries()\'!')
   }
 
-  public asset(uid?) {
+  public asset(uid ? ) {
     if (uid && typeof uid === 'string') {
       this._query.content_type_uid = '_assets'
       this._query.uid = uid
@@ -321,7 +505,38 @@ export class Stack {
     return this
   }
 
-  private preProcess (query) {
+  public includeSchema() {
+    this.internal.includeSchema = true
+
+    return this
+  }
+
+  public schema(uid ? ) {
+    if (uid && typeof uid === 'string') {
+      this._query.content_type_uid = 'contentTypes'
+      this._query.uid = uid
+    }
+    this.collection = this.db.collection(this.config.collectionName)
+    this.collection = this.collection.limit(1)
+    this.internal.single = true
+
+    return this
+  }
+
+  public schemas() {
+    this._query.content_type_uid = 'contentTypes'
+    this.collection = this.db.collection(this.config.collectionName)
+
+    return this
+  }
+
+  public getQuery() {
+    return {
+      ...this._query      
+    }
+  }
+
+  private preProcess(query) {
     if (this._query.query && typeof this._query.query === 'object') {
       this._query.query = merge(this._query.query, query)
       this._query.query = {
@@ -350,46 +565,67 @@ export class Stack {
     if (!(this._query.locale)) {
       this._query.locale = this.config.locales[0].code
     }
+
+    if (this._query.content_type_uid === 'contentTypes') {
+      debug('Removing \'locale\' filter, since the query is on content types')
+      delete this._query.locale
+    }
+
+    if (this.includeSchema) {
+      this._query.query = {
+        $in: [
+          ...this._query.query,
+          {
+            uid: this._query.content_type_uid
+          }
+        ]
+      }
+    }
   }
 
   private postProcess(result) {
     result = map(result, 'data')
-    const count = (result === null) ? 0: result.length
-    switch (this._query.content_type_uid) {
-      case '_assets':
-        if (this.internal.limit === 1) {
-          result = {
-            asset: (result === null) ? result: result[0]
-          }
-        } else {
-          result = {
-            assets: result
-          }
-        }
+    const count = (result === null) ? 0 : result.length
+    let contentType
+    if (this.internal.includeSchema) {
+      contentType = remove(result, {uid: this._query.content_type_uid})
+    }
 
-        break
-      case 'contentTypes':
-        if (this.internal.limit === 1) {
-          result = {
-            content_type: (result === null) ? result: result[0]
-          }
-        } else {
-          result = {
-            content_types: result
-          }
+    switch (this._query.content_type_uid) {
+    case '_assets':
+      if (this.internal.limit === 1) {
+        result = {
+          asset: (result === null) ? result : result[0]
         }
-        break
-      default:
-        if (this.internal.limit === 1) {
-          result = {
-            entry: (result === null) ? result: result[0]
-          }
-        } else {
-          result = {
-            entries: result
-          }
+      } else {
+        result = {
+          assets: result
         }
-        break
+      }
+
+      break
+    case 'contentTypes':
+      if (this.internal.limit === 1) {
+        result = {
+          content_type: (result === null) ? result : result[0]
+        }
+      } else {
+        result = {
+          content_types: result
+        }
+      }
+      break
+    default:
+      if (this.internal.limit === 1) {
+        result = {
+          entry: (result === null) ? result : result[0]
+        }
+      } else {
+        result = {
+          entries: result
+        }
+      }
+      break
     }
 
     if (this.internal.includeCount) {
@@ -399,6 +635,11 @@ export class Stack {
     if (this._query.content_type_uid === '_assets') {
       this._query.content_type_uid = 'assets'
     }
+
+    if (this.internal.includeSchema) {
+      result.content_type = contentType
+    }
+
     result.content_type_uid = this._query.content_type_uid
     result.locale = this._query.locale
     this.cleanup()

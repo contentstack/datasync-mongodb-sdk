@@ -2,8 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const stack_1 = require("./stack");
 class Contentstack {
-    constructor() {
-    }
     Stack(...stack_arguments) {
         return new stack_1.Stack(...stack_arguments);
     }
