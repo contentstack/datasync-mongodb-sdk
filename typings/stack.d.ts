@@ -12,6 +12,15 @@ export declare class Stack {
     close(): void;
     and(...queries: any[]): this;
     or(...queries: any[]): this;
+    lessThan(key: any, value: any): this;
+    lessThanOrEqualTo(key: any, value: any): this;
+    greaterThan(key: any, value: any): this;
+    greaterThanOrEqualTo(key: any, value: any): this;
+    notEqualTo(key: any, value: any): this;
+    containedIn(key: any, value: any): this;
+    notContainedIn(key: any, value: any): this;
+    exists(key: any): this;
+    notExists(key: any): this;
     contentType(uid: any): this;
     entry(uid?: any): this;
     entries(): this;
@@ -27,6 +36,10 @@ export declare class Stack {
     where(...expr: any[]): this;
     count(): this;
     includeCount(): this;
+    includeSchema(): this;
+    schema(uid?: any): this;
+    schemas(): this;
+    getQuery(): any;
     private preProcess;
     private postProcess;
     private cleanup;
