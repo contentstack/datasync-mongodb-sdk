@@ -594,7 +594,7 @@ class Stack {
         return queryFilters;
     }
     cleanup() {
-        this.query = null;
+        this.collection = null;
         this.internal = {};
         this._query = {};
     }
