@@ -9,4 +9,3 @@ exports.validateURI = (uri) => {
     }
     return uri;
 };
-//# sourceMappingURL=util.js.map

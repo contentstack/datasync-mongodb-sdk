@@ -6,7 +6,7 @@ import { Stack } from './stack'
  * @api public
  */
 class Contentstack {
-	/**
+  /**
 	 * @method Stack
 	 * @description Initialize an instance of ‘Stack’
 	 * @api public
@@ -21,9 +21,9 @@ class Contentstack {
 	 *
 	 * @returns {Stack}
 	 */
-	Stack(...stack_arguments){
-		return new Stack(...stack_arguments)
-	}
+  public Stack(...stack_arguments) {
+    return new Stack(...stack_arguments)
+  }
 }
 
 module.exports = new Contentstack()

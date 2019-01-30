@@ -31,7 +31,15 @@ function find (contentType = 'authors') {
   return new Promise((resolve, reject) => {
     Stack.contentType(contentType)
       .entries()
-      .find()
+      .includeCount()
+      // .includeSchema()
+      .language('es-es')
+      // .limit(1)
+      // .skip(1)
+      // .query({
+      //   "data.uid": 'blt17559b99fee73d6f'
+      // })
+      .findOne()
       .then(resolve)
       .catch(reject)
   })
@@ -42,8 +50,25 @@ return connect()
     return find()
       .then((result) => {
         const keys = Object.keys(result)
-        console.log(keys)
-        console.log(result[keys[0]])
+        // Sample output
+        // {
+        //   entries: [
+        //     {
+        //       title: 'French author',
+        //       gender: null,
+        //       age: null,
+        //       summary: '',
+        //       tags: [
+                
+        //       ],
+        //       locale: 'es-es',
+        //       uid: 'blt17559b99fee73d6f'
+        //     }
+        //   ],
+        //   content_type_uid: 'authors',
+        //   locale: 'es-es'
+        // }
+        console.log(result)
       })
   })
   .then(close)

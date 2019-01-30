@@ -13,10 +13,13 @@ export declare const config: {
         userNewUrlParser: boolean;
     };
     projections: {
-        created_by: number;
-        updated_by: number;
-        created_at: number;
-        updated_at: number;
+        'data.created_by': number;
+        'data.updated_by': number;
+        'data.created_at': number;
+        'data.updated_at': number;
+        'data.publish_details': number;
+        'data._version': number;
+        '_id': number;
     };
     skip: number;
     uri: string;
