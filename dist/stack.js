@@ -417,8 +417,8 @@ class Stack {
             field = util_1.append(field);
             this._query.query = {
                 [field]: {
-                    $regex: pattern,
                     $options: options,
+                    $regex: pattern,
                 },
             };
         }
@@ -471,6 +471,10 @@ class Stack {
         this.internal.includeSchema = true;
         return this;
     }
+    includeReferences() {
+        this.internal.includeReferences = true;
+        return this;
+    }
     getQuery() {
         return Object.assign({}, this._query);
     }
@@ -485,8 +489,23 @@ class Stack {
                 .skip(this.internal.skip)
                 .toArray()
                 .then((result) => {
-                result = this.postProcess(result);
-                return resolve(result);
+                if (this.internal.includeReferences) {
+                    result = lodash_1.map(result, 'data');
+                    return this.includeReferencesI(result, this._query.locale, {}, undefined)
+                        .then(() => {
+                        result = this.postProcess(result);
+                        return resolve(result);
+                    })
+                        .catch((refError) => {
+                        this.cleanup();
+                        return reject(refError);
+                    });
+                }
+                else {
+                    result = lodash_1.map(result, 'data');
+                    result = this.postProcess(result);
+                    return resolve(result);
+                }
             })
                 .catch((error) => {
                 this.cleanup();
@@ -506,8 +525,23 @@ class Stack {
                 .skip(this.internal.skip)
                 .toArray()
                 .then((result) => {
-                result = this.postProcess(result);
-                return resolve(result);
+                if (this.internal.includeReferences) {
+                    result = lodash_1.map(result, 'data');
+                    return this.includeReferencesI(result, this._query.locale, {})
+                        .then(() => {
+                        result = this.postProcess(result);
+                        return resolve(result);
+                    })
+                        .catch((refError) => {
+                        this.cleanup();
+                        return reject(refError);
+                    });
+                }
+                else {
+                    result = lodash_1.map(result, 'data');
+                    result = this.postProcess(result);
+                    return resolve(result);
+                }
             })
                 .catch((error) => {
                 this.cleanup();
@@ -565,7 +599,6 @@ class Stack {
         this._query = {};
     }
     postProcess(result) {
-        result = lodash_1.map(result, 'data');
         let contentType;
         if (this.internal.includeSchema) {
             contentType = lodash_1.remove(result, { uid: this._query.content_type_uid });
@@ -622,6 +655,84 @@ class Stack {
         result.locale = this._query.locale;
         this.cleanup();
         return result;
+    }
+    includeReferencesI(entry, locale, references, parentUid) {
+        const self = this;
+        return new Promise((resolve, reject) => {
+            if (entry === null || typeof entry !== 'object') {
+                return resolve();
+            }
+            if (entry.uid) {
+                parentUid = entry.uid;
+            }
+            const referencesFound = [];
+            for (const prop in entry) {
+                if (entry[prop] !== null && typeof entry[prop] === 'object') {
+                    if (entry[prop] && entry[prop].reference_to) {
+                        if (entry[prop].values.length === 0) {
+                            entry[prop] = [];
+                        }
+                        else {
+                            let uids = entry[prop].values;
+                            if (typeof uids === 'string') {
+                                uids = [uids];
+                            }
+                            if (entry[prop].reference_to !== '_assets') {
+                                uids = lodash_1.filter(uids, (uid) => {
+                                    return !(util_1.checkCyclic(uid, references));
+                                });
+                            }
+                            if (uids.length) {
+                                const query = {
+                                    content_type_uid: entry[prop].reference_to,
+                                    locale,
+                                    uid: {
+                                        $in: uids,
+                                    },
+                                };
+                                referencesFound.push(new Promise((rs, rj) => {
+                                    return self.db.collection('contents')
+                                        .find(query)
+                                        .project(self.config.projections)
+                                        .toArray()
+                                        .then((result) => {
+                                        const entities = lodash_1.map(result, 'data');
+                                        if (entities.length === 0) {
+                                            entry[prop] = [];
+                                            return rs();
+                                        }
+                                        else if (parentUid) {
+                                            references[parentUid] = references[parentUid] || [];
+                                            references[parentUid] = lodash_1.uniq(references[parentUid].concat(lodash_1.map(entry[prop], 'uid')));
+                                        }
+                                        const referenceBucket = [];
+                                        query.uid.$in.forEach((entityUid) => {
+                                            const elem = lodash_1.find(entities, (entity) => {
+                                                return entity.uid === entityUid;
+                                            });
+                                            if (elem) {
+                                                referenceBucket.push(elem);
+                                            }
+                                        });
+                                        entry[prop] = entities;
+                                        return self.includeReferencesI(entry[prop], locale, references, parentUid)
+                                            .then(rs)
+                                            .catch(rj);
+                                    })
+                                        .catch(rj);
+                                }));
+                            }
+                        }
+                    }
+                    else {
+                        referencesFound.push(self.includeReferencesI(entry[prop], locale, references, parentUid));
+                    }
+                }
+            }
+            return Promise.all(referencesFound)
+                .then(resolve)
+                .catch(reject);
+        });
     }
 }
 exports.Stack = Stack;

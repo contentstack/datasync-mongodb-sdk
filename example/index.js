@@ -27,11 +27,12 @@ function close () {
   return Stack.close()
 }
 
-function find (contentType = 'authors') {
+function find (contentType = 'multiassets') {
   return new Promise((resolve, reject) => {
     Stack.contentType(contentType)
       .entries()
       .includeCount()
+      .includeReferences()
       // .includeSchema()
       .language('es-es')
       // .limit(1)
@@ -39,7 +40,7 @@ function find (contentType = 'authors') {
       // .query({
       //   "data.uid": 'blt17559b99fee73d6f'
       // })
-      .findOne()
+      .find()
       .then(resolve)
       .catch(reject)
   })
@@ -68,7 +69,7 @@ return connect()
         //   content_type_uid: 'authors',
         //   locale: 'es-es'
         // }
-        console.log(result)
+        console.log(JSON.stringify(result, null, 1))
       })
   })
   .then(close)

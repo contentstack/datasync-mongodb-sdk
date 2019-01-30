@@ -3,3 +3,6 @@ sample-query.js
 node_modules
 package-lock.json
 coverage
+includeReference-development.js
+includeReference-experimentation.js
+includeReference-new.js

@@ -1,8 +1,8 @@
 import Debug from 'debug'
-import { find, map, merge, remove } from 'lodash'
+import { filter, find, map, merge, remove, uniq } from 'lodash'
 import { Db, MongoClient } from 'mongodb'
 import { config } from './config'
-import { append, validateURI } from './util'
+import { append, checkCyclic, validateURI } from './util'
 
 const debug = Debug('stack')
 
@@ -484,8 +484,8 @@ export class Stack {
       field = append(field)
       this._query.query = {
         [field]: {
-          $regex: pattern,
           $options: options,
+          $regex: pattern,
         },
       }
     }
@@ -567,6 +567,12 @@ export class Stack {
     return this
   }
 
+  public includeReferences() {
+    this.internal.includeReferences = true
+
+    return this
+  }
+
   public getQuery() {
     return {
       ...this._query,
@@ -585,9 +591,26 @@ export class Stack {
         .skip(this.internal.skip)
         .toArray()
         .then((result) => {
-          result = this.postProcess(result)
+          if (this.internal.includeReferences) {
+            result = map(result, 'data')
 
-          return resolve(result)
+            return this.includeReferencesI(result, this._query.locale, {}, undefined)
+              .then(() => {
+                result = this.postProcess(result)
+
+                return resolve(result)
+              })
+              .catch((refError) => {
+                this.cleanup()
+
+                return reject(refError)
+              })
+          } else {
+            result = map(result, 'data')
+            result = this.postProcess(result)
+
+            return resolve(result)
+          }
         })
         .catch((error) => {
           this.cleanup()
@@ -610,9 +633,26 @@ export class Stack {
         .skip(this.internal.skip)
         .toArray()
         .then((result) => {
-          result = this.postProcess(result)
+          if (this.internal.includeReferences) {
+            result = map(result, 'data')
 
-          return resolve(result)
+            return this.includeReferencesI(result, this._query.locale, {})
+              .then(() => {
+                result = this.postProcess(result)
+
+                return resolve(result)
+              })
+              .catch((refError) => {
+                this.cleanup()
+
+                return reject(refError)
+              })
+          } else {
+            result = map(result, 'data')
+            result = this.postProcess(result)
+
+            return resolve(result)
+          }
         })
         .catch((error) => {
           this.cleanup()
@@ -684,7 +724,6 @@ export class Stack {
   }
 
   private postProcess(result) {
-    result = map(result, 'data')
     let contentType
     if (this.internal.includeSchema) {
       contentType = remove(result, {uid: this._query.content_type_uid})
@@ -744,5 +783,92 @@ export class Stack {
     this.cleanup()
 
     return result
+  }
+
+  private includeReferencesI(entry, locale, references, parentUid?) {
+    const self = this
+
+    return new Promise((resolve, reject) => {
+      if (entry === null || typeof entry !== 'object') {
+        return resolve()
+      }
+
+      // current entry becomes the parent
+      if (entry.uid) {
+        parentUid = entry.uid
+      }
+
+      const referencesFound = []
+
+      // iterate over each key in the object
+      for (const prop in entry) {
+        if (entry[prop] !== null && typeof entry[prop] === 'object') {
+          if (entry[prop] && entry[prop].reference_to) {
+            if (entry[prop].values.length === 0) {
+              entry[prop] = []
+            } else {
+              let uids = entry[prop].values
+              if (typeof uids === 'string') {
+                uids = [uids]
+              }
+              if (entry[prop].reference_to !== '_assets') {
+                uids = filter(uids, (uid) => {
+                  return !(checkCyclic(uid, references))
+                })
+              }
+              if (uids.length) {
+                const query = {
+                  content_type_uid: entry[prop].reference_to,
+                  locale,
+                  uid: {
+                    $in: uids,
+                  },
+                }
+
+                referencesFound.push(new Promise((rs, rj) => {
+                  return self.db.collection('contents')
+                    .find(query)
+                    .project(self.config.projections)
+                    .toArray()
+                    .then((result) => {
+                      const entities = map(result, 'data')
+                      if (entities.length === 0) {
+                        entry[prop] = []
+
+                        return rs()
+                      } else if (parentUid) {
+                        references[parentUid] = references[parentUid] || []
+                        references[parentUid] = uniq(references[parentUid].concat(map(entry[prop], 'uid')))
+                      }
+                      const referenceBucket = []
+                      query.uid.$in.forEach((entityUid) => {
+                        const elem = find(entities, (entity) => {
+                          return entity.uid === entityUid
+                        })
+                        if (elem) {
+                          referenceBucket.push(elem)
+                        }
+                      })
+                      // format the references in order
+                      entry[prop] = entities
+
+                      return self.includeReferencesI(entry[prop], locale, references, parentUid)
+                        .then(rs)
+                        .catch(rj)
+                    })
+                    .catch(rj)
+                }))
+              }
+            }
+          } else {
+            referencesFound.push(self.includeReferencesI(entry[prop], locale, references, parentUid))
+          }
+        }
+      }
+
+      return Promise.all(referencesFound)
+        .then(resolve)
+        .catch(reject)
+    })
   }
 }
