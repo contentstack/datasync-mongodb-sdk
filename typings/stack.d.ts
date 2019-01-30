@@ -5,11 +5,12 @@ export declare class Stack {
     private collection;
     private internal;
     private db;
-    constructor(...stack_arguments: any[]);
+    constructor(...stackInfo: any[]);
     ascending(field: any): this;
     descending(field: any): this;
     connect(overrides?: {}): Promise<{}>;
     close(): void;
+    language(code: any): this;
     and(...queries: any[]): this;
     or(...queries: any[]): this;
     lessThan(key: any, value: any): this;
@@ -26,6 +27,8 @@ export declare class Stack {
     entries(): this;
     asset(uid?: any): this;
     assets(): this;
+    schema(uid?: any): this;
+    schemas(): this;
     limit(no: any): this;
     skip(no: any): this;
     query(queryObject?: {}): this;
@@ -37,11 +40,10 @@ export declare class Stack {
     count(): this;
     includeCount(): this;
     includeSchema(): this;
-    schema(uid?: any): this;
-    schemas(): this;
     getQuery(): any;
-    private preProcess;
-    private postProcess;
-    private cleanup;
     find(query?: {}): Promise<{}>;
+    findOne(query?: {}): Promise<{}>;
+    private preProcess;
+    private cleanup;
+    private postProcess;
 }

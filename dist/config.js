@@ -15,12 +15,14 @@ exports.config = {
         userNewUrlParser: true,
     },
     projections: {
-        created_by: 0,
-        updated_by: 0,
-        created_at: 0,
-        updated_at: 0
+        'data.created_by': 0,
+        'data.updated_by': 0,
+        'data.created_at': 0,
+        'data.updated_at': 0,
+        'data.publish_details': 0,
+        'data._version': 0,
+        '_id': 0,
     },
     skip: 0,
-    uri: 'mongodb://localhost:27017'
+    uri: 'mongodb://localhost:27017',
 };
-//# sourceMappingURL=config.js.map

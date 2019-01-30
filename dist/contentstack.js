@@ -7,4 +7,3 @@ class Contentstack {
     }
 }
 module.exports = new Contentstack();
-//# sourceMappingURL=contentstack.js.map

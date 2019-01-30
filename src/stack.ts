@@ -1,6 +1,6 @@
 import Debug from 'debug'
-import { map, merge, remove } from 'lodash'
-import { MongoClient, Db } from 'mongodb'
+import { find, map, merge, remove } from 'lodash'
+import { Db, MongoClient } from 'mongodb'
 import { config } from './config'
 import { append, validateURI } from './util'
 
@@ -22,12 +22,10 @@ export class Stack {
   private internal: any
   private db: Db
 
-  constructor(...stack_arguments) {
-    this.config = merge(config, ...stack_arguments)
+  constructor(...stackInfo) {
+    this.config = merge(config, ...stackInfo)
     this._query = {}
     this.internal = {}
-    this.db
-    this.client
   }
 
   /**
@@ -36,14 +34,15 @@ export class Stack {
    * @info
    *  The sort function requires that the entire sort be able to complete within 32 megabytes.
    *  When the sort option consumes more than 32 megabytes, MongoDB will return an error.
-   * @param field 
+   * @param field
    */
   public ascending(field) {
     if (!(field) || typeof field !== 'string') {
       throw new Error('Kindly provide a valid field name for \'.ascending()\'')
     }
+    field = append(field)
     this.internal.sort = {
-      [field]: 1
+      [field]: 1,
     }
 
     return this
@@ -57,14 +56,15 @@ export class Stack {
    *  When the sort option consumes more than 32 megabytes, MongoDB will return an error.
    * @link
    *  https://docs.mongodb.com/manual/reference/operator/meta/orderby/
-   * @param field 
+   * @param field
    */
   public descending(field) {
     if (!(field) || typeof field !== 'string') {
       throw new Error('Kindly provide a valid field name for \'.descending()\'')
     }
+    field = append(field)
     this.internal.sort = {
-      [field]: -1
+      [field]: -1,
     }
 
     return this
@@ -98,14 +98,23 @@ export class Stack {
     this.client.close()
   }
 
+  public language(code) {
+    if (!(code) || typeof code !== 'string' || !(find(this.config.locales, {code}))) {
+      throw new Error(`Language queried is invalid ${code}`)
+    }
+    this._query.locale = code
+
+    return this
+  }
+
   public and(...queries) {
-    if (this._query._query && typeof this._query._query === 'object') {
-      this._query._query = merge(this._query._query, {
-        $and: queries
+    if (this._query.query && typeof this._query.query === 'object') {
+      this._query.query = merge(this._query.query, {
+        $and: queries,
       })
     } else {
-      this._query._query = {
-        $and: queries
+      this._query.query = {
+        $and: queries,
       }
     }
 
@@ -113,13 +122,13 @@ export class Stack {
   }
 
   public or(...queries) {
-    if (this._query._query && typeof this._query._query === 'object') {
-      this._query._query = merge(this._query._query, {
-        $or: queries
+    if (this._query.query && typeof this._query.query === 'object') {
+      this._query.query = merge(this._query.query, {
+        $or: queries,
       })
     } else {
-      this._query._query = {
-        $or: queries
+      this._query.query = {
+        $or: queries,
       }
     }
 
@@ -130,16 +139,18 @@ export class Stack {
     if (typeof key !== 'string' || typeof value === 'undefined') {
       throw new Error('Kindly pass valid key and value parameters for \'.lessThan()\'')
     } else if (this._query.query && typeof this._query.query === 'object') {
+      key = append(key)
       this._query.query[key] = {
-        $lt: value
+        $lt: value,
       }
     } else {
+      key = append(key)
       this._query = {
         query: {
           [key]: {
-            $lt: value
-          }
-        }
+            $lt: value,
+          },
+        },
       }
     }
 
@@ -150,16 +161,18 @@ export class Stack {
     if (typeof key !== 'string' || typeof value === 'undefined') {
       throw new Error('Kindly pass valid key and value parameters for \'.lessThanOrEqualTo()\'')
     } else if (this._query.query && typeof this._query.query === 'object') {
+      key = append(key)
       this._query.query[key] = {
-        $lte: value
+        $lte: value,
       }
     } else {
+      key = append(key)
       this._query = {
         query: {
           [key]: {
-            $lte: value
-          }
-        }
+            $lte: value,
+          },
+        },
       }
     }
 
@@ -170,16 +183,18 @@ export class Stack {
     if (typeof key !== 'string' || typeof value === 'undefined') {
       throw new Error('Kindly pass valid key and value parameters for \'.greaterThan()\'')
     } else if (this._query.query && typeof this._query.query === 'object') {
+      key = append(key)
       this._query.query[key] = {
-        $gt: value
+        $gt: value,
       }
     } else {
+      key = append(key)
       this._query = {
         query: {
           [key]: {
-            $gt: value
-          }
-        }
+            $gt: value,
+          },
+        },
       }
     }
 
@@ -190,16 +205,18 @@ export class Stack {
     if (typeof key !== 'string' || typeof value === 'undefined') {
       throw new Error('Kindly pass valid key and value parameters for \'.greaterThanOrEqualTo()\'')
     } else if (this._query.query && typeof this._query.query === 'object') {
+      key = append(key)
       this._query.query[key] = {
-        $gte: value
+        $gte: value,
       }
     } else {
+      key = append(key)
       this._query = {
         query: {
           [key]: {
-            $gte: value
-          }
-        }
+            $gte: value,
+          },
+        },
       }
     }
 
@@ -210,16 +227,18 @@ export class Stack {
     if (typeof key !== 'string' || typeof value === 'undefined') {
       throw new Error('Kindly pass valid key and value parameters for \'.notEqualTo()\'')
     } else if (this._query.query && typeof this._query.query === 'object') {
+      key = append(key)
       this._query.query[key] = {
-        $ne: value
+        $ne: value,
       }
     } else {
+      key = append(key)
       this._query = {
         query: {
           [key]: {
-            $ne: value
-          }
-        }
+            $ne: value,
+          },
+        },
       }
     }
 
@@ -230,16 +249,18 @@ export class Stack {
     if (typeof key !== 'string' || typeof value !== 'object' || !(value instanceof Array)) {
       throw new Error('Kindly pass valid key and value parameters for \'.containedIn()\'')
     } else if (this._query.query && typeof this._query.query === 'object') {
+      key = append(key)
       this._query.query[key] = {
-        $in: value
+        $in: value,
       }
     } else {
+      key = append(key)
       this._query = {
         query: {
           [key]: {
-            $in: value
-          }
-        }
+            $in: value,
+          },
+        },
       }
     }
 
@@ -250,16 +271,18 @@ export class Stack {
     if (typeof key !== 'string' || typeof value !== 'object' || !(value instanceof Array)) {
       throw new Error('Kindly pass valid key and value parameters for \'.notContainedIn()\'')
     } else if (this._query.query && typeof this._query.query === 'object') {
+      key = append(key)
       this._query.query[key] = {
-        $nin: value
+        $nin: value,
       }
     } else {
+      key = append(key)
       this._query = {
         query: {
           [key]: {
-            $nin: value
-          }
-        }
+            $nin: value,
+          },
+        },
       }
     }
 
@@ -270,16 +293,18 @@ export class Stack {
     if (typeof key !== 'string') {
       throw new Error('Kindly pass valid key for \'.exists()\'')
     } else if (this._query.query && typeof this._query.query === 'object') {
+      key = append(key)
       this._query.query[key] = {
-        $exists: true
+        $exists: true,
       }
     } else {
+      key = append(key)
       this._query = {
         query: {
           [key]: {
-            $exists: true
-          }
-        }
+            $exists: true,
+          },
+        },
       }
     }
 
@@ -290,16 +315,18 @@ export class Stack {
     if (typeof key !== 'string') {
       throw new Error('Kindly pass valid key for \'.notExists()\'')
     } else if (this._query.query && typeof this._query.query === 'object') {
+      key = append(key)
       this._query.query[key] = {
-        $exists: false
+        $exists: false,
       }
     } else {
+      key = append(key)
       this._query = {
         query: {
           [key]: {
-            $exists: false
-          }
-        }
+            $exists: false,
+          },
+        },
       }
     }
 
@@ -323,7 +350,8 @@ export class Stack {
     if (uid && typeof uid === 'string') {
       this._query.uid = uid
     }
-    this.collection = this.collection.limit(1)
+    // this.collection = this.collection.limit(1)
+    this.internal.limit = 1
     this.internal.single = true
 
     return this
@@ -343,7 +371,8 @@ export class Stack {
       this._query.uid = uid
     }
     this.collection = this.db.collection(this.config.collectionName)
-    this.collection = this.collection.limit(1)
+    // this.collection = this.collection.limit(1)
+    this.internal.limit = 1
     this.internal.single = true
 
     return this
@@ -351,6 +380,26 @@ export class Stack {
 
   public assets() {
     this._query.content_type_uid = '_assets'
+    this.collection = this.db.collection(this.config.collectionName)
+
+    return this
+  }
+
+  public schema(uid ? ) {
+    if (uid && typeof uid === 'string') {
+      this._query.content_type_uid = 'contentTypes'
+      this._query.uid = uid
+    }
+    this.collection = this.db.collection(this.config.collectionName)
+    // this.collection = this.collection.limit(1)
+    this.internal.limit = 1
+    this.internal.single = true
+
+    return this
+  }
+
+  public schemas() {
+    this._query.content_type_uid = 'contentTypes'
     this.collection = this.db.collection(this.config.collectionName)
 
     return this
@@ -391,7 +440,7 @@ export class Stack {
       throw new Error('Kindly provide valid \'field\' values for \'only()\'')
     }
     this.internal.projections = this.internal.projections || {}
-    fields.forEach(field => {
+    fields.forEach((field) => {
       if (typeof field === 'string') {
         field = append(field)
         this.internal.projections[field] = 1
@@ -408,7 +457,7 @@ export class Stack {
       throw new Error('Kindly provide valid \'field\' values for \'except()\'')
     }
     this.internal.projections = this.internal.projections || {}
-    fields.forEach(field => {
+    fields.forEach((field) => {
       if (typeof field === 'string') {
         field = append(field)
         this.internal.projections[field] = 0
@@ -424,18 +473,20 @@ export class Stack {
     if (!(field) || !(pattern) || typeof field !== 'string' || typeof pattern !== 'string') {
       throw new Error('Kindly provide a valid field and pattern value for \'.regex()\'')
     } else if (this._query.query && typeof this._query.query === 'object') {
+      field = append(field)
       this._query.query = merge(this._query.query, {
         [field]: {
+          $options: options,
           $regex: pattern,
-          $options: options
-        }
+        },
       })
     } else {
+      field = append(field)
       this._query.query = {
         [field]: {
           $regex: pattern,
-          $options: options
-        }
+          $options: options,
+        },
       }
     }
 
@@ -451,9 +502,16 @@ export class Stack {
       return typeof value !== 'string'
     })
 
-    this._query.data = this._query.data || {}
-    this._query.data.tags = {
-      $in: values
+    if (this._query.query && typeof this._query.query === 'object') {
+      this._query.query['data.tags'] = {
+        $in: values,
+      }
+    } else {
+      this._query.query = {
+        'data.tags': {
+          $in: values,
+        },
+      }
     }
 
     return this
@@ -463,31 +521,29 @@ export class Stack {
    * @summary
    *  Pass JS expression or a full function to the query system
    * @description
-   *  - Use the $where operator to pass either a string containing a JavaScript expression 
-   *    or a full JavaScript function to the query system. 
-   *  - The $where provides greater flexibility, but requires that the database processes 
-   *    the JavaScript expression or function for each document in the collection. 
+   *  - Use the $where operator to pass either a string containing a JavaScript expression
+   *    or a full JavaScript function to the query system.
+   *  - The $where provides greater flexibility, but requires that the database processes
+   *    the JavaScript expression or function for each document in the collection.
    *  - Reference the document in the JavaScript expression or function using either this or obj.
    * @note
-   *  - Only apply the $where query operator to top-level documents. 
-   *  - The $where query operator will not work inside a nested document, for instance, 
+   *  - Only apply the $where query operator to top-level documents.
+   *  - The $where query operator will not work inside a nested document, for instance,
    *    in an $elemMatch query.
    * @link
    *  https://docs.mongodb.com/manual/reference/operator/query/where/index.html
-   * @param field 
-   * @param value 
+   * @param field
+   * @param value
    */
   public where(...expr) {
     if (!(expr)) {
       throw new Error('Kindly provide a valid field and expr/fn value for \'.where()\'')
     } else if (this._query.query && typeof this._query.query === 'object') {
       this._query.query = merge(this._query.query, {
-        $where: expr
+        $where: expr,
       })
     } else {
-      this._query.query = {
-        $where: expr
-      }
+      this._query.query.$where = expr
     }
 
     return this
@@ -511,47 +567,73 @@ export class Stack {
     return this
   }
 
-  public schema(uid ? ) {
-    if (uid && typeof uid === 'string') {
-      this._query.content_type_uid = 'contentTypes'
-      this._query.uid = uid
-    }
-    this.collection = this.db.collection(this.config.collectionName)
-    this.collection = this.collection.limit(1)
-    this.internal.single = true
-
-    return this
-  }
-
-  public schemas() {
-    this._query.content_type_uid = 'contentTypes'
-    this.collection = this.db.collection(this.config.collectionName)
-
-    return this
-  }
-
   public getQuery() {
     return {
-      ...this._query      
+      ...this._query,
     }
+  }
+
+  public find(query = {}) {
+    return new Promise((resolve, reject) => {
+      const queryFilters = this.preProcess(query)
+      console.log('find() query: ' + JSON.stringify(queryFilters, null, 1))
+
+      return this.collection
+        .find(queryFilters)
+        .project(this.internal.projections)
+        .limit(this.internal.limit)
+        .skip(this.internal.skip)
+        .toArray()
+        .then((result) => {
+          result = this.postProcess(result)
+
+          return resolve(result)
+        })
+        .catch((error) => {
+          this.cleanup()
+
+          return reject(error)
+        })
+    })
+  }
+
+  public findOne(query = {}) {
+    return new Promise((resolve, reject) => {
+      this.internal.single = true
+      const queryFilters = this.preProcess(query)
+      console.log('findOne query: ' + JSON.stringify(queryFilters, null, 1))
+
+      return this.collection
+        .find(queryFilters)
+        .project(this.internal.projections)
+        .limit(this.internal.limit)
+        .skip(this.internal.skip)
+        .toArray()
+        .then((result) => {
+          result = this.postProcess(result)
+
+          return resolve(result)
+        })
+        .catch((error) => {
+          this.cleanup()
+
+          return reject(error)
+        })
+    })
   }
 
   private preProcess(query) {
+    let queryFilters
     if (this._query.query && typeof this._query.query === 'object') {
       this._query.query = merge(this._query.query, query)
-      this._query.query = {
-        data: this._query.query
-      }
     } else {
       this._query.query = {}
     }
 
     if (this.internal.projections) {
-      this.internal.projections._id = 0
+      this.internal.projections = merge(this.config.projections, this.internal.projections)
     } else {
-      this.internal.projections = {
-        '_id': 0
-      }
+      this.internal.projections = this.config.projections
     }
 
     if (!(this.internal.limit)) {
@@ -571,58 +653,75 @@ export class Stack {
       delete this._query.locale
     }
 
-    if (this.includeSchema) {
-      this._query.query = {
-        $in: [
-          ...this._query.query,
-          {
-            uid: this._query.content_type_uid
-          }
-        ]
-      }
+    const filters = {
+      content_type_uid: this._query.content_type_uid,
+      locale: this._query.locale,
+      ...this._query.query,
     }
+
+    if (this.internal.includeSchema) {
+      // since, content type will take up 1 item-space
+      this.internal.limit += 1
+      queryFilters = {
+        $or: [
+          filters,
+          {
+            uid: this._query.content_type_uid,
+          },
+        ],
+      }
+    } else {
+      queryFilters = filters
+    }
+
+    return queryFilters
+  }
+
+  private cleanup() {
+    this.query = null
+    this.internal = {}
+    this._query = {}
   }
 
   private postProcess(result) {
     result = map(result, 'data')
-    const count = (result === null) ? 0 : result.length
     let contentType
     if (this.internal.includeSchema) {
       contentType = remove(result, {uid: this._query.content_type_uid})
     }
-
+    const count = (result === null) ? 0 : result.length
     switch (this._query.content_type_uid) {
     case '_assets':
-      if (this.internal.limit === 1) {
+      if (this.internal.single) {
         result = {
-          asset: (result === null) ? result : result[0]
+          asset: (result === null) ? result : result[0],
         }
       } else {
         result = {
-          assets: result
+          assets: result,
         }
       }
 
       break
     case 'contentTypes':
-      if (this.internal.limit === 1) {
+      if (this.internal.single) {
         result = {
-          content_type: (result === null) ? result : result[0]
+          content_type: (result === null) ? result : result[0],
         }
       } else {
         result = {
-          content_types: result
+          content_types: result,
         }
       }
       break
     default:
-      if (this.internal.limit === 1) {
+      if (this.internal.single) {
         result = {
-          entry: (result === null) ? result : result[0]
+          entry: (result === null) ? result : result[0],
         }
       } else {
         result = {
-          entries: result
+          entries: result,
         }
       }
       break
@@ -645,38 +744,5 @@ export class Stack {
     this.cleanup()
 
     return result
-  }
-
-  private cleanup() {
-    this.query = null
-    this.internal = {}
-    this._query = {}
-  }
-
-  public find(query = {}) {
-    return new Promise((resolve, reject) => {
-      this.preProcess(query)
-      const filters = {
-        content_type_uid: this._query.content_type_uid,
-        locale: this._query.locale,
-        ...this._query.query
-      }
-
-      return this.collection
-        .find(filters, this.internal.projections)
-        .limit(this.internal.limit)
-        .skip(this.internal.skip)
-        .toArray()
-        .then((result) => {
-          result = this.postProcess(result)
-
-          return resolve(result)
-        })
-        .catch((error) => {
-          this.cleanup()
-
-          return reject(error)
-        })
-    })
   }
 }
