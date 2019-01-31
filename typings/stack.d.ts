@@ -1,5 +1,10 @@
+/*!
+ * Contentstack Sync Mongodb SDK
+ * Copyright (c) 2019 Contentstack LLC
+ * MIT Licensed
+ */
 export declare class Stack {
-    private _query;
+    private q;
     private config;
     private client;
     private collection;

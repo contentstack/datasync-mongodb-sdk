@@ -1,3 +1,8 @@
+/*!
+ * Contentstack Sync Mongodb SDK
+ * Copyright (c) 2019 Contentstack LLC
+ * MIT Licensed
+ */
 export declare const config: {
     collectionName: string;
     dbName: string;
@@ -13,13 +18,13 @@ export declare const config: {
         userNewUrlParser: boolean;
     };
     projections: {
-        'data.created_by': number;
-        'data.updated_by': number;
-        'data.created_at': number;
-        'data.updated_at': number;
-        'data.publish_details': number;
-        'data._version': number;
         '_id': number;
+        'data._version': number;
+        'data.created_at': number;
+        'data.created_by': number;
+        'data.publish_details': number;
+        'data.updated_at': number;
+        'data.updated_by': number;
     };
     skip: number;
     uri: string;

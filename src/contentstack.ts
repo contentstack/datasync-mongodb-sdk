@@ -1,3 +1,9 @@
+/*!
+ * Contentstack Sync Mongodb SDK
+ * Copyright (c) 2019 Contentstack LLC
+ * MIT Licensed
+ */
+
 import { Stack } from './stack'
 
 /**
@@ -6,23 +12,13 @@ import { Stack } from './stack'
  * @api public
  */
 class Contentstack {
-  /**
-	 * @method Stack
-	 * @description Initialize an instance of ‘Stack’
-	 * @api public
-	 * @example
-	 * const Stack = Contentstack.Stack('api_key', 'delivery_token', 'environment')
-        OR
-	 * const Stack = Contentstack.Stack({
-	 *  api_key: 'api_key',
-	 *  access_token: 'delivery_token',
-	 *  environment: 'environment_name'
-	 * })
-	 *
-	 * @returns {Stack}
+	/**
+	 * @summary
+	 * 	Initialize Stack instance
+	 * @param {Object} stack_arguments - Stack config
 	 */
-  public Stack(...stack_arguments) {
-    return new Stack(...stack_arguments)
+  public Stack(...args) {
+    return new Stack(...args)
   }
 }
 

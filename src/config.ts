@@ -1,3 +1,9 @@
+/*!
+ * Contentstack Sync Mongodb SDK
+ * Copyright (c) 2019 Contentstack LLC
+ * MIT Licensed
+ */
+
 export const config = {
   collectionName: 'contents',
   dbName: 'contentstack-persistent-db',
@@ -15,13 +21,13 @@ export const config = {
     userNewUrlParser: true,
   },
   projections: {
-    'data.created_by': 0,
-    'data.updated_by': 0,
-    'data.created_at': 0,
-    'data.updated_at': 0,
-    'data.publish_details': 0,
-    'data._version': 0,
     '_id': 0,
+    'data._version': 0,
+    'data.created_at': 0,
+    'data.created_by': 0,
+    'data.publish_details': 0,
+    'data.updated_at': 0,
+    'data.updated_by': 0,
   },
   skip: 0,
   uri: 'mongodb://localhost:27017',
