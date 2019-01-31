@@ -1,4 +1,9 @@
 "use strict";
+/*!
+ * Contentstack Sync Mongodb SDK
+ * Copyright (c) 2019 Contentstack LLC
+ * MIT Licensed
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = require("lodash");
 exports.append = (field) => {

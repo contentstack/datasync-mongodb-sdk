@@ -6,3 +6,4 @@ coverage
 includeReference-development.js
 includeReference-experimentation.js
 includeReference-new.js
+includeReference-fs-sdk.ts
