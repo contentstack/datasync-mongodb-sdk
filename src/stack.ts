@@ -187,11 +187,9 @@ export class Stack {
       }
     } else {
       key = append(key)
-      this.q = {
-        query: {
-          [key]: {
-            $lt: value,
-          },
+      this.q.query = {
+        [key]: {
+          $lt: value,
         },
       }
     }
@@ -216,11 +214,9 @@ export class Stack {
       }
     } else {
       key = append(key)
-      this.q = {
-        query: {
-          [key]: {
-            $lte: value,
-          },
+      this.q.query = {
+        [key]: {
+          $lte: value,
         },
       }
     }
@@ -245,11 +241,9 @@ export class Stack {
       }
     } else {
       key = append(key)
-      this.q = {
-        query: {
-          [key]: {
-            $gt: value,
-          },
+      this.q.query = {
+        [key]: {
+          $gt: value,
         },
       }
     }
@@ -274,11 +268,9 @@ export class Stack {
       }
     } else {
       key = append(key)
-      this.q = {
-        query: {
-          [key]: {
-            $gte: value,
-          },
+      this.q.query = {
+        [key]: {
+          $gte: value,
         },
       }
     }
@@ -303,11 +295,9 @@ export class Stack {
       }
     } else {
       key = append(key)
-      this.q = {
-        query: {
-          [key]: {
-            $ne: value,
-          },
+      this.q.query = {
+        [key]: {
+          $ne: value,
         },
       }
     }
@@ -332,11 +322,9 @@ export class Stack {
       }
     } else {
       key = append(key)
-      this.q = {
-        query: {
-          [key]: {
-            $in: value,
-          },
+      this.q.query = {
+        [key]: {
+          $in: value,
         },
       }
     }
@@ -361,11 +349,9 @@ export class Stack {
       }
     } else {
       key = append(key)
-      this.q = {
-        query: {
-          [key]: {
-            $nin: value,
-          },
+      this.q.query = {
+        [key]: {
+          $nin: value,
         },
       }
     }
@@ -390,11 +376,9 @@ export class Stack {
       }
     } else {
       key = append(key)
-      this.q = {
-        query: {
-          [key]: {
-            $exists: true,
-          },
+      this.q.query = {
+        [key]: {
+          $exists: true,
         },
       }
     }
@@ -419,11 +403,9 @@ export class Stack {
       }
     } else {
       key = append(key)
-      this.q = {
-        query: {
-          [key]: {
-            $exists: false,
-          },
+      this.q.query = {
+        [key]: {
+          $exists: false,
         },
       }
     }
@@ -966,6 +948,8 @@ export class Stack {
     let contentType
     if (this.internal.includeSchema) {
       contentType = remove(result, {uid: this.q.content_type_uid})
+      contentType = (typeof contentType === 'object' && contentType instanceof Array && contentType.length) ?
+        contentType[0] : null
     }
     const count = (result === null) ? 0 : result.length
     switch (this.q.content_type_uid) {
