@@ -1,8 +1,8 @@
 const Contentstack = require('../dist/contentstack')
 
 const Stack = Contentstack.Stack({
-  api_key: 'blt46203405576620e7',
-  access_token: 'blt468dc99e0a65476c',
+  api_key: '',
+  access_token: '',
   locales: [
     {
       code: 'en-us',
@@ -27,14 +27,15 @@ function close () {
   return Stack.close()
 }
 
-function find (contentType = 'multiassets') {
+function find (contentType = 'blog') {
   return new Promise((resolve, reject) => {
     Stack.contentType(contentType)
       .entries()
       .includeCount()
-      .includeReferences()
-      // .includeSchema()
+      // .includeReferences()
+      .includeSchema()
       .language('es-es')
+      .notEqualTo('title', 'Blog One')
       // .limit(1)
       // .skip(1)
       // .query({
