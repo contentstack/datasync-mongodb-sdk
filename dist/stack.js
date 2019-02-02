@@ -693,7 +693,7 @@ class Stack {
                                         }
                                         else if (parentUid) {
                                             references[parentUid] = references[parentUid] || [];
-                                            references[parentUid] = lodash_1.uniq(references[parentUid].concat(lodash_1.map(entry[prop], 'uid')));
+                                            references[parentUid] = lodash_1.uniq(references[parentUid].concat(lodash_1.map(entities, 'uid')));
                                         }
                                         const referenceBucket = [];
                                         query.uid.$in.forEach((entityUid) => {

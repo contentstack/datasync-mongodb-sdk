@@ -1,9 +1,9 @@
-TODO
-sample-query.js
+# Module dependencies
 node_modules
 package-lock.json
+
+# Test coverages
 coverage
-includeReference-development.js
-includeReference-experimentation.js
-includeReference-new.js
-includeReference-fs-sdk.ts
+
+# Dev files
+includeReferences.js

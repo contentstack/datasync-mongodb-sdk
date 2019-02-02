@@ -1070,7 +1070,7 @@ export class Stack {
                         return rs()
                       } else if (parentUid) {
                         references[parentUid] = references[parentUid] || []
-                        references[parentUid] = uniq(references[parentUid].concat(map(entry[prop], 'uid')))
+                        references[parentUid] = uniq(references[parentUid].concat(map(entities, 'uid')))
                       }
                       const referenceBucket = []
                       query.uid.$in.forEach((entityUid) => {
