@@ -17,8 +17,8 @@ class Contentstack {
 	 * 	Initialize Stack instance
 	 * @param {Object} stack_arguments - Stack config
 	 */
-  public Stack(...args) {
-    return new Stack(...args)
+  public Stack(config, db) {
+    return new Stack(config, db)
   }
 }
 
