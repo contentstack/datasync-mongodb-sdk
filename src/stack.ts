@@ -8,7 +8,7 @@ import Debug from 'debug'
 import { filter, find, map, merge, remove, uniq } from 'lodash'
 import { Db, MongoClient } from 'mongodb'
 import { config } from './config'
-import { append, checkCyclic, validateURI } from './util'
+import { checkCyclic, validateURI } from './util'
 
 const debug = Debug('stack')
 
@@ -47,10 +47,16 @@ export class Stack {
   public ascending(field) {
     if (!(field) || typeof field !== 'string') {
       throw new Error('Kindly provide a valid field name for \'.ascending()\'')
+    } else if (typeof this.q.content_type_uid !== 'string') {
+      throw new Error('Kindly call \'.contentType()\' before \.ascending()\'')
     }
-    field = append(field)
-    this.internal.sort = {
-      [field]: 1,
+
+    if (this.internal.sort && typeof this.internal.sort === 'object') {
+      this.internal.sort[field] = 1
+    } else {
+      this.internal.sort = {
+        [field]: 1,
+      }
     }
 
     return this
@@ -69,10 +75,16 @@ export class Stack {
   public descending(field) {
     if (!(field) || typeof field !== 'string') {
       throw new Error('Kindly provide a valid field name for \'.descending()\'')
+    } else if (typeof this.q.content_type_uid !== 'string') {
+      throw new Error('Kindly call \'.contentType()\' before \.descending()\'')
     }
-    field = append(field)
-    this.internal.sort = {
-      [field]: -1,
+
+    if (this.internal.sort && typeof this.internal.sort === 'object') {
+      this.internal.sort[field] = -1
+    } else {
+      this.internal.sort = {
+        [field]: -1,
+      }
     }
 
     return this
@@ -182,12 +194,10 @@ export class Stack {
     if (typeof key !== 'string' || typeof value === 'undefined') {
       throw new Error('Kindly pass valid key and value parameters for \'.lessThan()\'')
     } else if (this.q.query && typeof this.q.query === 'object') {
-      key = append(key)
       this.q.query[key] = {
         $lt: value,
       }
     } else {
-      key = append(key)
       this.q.query = {
         [key]: {
           $lt: value,
@@ -209,12 +219,10 @@ export class Stack {
     if (typeof key !== 'string' || typeof value === 'undefined') {
       throw new Error('Kindly pass valid key and value parameters for \'.lessThanOrEqualTo()\'')
     } else if (this.q.query && typeof this.q.query === 'object') {
-      key = append(key)
       this.q.query[key] = {
         $lte: value,
       }
     } else {
-      key = append(key)
       this.q.query = {
         [key]: {
           $lte: value,
@@ -236,12 +244,10 @@ export class Stack {
     if (typeof key !== 'string' || typeof value === 'undefined') {
       throw new Error('Kindly pass valid key and value parameters for \'.greaterThan()\'')
     } else if (this.q.query && typeof this.q.query === 'object') {
-      key = append(key)
       this.q.query[key] = {
         $gt: value,
       }
     } else {
-      key = append(key)
       this.q.query = {
         [key]: {
           $gt: value,
@@ -263,12 +269,10 @@ export class Stack {
     if (typeof key !== 'string' || typeof value === 'undefined') {
       throw new Error('Kindly pass valid key and value parameters for \'.greaterThanOrEqualTo()\'')
     } else if (this.q.query && typeof this.q.query === 'object') {
-      key = append(key)
       this.q.query[key] = {
         $gte: value,
       }
     } else {
-      key = append(key)
       this.q.query = {
         [key]: {
           $gte: value,
@@ -290,12 +294,10 @@ export class Stack {
     if (typeof key !== 'string' || typeof value === 'undefined') {
       throw new Error('Kindly pass valid key and value parameters for \'.notEqualTo()\'')
     } else if (this.q.query && typeof this.q.query === 'object') {
-      key = append(key)
       this.q.query[key] = {
         $ne: value,
       }
     } else {
-      key = append(key)
       this.q.query = {
         [key]: {
           $ne: value,
@@ -317,12 +319,10 @@ export class Stack {
     if (typeof key !== 'string' || typeof value !== 'object' || !(value instanceof Array)) {
       throw new Error('Kindly pass valid key and value parameters for \'.containedIn()\'')
     } else if (this.q.query && typeof this.q.query === 'object') {
-      key = append(key)
       this.q.query[key] = {
         $in: value,
       }
     } else {
-      key = append(key)
       this.q.query = {
         [key]: {
           $in: value,
@@ -344,12 +344,10 @@ export class Stack {
     if (typeof key !== 'string' || typeof value !== 'object' || !(value instanceof Array)) {
       throw new Error('Kindly pass valid key and value parameters for \'.notContainedIn()\'')
     } else if (this.q.query && typeof this.q.query === 'object') {
-      key = append(key)
       this.q.query[key] = {
         $nin: value,
       }
     } else {
-      key = append(key)
       this.q.query = {
         [key]: {
           $nin: value,
@@ -371,12 +369,10 @@ export class Stack {
     if (typeof key !== 'string') {
       throw new Error('Kindly pass valid key for \'.exists()\'')
     } else if (this.q.query && typeof this.q.query === 'object') {
-      key = append(key)
       this.q.query[key] = {
         $exists: true,
       }
     } else {
-      key = append(key)
       this.q.query = {
         [key]: {
           $exists: true,
@@ -398,12 +394,10 @@ export class Stack {
     if (typeof key !== 'string') {
       throw new Error('Kindly pass valid key for \'.notExists()\'')
     } else if (this.q.query && typeof this.q.query === 'object') {
-      key = append(key)
       this.q.query[key] = {
         $exists: false,
       }
     } else {
-      key = append(key)
       this.q.query = {
         [key]: {
           $exists: false,
@@ -447,7 +441,6 @@ export class Stack {
     if (uid && typeof uid === 'string') {
       this.q.uid = uid
     }
-    // this.collection = this.collection.limit(1)
     this.internal.limit = 1
     this.internal.single = true
 
@@ -513,7 +506,6 @@ export class Stack {
       this.q.uid = uid
     }
     this.collection = this.db.collection(this.config.collectionName)
-    // this.collection = this.collection.limit(1)
     this.internal.limit = 1
     this.internal.single = true
 
@@ -541,7 +533,6 @@ export class Stack {
    */
   public limit(no) {
     if (typeof no === 'number' && (no >= 0) && typeof this.q.content_type_uid === 'string') {
-      // this.collection = this.collection.limit(no)
       this.internal.limit = no
 
       return this
@@ -558,7 +549,6 @@ export class Stack {
    */
   public skip(no) {
     if (typeof no === 'number' && (no >= 0) && typeof this.q.content_type_uid === 'string') {
-      // this.collection = this.collection.skip(no)
       this.internal.skip = no
 
       return this
@@ -595,10 +585,7 @@ export class Stack {
     this.internal.projections = this.internal.projections || {}
     fields.forEach((field) => {
       if (typeof field === 'string') {
-        field = append(field)
         this.internal.projections[field] = 1
-      } else {
-        debug(`.only(): ${field} is not of type string!`)
       }
     })
 
@@ -618,10 +605,7 @@ export class Stack {
     this.internal.projections = this.internal.projections || {}
     fields.forEach((field) => {
       if (typeof field === 'string') {
-        field = append(field)
         this.internal.projections[field] = 0
-      } else {
-        debug(`.except(): ${field} is not of type string!`)
       }
     })
 
@@ -640,7 +624,6 @@ export class Stack {
     if (!(field) || !(pattern) || typeof field !== 'string' || typeof pattern !== 'string') {
       throw new Error('Kindly provide a valid field and pattern value for \'.regex()\'')
     } else if (this.q.query && typeof this.q.query === 'object') {
-      field = append(field)
       this.q.query = merge(this.q.query, {
         [field]: {
           $options: options,
@@ -648,7 +631,6 @@ export class Stack {
         },
       })
     } else {
-      field = append(field)
       this.q.query = {
         [field]: {
           $options: options,
@@ -676,12 +658,12 @@ export class Stack {
     })
 
     if (this.q.query && typeof this.q.query === 'object') {
-      this.q.query['data.tags'] = {
+      this.q.query.tags = {
         $in: values,
       }
     } else {
       this.q.query = {
-        'data.tags': {
+        tags: {
           $in: values,
         },
       }
@@ -784,6 +766,12 @@ export class Stack {
     return new Promise((resolve, reject) => {
       const queryFilters = this.preProcess(query)
       console.log('Query formed: ' + JSON.stringify(queryFilters, null, 1))
+      // process it in a different manner
+      if (this.internal.includeReferences) {
+        return this.findWithReferences(queryFilters)
+          .then(resolve)
+          .catch(reject)
+      }
 
       return this.collection
         .find(queryFilters)
@@ -793,7 +781,6 @@ export class Stack {
         .toArray()
         .then((result) => {
           if (this.internal.includeReferences) {
-            result = map(result, 'data')
 
             return this.includeReferencesI(result, this.q.locale, {}, undefined)
               .then(() => {
@@ -807,7 +794,6 @@ export class Stack {
                 return reject(refError)
               })
           } else {
-            result = map(result, 'data')
             result = this.postProcess(result)
 
             return resolve(result)
@@ -843,7 +829,6 @@ export class Stack {
         .toArray()
         .then((result) => {
           if (this.internal.includeReferences) {
-            result = map(result, 'data')
 
             return this.includeReferencesI(result, this.q.locale, {})
               .then(() => {
@@ -857,7 +842,6 @@ export class Stack {
                 return reject(refError)
               })
           } else {
-            result = map(result, 'data')
             result = this.postProcess(result)
 
             return resolve(result)
@@ -871,6 +855,42 @@ export class Stack {
     })
   }
 
+  public findWithReferences(query) {
+    return new Promise((resolve, reject) => {
+      const queryFilter: any = {
+        content_type_uid: this.q.content_type_uid,
+        locale: this.q.locale,
+      }
+      if (query.uid && typeof query.uid === 'string') {
+        queryFilter.uid = query.uid
+      }
+
+      return this.collection
+        .find(queryFilter)
+        .project(this.internal.projections)
+        // .limit(this.internal.limit)
+        // .skip(this.internal.skip)
+        .toArray()
+        .then((result) => {
+          return this.includeReferencesI(result, this.q.locale, {}, undefined)
+            .then(() => {
+              result = this.postProcess(result)
+
+              return resolve(result)
+            })
+            .catch((refError) => {
+              this.cleanup()
+
+              return reject(refError)
+            })
+        })
+        .catch((error) => {
+          this.cleanup()
+
+          return reject(error)
+        })
+    })
+  }
   /**
    * @summary
    *  Internal method, that executes and formats the queries built/passed
@@ -927,6 +947,10 @@ export class Stack {
       }
     } else {
       queryFilters = filters
+    }
+
+    if (this.internal.sort) {
+      this.collection = this.collection.sort(this.internal.sort)
     }
 
     return queryFilters
@@ -1067,26 +1091,25 @@ export class Stack {
                     .project(self.config.projections)
                     .toArray()
                     .then((result) => {
-                      const entities = map(result, 'data')
-                      if (entities.length === 0) {
+                      if (result.length === 0) {
                         entry[prop] = []
 
                         return rs()
                       } else if (parentUid) {
                         references[parentUid] = references[parentUid] || []
-                        references[parentUid] = uniq(references[parentUid].concat(map(entities, 'uid')))
+                        references[parentUid] = uniq(references[parentUid].concat(map(result, 'uid')))
                       }
+                      // format the references in order
                       const referenceBucket = []
                       query.uid.$in.forEach((entityUid) => {
-                        const elem = find(entities, (entity) => {
+                        const elem = find(result, (entity) => {
                           return entity.uid === entityUid
                         })
                         if (elem) {
                           referenceBucket.push(elem)
                         }
                       })
-                      // format the references in order
-                      entry[prop] = entities
+                      entry[prop] = referenceBucket
 
                       return self.includeReferencesI(entry[prop], locale, references, parentUid)
                         .then(rs)
