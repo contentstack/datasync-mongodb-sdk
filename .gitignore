@@ -7,3 +7,5 @@ coverage
 
 # Dev files
 includeReferences.js
+example/parallel-testing.js
+example/parallel-testing-2.js

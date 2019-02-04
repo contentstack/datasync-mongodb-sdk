@@ -10,7 +10,7 @@ export declare class Stack {
     private collection;
     private internal;
     private db;
-    constructor(...stackInfo: any[]);
+    constructor(stackConfig: any, existingDB?: any);
     ascending(field: any): this;
     descending(field: any): this;
     connect(overrides?: {}): Promise<{}>;
@@ -27,11 +27,11 @@ export declare class Stack {
     notContainedIn(key: any, value: any): this;
     exists(key: any): this;
     notExists(key: any): this;
-    contentType(uid: any): this;
+    contentType(uid: any): Stack;
     entry(uid?: any): this;
     entries(): this;
-    asset(uid?: any): this;
-    assets(): this;
+    asset(uid?: any): Stack;
+    assets(): Stack;
     schema(uid?: any): this;
     schemas(): this;
     limit(no: any): this;
