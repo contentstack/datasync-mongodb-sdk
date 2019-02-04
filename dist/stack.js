@@ -15,11 +15,12 @@ const config_1 = require("./config");
 const util_1 = require("./util");
 const debug = debug_1.default('stack');
 class Stack {
-    constructor(...stackInfo) {
-        this.config = lodash_1.merge(config_1.config, ...stackInfo);
+    constructor(stackConfig, existingDB) {
+        this.config = lodash_1.merge(config_1.config, stackConfig);
         this.q = {};
         this.q = {};
         this.internal = {};
+        this.db = existingDB;
     }
     ascending(field) {
         if (!(field) || typeof field !== 'string') {
@@ -279,10 +280,11 @@ class Stack {
         return this;
     }
     contentType(uid) {
+        const stack = new Stack(this.config, this.db);
         if (uid && typeof uid === 'string') {
-            this.q.content_type_uid = uid;
-            this.collection = this.db.collection(this.config.collectionName);
-            return this;
+            stack.q.content_type_uid = uid;
+            stack.collection = stack.db.collection(stack.config.collectionName);
+            return stack;
         }
         throw new Error('Kindly pass the content type\'s uid');
     }
@@ -304,19 +306,21 @@ class Stack {
         throw new Error('Kindly call \'contentType()\' before \'entries()\'!');
     }
     asset(uid) {
+        const stack = new Stack(this.config, this.db);
         if (uid && typeof uid === 'string') {
-            this.q.content_type_uid = '_assets';
-            this.q.uid = uid;
+            stack.q.content_type_uid = '_assets';
+            stack.q.uid = uid;
         }
-        this.collection = this.db.collection(this.config.collectionName);
-        this.internal.limit = 1;
-        this.internal.single = true;
-        return this;
+        stack.collection = stack.db.collection(stack.config.collectionName);
+        stack.internal.limit = 1;
+        stack.internal.single = true;
+        return stack;
     }
     assets() {
-        this.q.content_type_uid = '_assets';
-        this.collection = this.db.collection(this.config.collectionName);
-        return this;
+        const stack = new Stack(this.config, this.db);
+        stack.q.content_type_uid = '_assets';
+        stack.collection = stack.db.collection(stack.config.collectionName);
+        return stack;
     }
     schema(uid) {
         if (uid && typeof uid === 'string') {
@@ -469,7 +473,7 @@ class Stack {
     find(query = {}) {
         return new Promise((resolve, reject) => {
             const queryFilters = this.preProcess(query);
-            console.log('find() query: ' + JSON.stringify(queryFilters, null, 1));
+            console.log('Query formed: ' + JSON.stringify(queryFilters, null, 1));
             return this.collection
                 .find(queryFilters)
                 .project(this.internal.projections)
@@ -505,7 +509,7 @@ class Stack {
         return new Promise((resolve, reject) => {
             this.internal.single = true;
             const queryFilters = this.preProcess(query);
-            console.log('findOne query: ' + JSON.stringify(queryFilters, null, 1));
+            console.log('Query formed: ' + JSON.stringify(queryFilters, null, 1));
             return this.collection
                 .find(queryFilters)
                 .project(this.internal.projections)

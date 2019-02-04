@@ -28,11 +28,12 @@ export class Stack {
   private internal: any
   private db: Db
 
-  constructor(...stackInfo) {
-    this.config = merge(config, ...stackInfo)
+  constructor(stackConfig, existingDB?) {
+    this.config = merge(config, stackConfig)
     this.q = {}
     this.q = {}
     this.internal = {}
+    this.db = existingDB
   }
 
   /**
@@ -420,11 +421,13 @@ export class Stack {
    * @returns {this} - Returns `stack's` instance
    */
   public contentType(uid) {
+    // create new instances, instead of re-using the old one
+    const stack = new Stack(this.config, this.db)
     if (uid && typeof uid === 'string') {
-      this.q.content_type_uid = uid
-      this.collection = this.db.collection(this.config.collectionName)
+      stack.q.content_type_uid = uid
+      stack.collection = stack.db.collection(stack.config.collectionName)
 
-      return this
+      return stack
     }
     throw new Error('Kindly pass the content type\'s uid')
   }
@@ -472,16 +475,16 @@ export class Stack {
    * @returns {this} - Returns `stack's` instance
    */
   public asset(uid ? ) {
+    const stack = new Stack(this.config, this.db)
     if (uid && typeof uid === 'string') {
-      this.q.content_type_uid = '_assets'
-      this.q.uid = uid
+      stack.q.content_type_uid = '_assets'
+      stack.q.uid = uid
     }
-    this.collection = this.db.collection(this.config.collectionName)
-    // this.collection = this.collection.limit(1)
-    this.internal.limit = 1
-    this.internal.single = true
+    stack.collection = stack.db.collection(stack.config.collectionName)
+    stack.internal.limit = 1
+    stack.internal.single = true
 
-    return this
+    return stack
   }
 
   /**
@@ -490,10 +493,11 @@ export class Stack {
    * @returns {this} - Returns `stack's` instance
    */
   public assets() {
-    this.q.content_type_uid = '_assets'
-    this.collection = this.db.collection(this.config.collectionName)
+    const stack = new Stack(this.config, this.db)
+    stack.q.content_type_uid = '_assets'
+    stack.collection = stack.db.collection(stack.config.collectionName)
 
-    return this
+    return stack
   }
 
   /**
@@ -779,7 +783,7 @@ export class Stack {
   public find(query = {}) {
     return new Promise((resolve, reject) => {
       const queryFilters = this.preProcess(query)
-      console.log('find() query: ' + JSON.stringify(queryFilters, null, 1))
+      console.log('Query formed: ' + JSON.stringify(queryFilters, null, 1))
 
       return this.collection
         .find(queryFilters)
@@ -829,7 +833,7 @@ export class Stack {
     return new Promise((resolve, reject) => {
       this.internal.single = true
       const queryFilters = this.preProcess(query)
-      console.log('findOne query: ' + JSON.stringify(queryFilters, null, 1))
+      console.log('Query formed: ' + JSON.stringify(queryFilters, null, 1))
 
       return this.collection
         .find(queryFilters)
