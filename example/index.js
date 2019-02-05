@@ -32,11 +32,12 @@ function find (contentType = 'blog') {
     Stack.contentType(contentType)
       .entries()
       .includeCount()
-      // .includeReferences()
-      .includeSchema()
+      .includeReferences()
+      // .includeSchema()
       .language('es-es')
-      .notEqualTo('title', 'Blog One')
-      // .limit(1)
+      // .notEqualTo('title', 'Blog One')
+      // .query({"title": "Blog Two"})
+      .limit(1)
       // .skip(1)
       // .query({
       //   "data.uid": 'blt17559b99fee73d6f'

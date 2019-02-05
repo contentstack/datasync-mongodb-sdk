@@ -98,7 +98,7 @@ module.exports = {
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
   testPathIgnorePatterns: [
-    '/test/dummy/*',
+    '/test/data/*',
   ],
   // The glob patterns Jest uses to detect test files
   testMatch: [
