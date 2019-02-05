@@ -3,4 +3,7 @@
  * Copyright (c) 2019 Contentstack LLC
  * MIT Licensed
  */
-export {};
+import { Stack } from './stack';
+export declare class Contentstack {
+    static Stack(config?: any, db?: any): Stack;
+}

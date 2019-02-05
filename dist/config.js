@@ -22,6 +22,7 @@ exports.config = {
     projections: {
         _id: 0,
         _version: 0,
+        content_type_uid: 0,
         created_at: 0,
         sys_keys: 0,
         updated_at: 0,
