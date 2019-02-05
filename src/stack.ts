@@ -7,6 +7,7 @@
 import Debug from 'debug'
 import { filter, find, map, merge, remove, uniq } from 'lodash'
 import { Db, MongoClient } from 'mongodb'
+import sift from 'sift'
 import { config } from './config'
 import { checkCyclic, validateURI } from './util'
 
@@ -745,6 +746,34 @@ export class Stack {
 
   /**
    * @summary
+   *  Excludes all references of the entries being scanned
+   * @returns {this} - Returns `stack's` instance
+   */
+  public excludeReferences() {
+    this.internal.excludeReferences = true
+
+    return this
+  }
+
+  /**
+   * @summary
+   *  Wrapper, that allows querying on the entry's references.
+   * @note
+   *  This is a slow method, since it scans all documents and fires the `reference` query on them
+   *  Use `.query()` filters to reduce the total no of documents being scanned
+   * @returns {this} - Returns `stack's` instance
+   */
+  public queryReferences(query) {
+    if (query && typeof query === 'object') {
+      this.internal.queryReferences = query
+      return this
+    }
+    
+    throw new Error('Kindly pass a query object for \'.queryReferences()\'')
+  }
+
+  /**
+   * @summary
    *  Returns the query build thusfar
    * @returns {this} - Returns `stack's` instance
    */
@@ -767,8 +796,8 @@ export class Stack {
       const queryFilters = this.preProcess(query)
       console.log('Query formed: ' + JSON.stringify(queryFilters, null, 1))
       // process it in a different manner
-      if (this.internal.includeReferences) {
-        return this.findWithReferences(queryFilters)
+      if (this.internal.queryReferences) {
+        return this.queryOnReferences(queryFilters)
           .then(resolve)
           .catch(reject)
       }
@@ -780,8 +809,11 @@ export class Stack {
         .skip(this.internal.skip)
         .toArray()
         .then((result) => {
-          if (this.internal.includeReferences) {
+          if (this.internal.excludeReferences) {
+            result = this.postProcess(result)
 
+            return resolve(result)
+          } else {
             return this.includeReferencesI(result, this.q.locale, {}, undefined)
               .then(() => {
                 result = this.postProcess(result)
@@ -793,10 +825,6 @@ export class Stack {
 
                 return reject(refError)
               })
-          } else {
-            result = this.postProcess(result)
-
-            return resolve(result)
           }
         })
         .catch((error) => {
@@ -820,6 +848,12 @@ export class Stack {
       this.internal.single = true
       const queryFilters = this.preProcess(query)
       console.log('Query formed: ' + JSON.stringify(queryFilters, null, 1))
+      // process it in a different manner
+      if (this.internal.queryReferences) {
+        return this.queryOnReferences(queryFilters)
+          .then(resolve)
+          .catch(reject)
+      }
 
       return this.collection
         .find(queryFilters)
@@ -829,7 +863,10 @@ export class Stack {
         .toArray()
         .then((result) => {
           if (this.internal.includeReferences) {
+            result = this.postProcess(result)
 
+            return resolve(result)
+          } else {
             return this.includeReferencesI(result, this.q.locale, {})
               .then(() => {
                 result = this.postProcess(result)
@@ -841,10 +878,6 @@ export class Stack {
 
                 return reject(refError)
               })
-          } else {
-            result = this.postProcess(result)
-
-            return resolve(result)
           }
         })
         .catch((error) => {
@@ -855,18 +888,10 @@ export class Stack {
     })
   }
 
-  public findWithReferences(query) {
+  public queryOnReferences(query) {
     return new Promise((resolve, reject) => {
-      const queryFilter: any = {
-        content_type_uid: this.q.content_type_uid,
-        locale: this.q.locale,
-      }
-      if (query.uid && typeof query.uid === 'string') {
-        queryFilter.uid = query.uid
-      }
-
       return this.collection
-        .find(queryFilter)
+        .find(query)
         .project(this.internal.projections)
         // .limit(this.internal.limit)
         // .skip(this.internal.skip)
@@ -874,6 +899,14 @@ export class Stack {
         .then((result) => {
           return this.includeReferencesI(result, this.q.locale, {}, undefined)
             .then(() => {
+              result = sift(this.internal.queryReferences, result)
+
+              if (this.internal.skip) {
+                result = result.splice(this.internal.skip, this.internal.limit)
+              } else if (this.internal.limit) {
+                result = result.splice(0, this.internal.limit)
+              }
+
               result = this.postProcess(result)
 
               return resolve(result)
