@@ -24,6 +24,7 @@ export const config = {
     _id: 0,
     _version: 0,
     created_at: 0,
+    sys_keys: 0,
     updated_at: 0,
     updated_by: 0,
   },

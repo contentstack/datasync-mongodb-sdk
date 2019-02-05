@@ -46,9 +46,12 @@ export declare class Stack {
     includeCount(): this;
     includeSchema(): this;
     includeReferences(): this;
+    excludeReferences(): this;
+    queryReferences(query: any): this;
     getQuery(): any;
     find(query?: {}): Promise<{}>;
     findOne(query?: {}): Promise<{}>;
+    queryOnReferences(query: any): Promise<{}>;
     private preProcess;
     private cleanup;
     private postProcess;
