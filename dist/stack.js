@@ -484,14 +484,20 @@ class Stack {
                 .skip(this.internal.skip)
                 .toArray()
                 .then((result) => {
+                let contentType;
+                if (this.internal.includeSchema) {
+                    contentType = lodash_1.remove(result, { uid: this.q.content_type_uid });
+                    contentType = (typeof contentType === 'object' && contentType instanceof Array && contentType.length) ?
+                        contentType[0] : null;
+                }
                 if (this.internal.excludeReferences) {
-                    result = this.postProcess(result);
+                    result = this.postProcess(result, contentType);
                     return resolve(result);
                 }
                 else {
                     return this.includeReferencesI(result, this.q.locale, {}, undefined)
                         .then(() => {
-                        result = this.postProcess(result);
+                        result = this.postProcess(result, contentType);
                         return resolve(result);
                     })
                         .catch((refError) => {
@@ -509,40 +515,9 @@ class Stack {
     findOne(query = {}) {
         return new Promise((resolve, reject) => {
             this.internal.single = true;
-            const queryFilters = this.preProcess(query);
-            console.log('Query formed: ' + JSON.stringify(queryFilters, null, 1));
-            if (this.internal.queryReferences) {
-                return this.queryOnReferences(queryFilters)
-                    .then(resolve)
-                    .catch(reject);
-            }
-            return this.collection
-                .find(queryFilters)
-                .project(this.internal.projections)
-                .limit(this.internal.limit)
-                .skip(this.internal.skip)
-                .toArray()
-                .then((result) => {
-                if (this.internal.includeReferences) {
-                    result = this.postProcess(result);
-                    return resolve(result);
-                }
-                else {
-                    return this.includeReferencesI(result, this.q.locale, {})
-                        .then(() => {
-                        result = this.postProcess(result);
-                        return resolve(result);
-                    })
-                        .catch((refError) => {
-                        this.cleanup();
-                        return reject(refError);
-                    });
-                }
-            })
-                .catch((error) => {
-                this.cleanup();
-                return reject(error);
-            });
+            return this.find(query)
+                .then(resolve)
+                .catch(reject);
         });
     }
     queryOnReferences(query) {
@@ -627,13 +602,7 @@ class Stack {
         this.internal = {};
         this.q = {};
     }
-    postProcess(result) {
-        let contentType;
-        if (this.internal.includeSchema) {
-            contentType = lodash_1.remove(result, { uid: this.q.content_type_uid });
-            contentType = (typeof contentType === 'object' && contentType instanceof Array && contentType.length) ?
-                contentType[0] : null;
-        }
+    postProcess(result, contentType) {
         const count = (result === null) ? 0 : result.length;
         switch (this.q.content_type_uid) {
             case '_assets':
@@ -699,7 +668,8 @@ class Stack {
             const referencesFound = [];
             for (const prop in entry) {
                 if (entry[prop] !== null && typeof entry[prop] === 'object') {
-                    if (entry[prop] && entry[prop].reference_to) {
+                    if (entry[prop] && entry[prop].reference_to && ((!(this.internal.includeReferences)
+                        && entry[prop].reference_to === '_assets') || this.internal.includeReferences)) {
                         if (entry[prop].values.length === 0) {
                             entry[prop] = [];
                         }

@@ -20,6 +20,7 @@ export declare const config: {
     projections: {
         _id: number;
         _version: number;
+        content_type_uid: number;
         created_at: number;
         sys_keys: number;
         updated_at: number;

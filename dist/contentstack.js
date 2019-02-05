@@ -7,8 +7,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const stack_1 = require("./stack");
 class Contentstack {
-    Stack(config, db) {
+    static Stack(config, db) {
         return new stack_1.Stack(config, db);
     }
 }
-module.exports = new Contentstack();
+exports.Contentstack = Contentstack;

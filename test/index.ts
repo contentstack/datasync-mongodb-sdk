@@ -2,17 +2,46 @@
  * @description Test contentstack-mongodb-sdk basic methods
  */
 
-// import { config } from '../src/config'
-// import Contentstack from '../src/contentstack'
-const Contentstack = require('../src/contentstack')
-let Stack
+import { Contentstack } from '../src/contentstack'
+import { entries as authors } from './data/author'
+import { entries as blogs } from './data/blog'
+import { entries as categories } from './data/category'
+
+const Stack = Contentstack.Stack()
+let db
 
 describe('core', () => {
+  afterAll(() => {
+    return Stack.close()
+  })
+
   test('initialize stack', () => {
     expect(Contentstack.Stack()).toHaveProperty('connect')
   })
 
   test('connect', () => {
-    
+    Stack.connect().then((dbInstance) => {
+      db = dbInstance
+      // const keys = ['insertMany', 'insertOne', 'updateOne', 'updateMany', 'deleteOne', 'deleteMany']
+      // keys.forEach((key) => {
+      //   expect(dbInstance).toHaveProperty(key)
+      // })
+    }).catch((error) => {
+      expect(error).toBeNull()
+    })
+  })
+
+  test('db inserts', () => {
+    return db.collection('contents').insertMany(authors)
+      .then(() => {
+        return db.collection('contents').insertMany(blogs)
+      })
+      .then(() => {
+        return db.collection('contents').insertMany(categories)
+      })
+      .catch((error) => {
+        expect(error).toBeNull()
+      })
   })
 })
+
