@@ -705,16 +705,21 @@ class Stack {
                                             references[parentUid] = references[parentUid] || [];
                                             references[parentUid] = lodash_1.uniq(references[parentUid].concat(lodash_1.map(result, 'uid')));
                                         }
-                                        const referenceBucket = [];
-                                        query.uid.$in.forEach((entityUid) => {
-                                            const elem = lodash_1.find(result, (entity) => {
-                                                return entity.uid === entityUid;
+                                        if (typeof entry[prop].values === 'string') {
+                                            entry[prop] = ((result === null) || result.length === 0) ? null : result[0];
+                                        }
+                                        else {
+                                            const referenceBucket = [];
+                                            query.uid.$in.forEach((entityUid) => {
+                                                const elem = lodash_1.find(result, (entity) => {
+                                                    return entity.uid === entityUid;
+                                                });
+                                                if (elem) {
+                                                    referenceBucket.push(elem);
+                                                }
                                             });
-                                            if (elem) {
-                                                referenceBucket.push(elem);
-                                            }
-                                        });
-                                        entry[prop] = referenceBucket;
+                                            entry[prop] = referenceBucket;
+                                        }
                                         return self.includeReferencesI(entry[prop], locale, references, parentUid)
                                             .then(rs)
                                             .catch(rj);

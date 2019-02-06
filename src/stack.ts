@@ -1101,17 +1101,22 @@ export class Stack {
                         references[parentUid] = references[parentUid] || []
                         references[parentUid] = uniq(references[parentUid].concat(map(result, 'uid')))
                       }
-                      // format the references in order
-                      const referenceBucket = []
-                      query.uid.$in.forEach((entityUid) => {
-                        const elem = find(result, (entity) => {
-                          return entity.uid === entityUid
+
+                      if (typeof entry[prop].values === 'string') {
+                        entry[prop] = ((result === null) || result.length === 0) ? null : result[0]
+                      } else {
+                        // format the references in order
+                        const referenceBucket = []
+                        query.uid.$in.forEach((entityUid) => {
+                          const elem = find(result, (entity) => {
+                            return entity.uid === entityUid
+                          })
+                          if (elem) {
+                            referenceBucket.push(elem)
+                          }
                         })
-                        if (elem) {
-                          referenceBucket.push(elem)
-                        }
-                      })
-                      entry[prop] = referenceBucket
+                        entry[prop] = referenceBucket
+                      }
 
                       return self.includeReferencesI(entry[prop], locale, references, parentUid)
                         .then(rs)

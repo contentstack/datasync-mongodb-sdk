@@ -70,7 +70,7 @@ export const entries = [
     tags: ['8'],
     category: {
       reference_to: 'category',
-      values: ['c1']
+      values: 'c1'
     }
   },
   {
@@ -82,7 +82,7 @@ export const entries = [
     tags: ['10'],
     category: {
       reference_to: 'category',
-      values: ['c2']
+      values: 'c2'
     }
   }
 ]
