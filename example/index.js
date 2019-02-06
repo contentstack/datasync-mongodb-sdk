@@ -1,4 +1,4 @@
-const Contentstack = require('../dist/contentstack')
+const Contentstack = require('../dist/contentstack').Contentstack
 
 const Stack = Contentstack.Stack({
   api_key: '',
@@ -12,7 +12,7 @@ const Stack = Contentstack.Stack({
       code: 'es-es',
       relative_url_prefix: '/es/'
     }
-  ]
+  ],
 })
 
 function connect () {
@@ -31,16 +31,20 @@ function find (contentType = 'blog') {
   return new Promise((resolve, reject) => {
     Stack.contentType(contentType)
       .entries()
-      .includeCount()
+      // .includeCount()
       .includeReferences()
+      .queryReferences({'authors.category': {}})
       // .includeSchema()
-      .language('es-es')
+      // .language('es-es')
       // .notEqualTo('title', 'Blog One')
-      // .query({"title": "Blog Two"})
-      .limit(1)
+      // .query({tags: {$in: ['one', 'two']}})
+      .queryReferences({'authors.category.uid': 'c2'})
+      // .excludeReferences()
+      // .excludeAssets()
+      // .limit(1)
       // .skip(1)
       // .query({
-      //   "data.uid": 'blt17559b99fee73d6f'
+      //   uid: 'blt17559b99fee73d6f'
       // })
       .find()
       .then(resolve)

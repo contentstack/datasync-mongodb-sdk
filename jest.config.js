@@ -99,6 +99,7 @@ module.exports = {
   // testEnvironmentOptions: {},
   testPathIgnorePatterns: [
     '/test/data/*',
+    '/test/.*config.ts'
   ],
   // The glob patterns Jest uses to detect test files
   testMatch: [
