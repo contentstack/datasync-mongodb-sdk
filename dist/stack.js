@@ -471,7 +471,6 @@ class Stack {
     find(query = {}) {
         return new Promise((resolve, reject) => {
             const queryFilters = this.preProcess(query);
-            console.log('Query formed: ' + JSON.stringify(queryFilters, null, 1));
             if (this.internal.queryReferences) {
                 return this.queryOnReferences(queryFilters)
                     .then(resolve)

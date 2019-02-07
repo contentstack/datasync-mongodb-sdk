@@ -8,3 +8,6 @@ coverage
 # Typescript configs
 tsconfig.json
 tslint.json
+
+# Source files
+src

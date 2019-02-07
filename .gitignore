@@ -4,7 +4,3 @@ package-lock.json
 
 # Test coverages
 coverage
-
-# Typescript configs
-tsconfig.json
-tslint.json
