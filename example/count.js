@@ -27,12 +27,12 @@ function close () {
   return Stack.close()
 }
 
-function find (contentType = 'blog') {
+function count (contentType = 'blog') {
   return new Promise((resolve, reject) => {
     Stack.contentType(contentType)
       .entries()
       // .includeCount()
-      .includeReferences()
+      // .includeReferences()
       // .queryReferences({'authors.category': {}})
       // .includeSchema()
       // .language('es-es')
@@ -46,7 +46,7 @@ function find (contentType = 'blog') {
       // .query({
       //   uid: 'blt17559b99fee73d6f'
       // })
-      .find()
+      .count()
       .then(resolve)
       .catch(reject)
   })
@@ -54,7 +54,7 @@ function find (contentType = 'blog') {
 
 return connect()
   .then(() => {
-    return find()
+    return count()
       .then((result) => {
         const keys = Object.keys(result)
         // Sample output

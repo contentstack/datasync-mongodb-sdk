@@ -41,8 +41,7 @@ export declare class Stack {
     except(fields: any): this;
     regex(field: any, pattern: any, options?: string): this;
     tags(values: any): this;
-    where(...expr: any[]): this;
-    count(): this;
+    where(expr: any): this;
     includeCount(): this;
     includeSchema(): this;
     includeReferences(): this;
@@ -50,6 +49,7 @@ export declare class Stack {
     queryReferences(query: any): this;
     getQuery(): any;
     find(query?: {}): Promise<{}>;
+    count(query?: any): Promise<{}>;
     findOne(query?: {}): Promise<{}>;
     queryOnReferences(query: any): Promise<{}>;
     private preProcess;

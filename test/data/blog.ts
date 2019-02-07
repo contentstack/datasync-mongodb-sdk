@@ -1,21 +1,29 @@
 export const entries = [
   {
+    authors: {
+      reference_to: 'author',
+      values: ['a1'],
+    },
     content_type_uid: 'blog',
-    uid: 'b1',
+    files: {
+      reference_to: '_assets',
+      values: ['a1', 'a2'],
+    },
     locale: 'en-us',
-    title: 'Blog One',
+    single_file: {
+      reference_to: '_assets',
+      values: 'a1',
+    },
     self_reference: {
       reference_to: 'blog',
       values: [
         'b1',
         'b2',
-        'b3'
-      ]
+        'b3',
+      ],
     },
-    authors: {
-      reference_to: 'author',
-      values: ['a1']
-    }
+    title: 'Blog One',
+    uid: 'b1',
   },
   {
     content_type_uid: 'blog',
