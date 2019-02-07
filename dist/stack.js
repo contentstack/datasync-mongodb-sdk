@@ -8,13 +8,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const debug_1 = __importDefault(require("debug"));
 const lodash_1 = require("lodash");
 const mongodb_1 = require("mongodb");
 const sift_1 = __importDefault(require("sift"));
 const config_1 = require("./config");
 const util_1 = require("./util");
-const debug = debug_1.default('stack');
 class Stack {
     constructor(stackConfig, existingDB) {
         this.config = lodash_1.merge(config_1.config, stackConfig);
@@ -68,7 +66,6 @@ class Stack {
                 this.client = client;
                 return client.connect().then(() => {
                     this.db = client.db(dbName);
-                    debug('Db connection set successfully!');
                     return resolve(this.db);
                 }).catch(reject);
             }
@@ -78,7 +75,6 @@ class Stack {
         });
     }
     close() {
-        debug('Closing db connection!');
         this.client.close();
     }
     language(code) {
@@ -381,7 +377,7 @@ class Stack {
         });
         return this;
     }
-    regex(field, pattern, options = 'g') {
+    regex(field, pattern, options = 'i') {
         if (!(field) || !(pattern) || typeof field !== 'string' || typeof pattern !== 'string') {
             throw new Error('Kindly provide a valid field and pattern value for \'.regex()\'');
         }
@@ -424,7 +420,7 @@ class Stack {
         }
         return this;
     }
-    where(...expr) {
+    where(expr) {
         if (!(expr)) {
             throw new Error('Kindly provide a valid field and expr/fn value for \'.where()\'');
         }
@@ -436,10 +432,6 @@ class Stack {
         else {
             this.q.query.$where = expr;
         }
-        return this;
-    }
-    count() {
-        this.collection = this.collection.count();
         return this;
     }
     includeCount() {
@@ -511,6 +503,45 @@ class Stack {
             });
         });
     }
+    count(query) {
+        return new Promise((resolve, reject) => {
+            const queryFilters = this.preProcess(query);
+            if (this.internal.queryReferences) {
+                return this.collection
+                    .find(queryFilters)
+                    .project(this.internal.projections)
+                    .toArray()
+                    .then((result) => {
+                    if (result === null || result.length === 0) {
+                        return resolve({ count: 0 });
+                    }
+                    return this.includeReferencesI(result, this.q.locale, {}, undefined)
+                        .then(() => {
+                        result = sift_1.default(this.internal.queryReferences, result);
+                        result = result.length;
+                        this.cleanup();
+                        return resolve({ count: result });
+                    });
+                })
+                    .catch((error) => {
+                    this.cleanup();
+                    return reject(error);
+                });
+            }
+            return this.collection
+                .find(queryFilters)
+                .project(this.internal.projections)
+                .count()
+                .then((result) => {
+                this.cleanup();
+                return resolve({ count: result });
+            })
+                .catch((error) => {
+                this.cleanup();
+                return reject(error);
+            });
+        });
+    }
     findOne(query = {}) {
         return new Promise((resolve, reject) => {
             this.internal.single = true;
@@ -573,7 +604,6 @@ class Stack {
             this.q.locale = this.config.locales[0].code;
         }
         if (this.q.content_type_uid === 'contentTypes') {
-            debug('Removing \'locale\' filter, since the query is on content types');
             delete this.q.locale;
         }
         const filters = Object.assign({ content_type_uid: this.q.content_type_uid, locale: this.q.locale }, this.q.query);
@@ -598,8 +628,8 @@ class Stack {
     }
     cleanup() {
         this.collection = null;
-        this.internal = {};
-        this.q = {};
+        this.internal = null;
+        this.q = null;
     }
     postProcess(result, contentType) {
         const count = (result === null) ? 0 : result.length;

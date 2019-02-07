@@ -4,14 +4,11 @@
  * MIT Licensed
  */
 
-import Debug from 'debug'
 import { filter, find, map, merge, remove, uniq } from 'lodash'
 import { Db, MongoClient } from 'mongodb'
 import sift from 'sift'
 import { config } from './config'
 import { checkCyclic, validateURI } from './util'
-
-const debug = Debug('stack')
 
 /**
  * @summary
@@ -109,7 +106,6 @@ export class Stack {
 
         return client.connect().then(() => {
           this.db = client.db(dbName)
-          debug('Db connection set successfully!')
 
           return resolve(this.db)
         }).catch(reject)
@@ -125,7 +121,6 @@ export class Stack {
    *  Closes connection with mongodb
    */
   public close() {
-    debug('Closing db connection!')
     this.client.close()
   }
 
@@ -621,7 +616,7 @@ export class Stack {
    * @param {options} options - Options to be applied while evaluating the regex
    * @returns {this} - Returns `stack's` instance
    */
-  public regex(field, pattern, options = 'g') {
+  public regex(field, pattern, options = 'i') {
     if (!(field) || !(pattern) || typeof field !== 'string' || typeof pattern !== 'string') {
       throw new Error('Kindly provide a valid field and pattern value for \'.regex()\'')
     } else if (this.q.query && typeof this.q.query === 'object') {
@@ -691,7 +686,7 @@ export class Stack {
    * @param field
    * @param value
    */
-  public where(...expr) {
+  public where(expr) {
     if (!(expr)) {
       throw new Error('Kindly provide a valid field and expr/fn value for \'.where()\'')
     } else if (this.q.query && typeof this.q.query === 'object') {
@@ -701,12 +696,6 @@ export class Stack {
     } else {
       this.q.query.$where = expr
     }
-
-    return this
-  }
-
-  public count() {
-    this.collection = this.collection.count()
 
     return this
   }
@@ -843,6 +832,53 @@ export class Stack {
     })
   }
 
+  public count(query?) {
+    return new Promise((resolve, reject) => {
+      const queryFilters = this.preProcess(query)
+      // process it in a different manner
+      if (this.internal.queryReferences) {
+        return this.collection
+        .find(queryFilters)
+        .project(this.internal.projections)
+        .toArray()
+        .then((result) => {
+          if (result === null || result.length === 0) {
+            return resolve({ count: 0})
+          }
+
+          return this.includeReferencesI(result, this.q.locale, {}, undefined)
+            .then(() => {
+              result = sift(this.internal.queryReferences, result)
+              result = result.length
+              this.cleanup()
+
+              return resolve({ count: result})
+            })
+        })
+        .catch((error) => {
+          this.cleanup()
+
+          return reject(error)
+        })
+      }
+
+      return this.collection
+        .find(queryFilters)
+        .project(this.internal.projections)
+        .count()
+        .then((result) => {
+          this.cleanup()
+
+          return resolve({ count: result })
+        })
+        .catch((error) => {
+          this.cleanup()
+
+          return reject(error)
+        })
+    })
+  }
+
   /**
    * @summary
    *  Queries the db using the query built/passed. Returns a single entry/asset/content type object
@@ -930,7 +966,6 @@ export class Stack {
     }
 
     if (this.q.content_type_uid === 'contentTypes') {
-      debug('Removing \'locale\' filter, since the query is on content types')
       delete this.q.locale
     }
 
@@ -968,8 +1003,8 @@ export class Stack {
    */
   private cleanup() {
     this.collection = null
-    this.internal = {}
-    this.q = {}
+    this.internal = null
+    this.q = null
   }
 
   /**
