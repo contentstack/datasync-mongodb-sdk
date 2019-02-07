@@ -795,7 +795,6 @@ export class Stack {
   public find(query = {}) {
     return new Promise((resolve, reject) => {
       const queryFilters = this.preProcess(query)
-      console.log('Query formed: ' + JSON.stringify(queryFilters, null, 1))
       // process it in a different manner
       if (this.internal.queryReferences) {
         return this.queryOnReferences(queryFilters)

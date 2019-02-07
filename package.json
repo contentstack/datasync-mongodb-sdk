@@ -1,6 +1,6 @@
 {
-  "name": "contentstack-mongodb-sdk",
-  "version": "0.0.2",
+  "name": "contentstack-sync-mongodb-sdk",
+  "version": "1.0.0",
   "description": "Contentstack sync utility's Mongodb SDK",
   "main": "dist/contentstack.js",
   "scripts": {
