@@ -13,7 +13,7 @@ import { config } from './config'
 const Stack = Contentstack.Stack(config)
 // let db
 
-describe('# Core', () => {
+describe('# Querying', () => {
   beforeAll(() => {
     return Stack.connect({dbName: 'sync-test'}).then(() => {
       // db = dbInstance
@@ -62,6 +62,7 @@ describe('# Core', () => {
     test('find', () => {
       return Stack.contentType('blog')
         .entries()
+        .ascending()
         .find()
         .then((result) => {
           (result as any).entries.forEach((entry) => {

@@ -11,8 +11,8 @@ export declare class Stack {
     private internal;
     private db;
     constructor(stackConfig: any, existingDB?: any);
-    ascending(field: any): this;
-    descending(field: any): this;
+    ascending(field?: any): this;
+    descending(field?: any): this;
     connect(overrides?: {}): Promise<{}>;
     close(): void;
     language(code: any): this;
@@ -32,8 +32,8 @@ export declare class Stack {
     entries(): this;
     asset(uid?: any): Stack;
     assets(): Stack;
-    schema(uid?: any): this;
-    schemas(): this;
+    schema(uid?: any): Stack;
+    schemas(): Stack;
     limit(no: any): this;
     skip(no: any): this;
     query(queryObject?: {}): this;

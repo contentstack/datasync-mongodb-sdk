@@ -29,7 +29,6 @@ export class Stack {
   constructor(stackConfig, existingDB?) {
     this.config = merge(config, stackConfig)
     this.q = {}
-    this.q = {}
     this.internal = {}
     this.db = existingDB
   }
@@ -42,18 +41,27 @@ export class Stack {
    *  When the sort option consumes more than 32 megabytes, MongoDB will return an error.
    * @param field
    */
-  public ascending(field) {
-    if (!(field) || typeof field !== 'string') {
-      throw new Error('Kindly provide a valid field name for \'.ascending()\'')
-    } else if (typeof this.q.content_type_uid !== 'string') {
+  public ascending(field?) {
+    if (typeof this.q.content_type_uid !== 'string') {
       throw new Error('Kindly call \'.contentType()\' before \.ascending()\'')
     }
 
-    if (this.internal.sort && typeof this.internal.sort === 'object') {
-      this.internal.sort[field] = 1
+    if (!(field) || typeof field !== 'string') {
+      // throw new Error('Kindly provide a valid field name for \'.ascending()\'')
+      if (this.internal.sort && typeof this.internal.sort === 'object') {
+        this.internal.sort.published_at = 1
+      } else {
+        this.internal.sort = {
+          published_at: 1,
+        }
+      }
     } else {
-      this.internal.sort = {
-        [field]: 1,
+      if (this.internal.sort && typeof this.internal.sort === 'object') {
+        this.internal.sort[field] = 1
+      } else {
+        this.internal.sort = {
+          [field]: 1,
+        }
       }
     }
 
@@ -70,18 +78,27 @@ export class Stack {
    *  https://docs.mongodb.com/manual/reference/operator/meta/orderby/
    * @param field
    */
-  public descending(field) {
-    if (!(field) || typeof field !== 'string') {
-      throw new Error('Kindly provide a valid field name for \'.descending()\'')
-    } else if (typeof this.q.content_type_uid !== 'string') {
+  public descending(field?) {
+    if (typeof this.q.content_type_uid !== 'string') {
       throw new Error('Kindly call \'.contentType()\' before \.descending()\'')
     }
 
-    if (this.internal.sort && typeof this.internal.sort === 'object') {
-      this.internal.sort[field] = -1
+    if (!(field) || typeof field !== 'string') {
+      // throw new Error('Kindly provide a valid field name for \'.descending()\'')
+      if (this.internal.sort && typeof this.internal.sort === 'object') {
+        this.internal.sort[field] = -1
+      } else {
+        this.internal.sort = {
+          [field]: -1,
+        }
+      }
     } else {
-      this.internal.sort = {
-        [field]: -1,
+      if (this.internal.sort && typeof this.internal.sort === 'object') {
+        this.internal.sort[field] = -1
+      } else {
+        this.internal.sort = {
+          [field]: -1,
+        }
       }
     }
 
@@ -466,9 +483,9 @@ export class Stack {
   public asset(uid ? ) {
     const stack = new Stack(this.config, this.db)
     if (uid && typeof uid === 'string') {
-      stack.q.content_type_uid = '_assets'
       stack.q.uid = uid
     }
+    stack.q.content_type_uid = '_assets'
     stack.collection = stack.db.collection(stack.config.collectionName)
     stack.internal.limit = 1
     stack.internal.single = true
@@ -497,15 +514,16 @@ export class Stack {
    * @returns {this} - Returns `stack's` instance
    */
   public schema(uid ? ) {
+    const stack = new Stack(this.config, this.db)
     if (uid && typeof uid === 'string') {
-      this.q.content_type_uid = 'contentTypes'
-      this.q.uid = uid
+      stack.q.uid = uid
     }
-    this.collection = this.db.collection(this.config.collectionName)
-    this.internal.limit = 1
-    this.internal.single = true
+    stack.q.content_type_uid = 'contentTypes'
+    stack.collection = stack.db.collection(stack.config.collectionName)
+    stack.internal.limit = 1
+    stack.internal.single = true
 
-    return this
+    return stack
   }
 
   /**
@@ -514,10 +532,11 @@ export class Stack {
    * @returns {this} - Returns `stack's` instance
    */
   public schemas() {
-    this.q.content_type_uid = 'contentTypes'
-    this.collection = this.db.collection(this.config.collectionName)
+    const stack = new Stack(this.config, this.db)
+    stack.q.content_type_uid = 'contentTypes'
+    stack.collection = stack.db.collection(stack.config.collectionName)
 
-    return this
+    return stack
   }
 
   /**
@@ -799,13 +818,15 @@ export class Stack {
         .toArray()
         .then((result) => {
           let contentType
-          if (this.internal.includeSchema) {
+          if (this.internal.includeSchema && this.q.content_type_uid !== 'contentTypes' && this.q.content_type_uid !==
+            '_assets') {
             contentType = remove(result, {uid: this.q.content_type_uid})
             contentType = (typeof contentType === 'object' && contentType instanceof Array && contentType.length) ?
               contentType[0] : null
           }
 
-          if (this.internal.excludeReferences) {
+          if (this.internal.excludeReferences || this.q.content_type_uid === 'contentTypes' || this.q.content_type_uid
+            === '_assets') {
             result = this.postProcess(result, contentType)
 
             return resolve(result)
@@ -835,10 +856,14 @@ export class Stack {
   public count(query?) {
     return new Promise((resolve, reject) => {
       const queryFilters = this.preProcess(query)
+      this.collection = this.collection.find(queryFilters)
+      if (this.internal.sort) {
+        this.collection = this.collection.sort(this.internal.sort)
+      }
       // process it in a different manner
       if (this.internal.queryReferences) {
         return this.collection
-        .find(queryFilters)
+        // .find(queryFilters)
         .project(this.internal.projections)
         .toArray()
         .then((result) => {
@@ -863,7 +888,7 @@ export class Stack {
       }
 
       return this.collection
-        .find(queryFilters)
+        // .find(queryFilters)
         .project(this.internal.projections)
         .count()
         .then((result) => {
@@ -990,10 +1015,6 @@ export class Stack {
       queryFilters = filters
     }
 
-    if (this.internal.sort) {
-      this.collection = this.collection.sort(this.internal.sort)
-    }
-
     return queryFilters
   }
 
@@ -1026,7 +1047,8 @@ export class Stack {
           assets: result,
         }
       }
-
+      result.content_type_uid = 'assets'
+      result.locale = this.q.locale
       break
     case 'contentTypes':
       if (this.internal.single) {
@@ -1038,6 +1060,7 @@ export class Stack {
           content_types: result,
         }
       }
+      result.content_type_uid = 'content_types'
       break
     default:
       if (this.internal.single) {
@@ -1049,6 +1072,8 @@ export class Stack {
           entries: result,
         }
       }
+      result.content_type_uid = this.q.content_type_uid
+      result.locale = this.q.locale
       break
     }
 
@@ -1056,16 +1081,10 @@ export class Stack {
       result.count = count
     }
 
-    if (this.q.content_type_uid === '_assets') {
-      this.q.content_type_uid = 'assets'
-    }
-
     if (this.internal.includeSchema) {
       result.content_type = contentType
     }
 
-    result.content_type_uid = this.q.content_type_uid
-    result.locale = this.q.locale
     this.cleanup()
 
     return result

@@ -1,4 +1,6 @@
-const Contentstack = require('../dist/contentstack').Contentstack
+const Contentstack = require('../dist').Contentstack
+// const Stack = require('../dist/contentstack').Stack
+// import * as Contentstack from '../dist'
 
 const Stack = Contentstack.Stack({
   api_key: '',

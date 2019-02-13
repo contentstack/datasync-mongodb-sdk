@@ -2,6 +2,11 @@ export const assets = [
   {
     content_type_uid: '_assets',
     locale: 'en-us',
+    sys_keys: {
+      content_type_uid : '_assets',
+      locale: 'en-us',
+      uid: 'a1',
+    },
     tags: ['1'],
     title: 'A 1',
     uid: 'a1',
@@ -11,6 +16,11 @@ export const assets = [
   {
     content_type_uid: '_assets',
     locale: 'en-us',
+    sys_keys: {
+      content_type_uid : '_assets',
+      locale: 'en-us',
+      uid: 'a2',
+    },
     tags: ['2'],
     title: 'A 2',
     uid: 'a2',
@@ -19,7 +29,11 @@ export const assets = [
   },
   {
     content_type_uid: '_assets',
-    locale: 'en-us',
+    locale: 'en-us',    sys_keys: {
+      content_type_uid : '_assets',
+      locale: 'en-us',
+      uid: 'a3',
+    },
     tags: ['3'],
     title: 'A 3',
     uid: 'a3',
