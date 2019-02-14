@@ -52,11 +52,11 @@ class Stack {
         }
         if (!(field) || typeof field !== 'string') {
             if (this.internal.sort && typeof this.internal.sort === 'object') {
-                this.internal.sort[field] = -1;
+                this.internal.sort.published_at = -1;
             }
             else {
                 this.internal.sort = {
-                    [field]: -1,
+                    published_at: -1,
                 };
             }
         }
@@ -101,7 +101,7 @@ class Stack {
         this.q.locale = code;
         return this;
     }
-    and(...queries) {
+    and(queries) {
         if (this.q.query && typeof this.q.query === 'object') {
             this.q.query = lodash_1.merge(this.q.query, {
                 $and: queries,
@@ -114,7 +114,7 @@ class Stack {
         }
         return this;
     }
-    or(...queries) {
+    or(queries) {
         if (this.q.query && typeof this.q.query === 'object') {
             this.q.query = lodash_1.merge(this.q.query, {
                 $or: queries,
@@ -376,10 +376,11 @@ class Stack {
         if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
             throw new Error('Kindly provide valid \'field\' values for \'only()\'');
         }
-        this.internal.projections = this.internal.projections || {};
+        this.internal.only = this.internal.only || {};
+        this.internal.only._id = 0;
         fields.forEach((field) => {
             if (typeof field === 'string') {
-                this.internal.projections[field] = 1;
+                this.internal.only[field] = 1;
             }
         });
         return this;
@@ -388,12 +389,13 @@ class Stack {
         if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
             throw new Error('Kindly provide valid \'field\' values for \'except()\'');
         }
-        this.internal.projections = this.internal.projections || {};
+        this.internal.except = this.internal.except || {};
         fields.forEach((field) => {
             if (typeof field === 'string') {
-                this.internal.projections[field] = 0;
+                this.internal.except[field] = 0;
             }
         });
+        this.internal.except = lodash_1.merge(this.config.projections, this.internal.except);
         return this;
     }
     regex(field, pattern, options = 'i') {
@@ -482,13 +484,18 @@ class Stack {
     find(query = {}) {
         return new Promise((resolve, reject) => {
             const queryFilters = this.preProcess(query);
+            if (this.internal.sort) {
+                this.collection = this.collection.find(queryFilters).sort(this.internal.sort);
+            }
+            else {
+                this.collection = this.collection.find(queryFilters);
+            }
             if (this.internal.queryReferences) {
-                return this.queryOnReferences(queryFilters)
+                return this.queryOnReferences()
                     .then(resolve)
                     .catch(reject);
             }
             return this.collection
-                .find(queryFilters)
                 .project(this.internal.projections)
                 .limit(this.internal.limit)
                 .skip(this.internal.skip)
@@ -573,10 +580,9 @@ class Stack {
                 .catch(reject);
         });
     }
-    queryOnReferences(query) {
+    queryOnReferences() {
         return new Promise((resolve, reject) => {
             return this.collection
-                .find(query)
                 .project(this.internal.projections)
                 .toArray()
                 .then((result) => {
@@ -611,11 +617,11 @@ class Stack {
         else {
             this.q.query = {};
         }
-        if (this.internal.projections) {
-            this.internal.projections = lodash_1.merge(this.config.projections, this.internal.projections);
+        if (this.internal.only) {
+            this.internal.projections = this.internal.only;
         }
         else {
-            this.internal.projections = this.config.projections;
+            this.internal.projections = lodash_1.merge(this.config.projections, this.internal.except);
         }
         if (!(this.internal.limit)) {
             this.internal.limit = this.config.limit;
@@ -741,7 +747,7 @@ class Stack {
                                     },
                                 };
                                 referencesFound.push(new Promise((rs, rj) => {
-                                    return self.db.collection('contents')
+                                    return self.db.collection(this.config.collectionName)
                                         .find(query)
                                         .project(self.config.projections)
                                         .toArray()

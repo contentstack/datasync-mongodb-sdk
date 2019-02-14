@@ -10,7 +10,7 @@ import { entries as blogs } from './data/blog'
 import { entries as categories } from './data/category'
 import { content_types } from './data/content_types'
 
-config.collectionName = 'queries'
+config.collectionName = 'sorting'
 
 const Stack = Contentstack.Stack(config)
 let db
@@ -30,7 +30,7 @@ const itemPropertyChecks = (result) => {
   }
 }
 
-describe('# Querying', () => {
+describe('# Sorting', () => {
   beforeAll(() => {
     expect.extend({
       compareValue(value, compareValue, operator, strict = false) {
@@ -135,78 +135,91 @@ describe('# Querying', () => {
     },
   })
 
-  describe('basic querying', () => {
-    test('.query $and', () => {
+  describe('on field', () => {
+    test('ascending', () => {
       return Stack.contentType('blog')
         .entries()
-        .query({$and: [{content_type_uid: 'blog'}, {no: 1}]})
+        .ascending('no')
         .find()
         .then((result) => {
-          (result as any).entries.forEach((entry) => {
+          (result as any).entries.forEach((entry, index) => {
             itemPropertyChecks(result)
             expect(result).toHaveProperty('entries')
             expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(1)
-            expect(entry).toHaveProperty('no')
-            expect(entry.no).toEqual(1)
+            expect((result as any).entries).toHaveLength(5)
+            
+            if (index === ((result as any).entries.length - 1)) {
+              index -= 1
+            }
+            (expect(entry.no) as any).compareValue((result as any).entries[index + 1].no, false)
           })
         }).catch((error) => {
           expect(error).toBeNull()
         })
     })
 
-    test('.query $or', () => {
+    test('descending', () => {
       return Stack.contentType('blog')
         .entries()
-        .query({$or: [{content_type_uid: 'blogs'}, {no: 1}]})
+        .descending('no')
         .find()
         .then((result) => {
-          (result as any).entries.forEach((entry) => {
+          (result as any).entries.forEach((entry, index) => {
             itemPropertyChecks(result)
             expect(result).toHaveProperty('entries')
             expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(1)
-            expect(entry).toHaveProperty('no')
-            expect(entry.no).toEqual(1)
+            expect((result as any).entries).toHaveLength(5)
+            
+            if (index === ((result as any).entries.length - 1)) {
+              index -= 1
+            }
+            (expect(entry.no) as any).compareValue((result as any).entries[index + 1].no, true)
+          })
+        }).catch((error) => {
+          expect(error).toBeNull()
+        })
+    })
+  })
+
+  describe('without field', () => {
+    test('ascending', () => {
+      return Stack.contentType('blog')
+        .entries()
+        .ascending()
+        .find()
+        .then((result) => {
+          (result as any).entries.forEach((entry, index) => {
+            itemPropertyChecks(result)
+            expect(result).toHaveProperty('entries')
+            expect((result as any).content_type_uid).toEqual('blog')
+            expect((result as any).entries).toHaveLength(5)
+            
+            if (index === ((result as any).entries.length - 1)) {
+              index -= 1
+            }
+            (expect(entry.published_at) as any).compareValue((result as any).entries[index + 1].published_at, false)
           })
         }).catch((error) => {
           expect(error).toBeNull()
         })
     })
 
-    test('.tags()', () => {
+    test('descending', () => {
       return Stack.contentType('blog')
         .entries()
-        .tags(['last'])
+        .descending()
         .find()
         .then((result) => {
-          (result as any).entries.forEach((entry) => {
+          (result as any).entries.forEach((entry, index) => {
             itemPropertyChecks(result)
             expect(result).toHaveProperty('entries')
             expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(1)
-            expect(entry).toHaveProperty('tags')
-            expect(entry.tags).toContain('last')
-          })
-        }).catch((error) => {
-          expect(error).toBeNull()
-        })
-    })
-
-    test('.query + .tags()', () => {
-      return Stack.contentType('blog')
-        .entries()
-        .query({$or: [{content_type_uid: 'blogs'}, {tags: {$exists: true}}]})
-        .tags(['last'])
-        .find()
-        .then((result) => {
-          (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(1)
-            expect(entry).toHaveProperty('tags')
-            expect(entry.tags).toContain('last')
+            expect((result as any).entries).toHaveLength(5)
+            
+            if (index === ((result as any).entries.length - 1)) {
+              index -= 1
+            }
+            (expect(entry.published_at) as any).compareValue((result as any).entries[index + 1].published_at, true)
           })
         }).catch((error) => {
           expect(error).toBeNull()

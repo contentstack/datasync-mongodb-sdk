@@ -16,8 +16,8 @@ export declare class Stack {
     connect(overrides?: {}): Promise<{}>;
     close(): void;
     language(code: any): this;
-    and(...queries: any[]): this;
-    or(...queries: any[]): this;
+    and(queries: any): this;
+    or(queries: any): this;
     lessThan(key: any, value: any): this;
     lessThanOrEqualTo(key: any, value: any): this;
     greaterThan(key: any, value: any): this;
@@ -51,7 +51,7 @@ export declare class Stack {
     find(query?: {}): Promise<{}>;
     count(query?: any): Promise<{}>;
     findOne(query?: {}): Promise<{}>;
-    queryOnReferences(query: any): Promise<{}>;
+    private queryOnReferences;
     private preProcess;
     private cleanup;
     private postProcess;
