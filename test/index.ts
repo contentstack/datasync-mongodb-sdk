@@ -2,61 +2,52 @@
  * @description Test contentstack-mongodb-sdk basic methods
  */
 
-import { Contentstack } from '../src/contentstack'
+import { Contentstack } from '../src'
 import { config } from './config'
-// import { assets } from './data/assets'
-// import { entries as authors } from './data/author'
-// import { entries as blogs } from './data/blog'
-// import { entries as categories } from './data/category'
-// import { content_types } from './data/content_types'
+import { assets } from './data/assets'
+import { entries as authors } from './data/author'
+import { entries as blogs } from './data/blog'
+import { entries as categories } from './data/category'
+import { content_types } from './data/content_types'
+
+config.collectionName = 'core'
 
 const Stack = Contentstack.Stack(config)
-// let db
+let db
 
 describe('# Core', () => {
   beforeAll(() => {
-    return Stack.connect({dbName: 'sync-test'}).then(() => {
-      // db = dbInstance
+    return Stack.connect().then((dbInstance) => {
+      db = dbInstance
+    })
+  })
+  beforeAll(() => {
+    return db.collection(config.collectionName).insertMany(authors)
+    .then(() => {
+      return db.collection(config.collectionName).insertMany(blogs)
+    })
+    .then(() => {
+      return db.collection(config.collectionName).insertMany(categories)
+    })
+    .then(() => {
+      return db.collection(config.collectionName).insertMany(assets)
+    })
+    .then(() => {
+      return db.collection(config.collectionName).insertMany(content_types)
+    })
+    .catch((error) => {
+      expect(error).toBeNull()
     })
   })
   afterAll(() => {
-    return Stack.close()
+    return db.collection(config.collectionName).drop().then(() => {
+      return Stack.close()
+    })
   })
 
   test('initialize stack', () => {
     expect(Contentstack.Stack()).toHaveProperty('connect')
   })
-
-  // test('connect', () => {
-  //   Stack.connect().then((dbInstance) => {
-  //     // db = dbInstance
-  //     // const keys = ['insertMany', 'insertOne', 'updateOne', 'updateMany', 'deleteOne', 'deleteMany']
-  //     // keys.forEach((key) => {
-  //     //   expect(dbInstance).toHaveProperty(key)
-  //     // })
-  //   }).catch((error) => {
-  //     expect(error).toBeNull()
-  //   })
-  // })
-
-  // test('db inserts', () => {
-  //   return db.collection('contents').insertMany(authors)
-  //     .then(() => {
-  //       return db.collection('contents').insertMany(blogs)
-  //     })
-  //     .then(() => {
-  //       return db.collection('contents').insertMany(categories)
-  //     })
-  //     .then(() => {
-  //       return db.collection('contents').insertMany(assets)
-  //     })
-  //     .then(() => {
-  //       return db.collection('contents').insertMany(content_types)
-  //     })
-  //     .catch((error) => {
-  //       expect(error).toBeNull()
-  //     })
-  // })
 
   describe('entries', () => {
     test('find', () => {

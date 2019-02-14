@@ -2,7 +2,7 @@ export const content_types = [
   {
     content_type_uid: 'contentTypes',
     published_at: '2019-02-07T14:52:37.617Z',
-    schemas: [
+    schema: [
       {
         'display_name' : 'Title',
         'uid' : 'title',
@@ -36,7 +36,7 @@ export const content_types = [
   {
     content_type_uid: 'contentTypes',
     published_at: '2019-02-07T14:52:37.618Z',
-    schemas: [
+    schema: [
       {
         'display_name' : 'Title',
         'uid' : 'title',
@@ -70,7 +70,7 @@ export const content_types = [
   {
     content_type_uid: 'contentTypes',
     published_at: '2019-02-07T14:52:37.616Z',
-    schemas: [
+    schema: [
       {
         'display_name' : 'Title',
         'uid' : 'title',

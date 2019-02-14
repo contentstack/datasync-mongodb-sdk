@@ -10,7 +10,7 @@ import { entries as blogs } from './data/blog'
 import { entries as categories } from './data/category'
 import { content_types } from './data/content_types'
 
-config.collectionName = 'queries'
+config.collectionName = 'conditional'
 
 const Stack = Contentstack.Stack(config)
 let db
@@ -30,45 +30,8 @@ const itemPropertyChecks = (result) => {
   }
 }
 
-describe('# Querying', () => {
+describe('# Conditional Operator Querying', () => {
   beforeAll(() => {
-    expect.extend({
-      compareValue(value, compareValue, operator, strict = false) {
-        let pass, comparison
-        // if operator is true, value >= compareValue, else the opposite
-        if (operator) {
-          if (strict) {
-            comparison = ' > '
-            pass = value > compareValue 
-          } else {
-            comparison = ' >= '
-            pass = value >= compareValue 
-          }
-        } else {
-          if (strict) {
-            comparison = ' < '
-            pass = value < compareValue 
-          } else {
-            comparison = ' <= '
-            pass = value <= compareValue 
-          }
-        }
-  
-        if (pass) {
-          return {
-            message: () =>
-              `expected ${value} not to be ${comparison} than ${compareValue}`,
-            pass: true,
-          };
-        } else {
-          return {
-            message: () =>
-            `expected ${value} to be ${comparison} than ${compareValue}`,
-            pass: false,
-          };
-        }
-      },
-    })
     return Stack.connect().then((dbInstance) => {
       db = dbInstance
     })
@@ -97,49 +60,11 @@ describe('# Querying', () => {
     })
   })
 
-  expect.extend({
-    compareValue(value, compareValue, operator, strict = false) {
-      let pass, comparison
-      // if operator is true, value >= compareValue, else the opposite
-      if (operator) {
-        if (strict) {
-          comparison = ' > '
-          pass = value > compareValue 
-        } else {
-          comparison = ' >= '
-          pass = value >= compareValue 
-        }
-      } else {
-        if (strict) {
-          comparison = ' < '
-          pass = value < compareValue 
-        } else {
-          comparison = ' <= '
-          pass = value <= compareValue 
-        }
-      }
-
-      if (pass) {
-        return {
-          message: () =>
-            `expected ${value} not to be ${comparison} than ${compareValue}`,
-          pass: true,
-        };
-      } else {
-        return {
-          message: () =>
-          `expected ${value} to be ${comparison} than ${compareValue}`,
-          pass: false,
-        };
-      }
-    },
-  })
-
-  describe('basic querying', () => {
-    test('.query $and', () => {
+  describe('on: non pre-existing operator', () => {
+    test('.lessThan()', () => {
       return Stack.contentType('blog')
         .entries()
-        .query({$and: [{content_type_uid: 'blog'}, {no: 1}]})
+        .lessThan('no', 1)
         .find()
         .then((result) => {
           (result as any).entries.forEach((entry) => {
@@ -148,17 +73,17 @@ describe('# Querying', () => {
             expect((result as any).content_type_uid).toEqual('blog')
             expect((result as any).entries).toHaveLength(1)
             expect(entry).toHaveProperty('no')
-            expect(entry.no).toEqual(1)
+            expect(entry.no).toEqual(0)
           })
         }).catch((error) => {
           expect(error).toBeNull()
         })
     })
 
-    test('.query $or', () => {
+    test('.lessThanOrEqualTo()', () => {
       return Stack.contentType('blog')
         .entries()
-        .query({$or: [{content_type_uid: 'blogs'}, {no: 1}]})
+        .lessThanOrEqualTo('no', 0)
         .find()
         .then((result) => {
           (result as any).entries.forEach((entry) => {
@@ -167,17 +92,74 @@ describe('# Querying', () => {
             expect((result as any).content_type_uid).toEqual('blog')
             expect((result as any).entries).toHaveLength(1)
             expect(entry).toHaveProperty('no')
-            expect(entry.no).toEqual(1)
+            expect(entry.no).toEqual(0)
           })
         }).catch((error) => {
           expect(error).toBeNull()
         })
     })
 
-    test('.tags()', () => {
+    test('.notEqualTo()', () => {
       return Stack.contentType('blog')
         .entries()
-        .tags(['last'])
+        .notEqualTo('no', 0)
+        .find()
+        .then((result) => {
+          (result as any).entries.forEach((entry) => {
+            itemPropertyChecks(result)
+            expect(result).toHaveProperty('entries')
+            expect((result as any).content_type_uid).toEqual('blog')
+            expect((result as any).entries).toHaveLength(4)
+            expect(entry).toHaveProperty('no')
+            expect(entry.no).not.toEqual(0)
+          })
+        }).catch((error) => {
+          expect(error).toBeNull()
+        })
+    })
+
+    test('.greaterThan()', () => {
+      return Stack.contentType('blog')
+        .entries()
+        .greaterThan('no', 5)
+        .find()
+        .then((result) => {
+          (result as any).entries.forEach((entry) => {
+            itemPropertyChecks(result)
+            expect(result).toHaveProperty('entries')
+            expect((result as any).content_type_uid).toEqual('blog')
+            expect((result as any).entries).toHaveLength(1)
+            expect(entry).toHaveProperty('no')
+            expect(entry.no).toBeGreaterThan(5)
+          })
+        }).catch((error) => {
+          expect(error).toBeNull()
+        })
+    })
+
+    test('.greaterThanOrEqualTo()', () => {
+      return Stack.contentType('blog')
+        .entries()
+        .greaterThanOrEqualTo('no', 6)
+        .find()
+        .then((result) => {
+          (result as any).entries.forEach((entry) => {
+            itemPropertyChecks(result)
+            expect(result).toHaveProperty('entries')
+            expect((result as any).content_type_uid).toEqual('blog')
+            expect((result as any).entries).toHaveLength(1)
+            expect(entry).toHaveProperty('no')
+            expect(entry.no).toBeGreaterThanOrEqual(6)
+          })
+        }).catch((error) => {
+          expect(error).toBeNull()
+        })
+    })
+
+    test('.containedIn()', () => {
+      return Stack.contentType('blog')
+        .entries()
+        .containedIn('tags', ['last'])
         .find()
         .then((result) => {
           (result as any).entries.forEach((entry) => {
@@ -193,20 +175,20 @@ describe('# Querying', () => {
         })
     })
 
-    test('.query + .tags()', () => {
+    test('.notContainedIn()', () => {
       return Stack.contentType('blog')
         .entries()
-        .query({$or: [{content_type_uid: 'blogs'}, {tags: {$exists: true}}]})
-        .tags(['last'])
+        .notContainedIn('tags', ['last'])
         .find()
         .then((result) => {
           (result as any).entries.forEach((entry) => {
             itemPropertyChecks(result)
             expect(result).toHaveProperty('entries')
             expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(1)
-            expect(entry).toHaveProperty('tags')
-            expect(entry.tags).toContain('last')
+            expect((result as any).entries).toHaveLength(4)
+            if (entry.tags) {
+              expect(entry.tags).not.toContain('last')
+            }
           })
         }).catch((error) => {
           expect(error).toBeNull()

@@ -86,10 +86,10 @@ export class Stack {
     if (!(field) || typeof field !== 'string') {
       // throw new Error('Kindly provide a valid field name for \'.descending()\'')
       if (this.internal.sort && typeof this.internal.sort === 'object') {
-        this.internal.sort[field] = -1
+        this.internal.sort.published_at = -1
       } else {
         this.internal.sort = {
-          [field]: -1,
+          published_at: -1,
         }
       }
     } else {
@@ -162,7 +162,7 @@ export class Stack {
    * @param {Object} queries - Query filter
    * @returns {this} - Returns `stack's` instance
    */
-  public and(...queries) {
+  public and(queries) {
     if (this.q.query && typeof this.q.query === 'object') {
       this.q.query = merge(this.q.query, {
         $and: queries,
@@ -182,7 +182,7 @@ export class Stack {
    * @param {Object} queries - Query filter
    * @returns {this} - Returns `stack's` instance
    */
-  public or(...queries) {
+  public or(queries) {
     if (this.q.query && typeof this.q.query === 'object') {
       this.q.query = merge(this.q.query, {
         $or: queries,
@@ -597,10 +597,12 @@ export class Stack {
     if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
       throw new Error('Kindly provide valid \'field\' values for \'only()\'')
     }
-    this.internal.projections = this.internal.projections || {}
+    this.internal.only = this.internal.only || {}
+    this.internal.only._id = 0
+
     fields.forEach((field) => {
       if (typeof field === 'string') {
-        this.internal.projections[field] = 1
+        this.internal.only[field] = 1
       }
     })
 
@@ -617,12 +619,14 @@ export class Stack {
     if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
       throw new Error('Kindly provide valid \'field\' values for \'except()\'')
     }
-    this.internal.projections = this.internal.projections || {}
+    this.internal.except = this.internal.except || {}
     fields.forEach((field) => {
       if (typeof field === 'string') {
-        this.internal.projections[field] = 0
+        this.internal.except[field] = 0
       }
     })
+
+    this.internal.except = merge(this.config.projections, this.internal.except)
 
     return this
   }
@@ -803,15 +807,21 @@ export class Stack {
   public find(query = {}) {
     return new Promise((resolve, reject) => {
       const queryFilters = this.preProcess(query)
+
+      if (this.internal.sort) {
+        this.collection = this.collection.find(queryFilters).sort(this.internal.sort)
+      } else {
+        this.collection = this.collection.find(queryFilters)
+      }
+
       // process it in a different manner
       if (this.internal.queryReferences) {
-        return this.queryOnReferences(queryFilters)
+        return this.queryOnReferences()
           .then(resolve)
           .catch(reject)
       }
 
       return this.collection
-        .find(queryFilters)
         .project(this.internal.projections)
         .limit(this.internal.limit)
         .skip(this.internal.skip)
@@ -922,10 +932,10 @@ export class Stack {
     })
   }
 
-  public queryOnReferences(query) {
+  private queryOnReferences() {
     return new Promise((resolve, reject) => {
       return this.collection
-        .find(query)
+        // .find(query)
         .project(this.internal.projections)
         // .limit(this.internal.limit)
         // .skip(this.internal.skip)
@@ -972,10 +982,10 @@ export class Stack {
       this.q.query = {}
     }
 
-    if (this.internal.projections) {
-      this.internal.projections = merge(this.config.projections, this.internal.projections)
+    if (this.internal.only) {
+      this.internal.projections = this.internal.only
     } else {
-      this.internal.projections = this.config.projections
+      this.internal.projections = merge(this.config.projections, this.internal.except)
     }
 
     if (!(this.internal.limit)) {
@@ -1036,6 +1046,10 @@ export class Stack {
    */
   private postProcess(result, contentType?) {
     const count = (result === null) ? 0 : result.length
+    // if (this.internal.only) {
+    //   result.forEach((item) => mask(item, this.internal.except))
+    // }
+    // result.forEach((item) => delete item._id)
     switch (this.q.content_type_uid) {
     case '_assets':
       if (this.internal.single) {
@@ -1141,7 +1155,7 @@ export class Stack {
                 }
 
                 referencesFound.push(new Promise((rs, rj) => {
-                  return self.db.collection('contents')
+                  return self.db.collection(this.config.collectionName)
                     .find(query)
                     .project(self.config.projections)
                     .toArray()
