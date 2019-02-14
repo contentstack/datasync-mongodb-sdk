@@ -64,3 +64,25 @@ const getParents = (child, mapping) => {
 
   return parents
 }
+
+export const mask = (json, filter) => {
+  filter.forEach((field) => {
+    maskKeys(json, field.split('.'), 0)
+  })
+}
+
+const maskKeys = (json, arr, pos) => {
+  const key = arr[pos]
+  if (json.hasOwnProperty(key)) {
+    if (pos === arr.length - 1) {
+      delete json[key]
+    } else {
+      pos++
+      maskKeys(json[key], arr, pos)
+    }
+  } else if (typeof json === 'object' && json instanceof Array && json.length) {
+    json.forEach((sub) => {
+      maskKeys(sub, arr, pos)
+    })
+  }
+}

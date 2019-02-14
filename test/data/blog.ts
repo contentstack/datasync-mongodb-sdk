@@ -4,6 +4,7 @@ export const entries = [
       reference_to: 'author',
       values: ['a1'],
     },
+    no: 1,
     content_type_uid: 'blog',
     files: {
       reference_to: '_assets',
@@ -28,6 +29,7 @@ export const entries = [
       locale: 'en-us',
       uid: 'b1',
     },
+    tags: ['first', 'not-last'],
     title: 'Blog One',
     uid: 'b1',
   },
@@ -46,6 +48,7 @@ export const entries = [
         'b4',
       ],
     },
+    no: 3,
     sys_keys: {
       content_type_uid: 'blog',
       locale: 'en-us',
@@ -55,6 +58,7 @@ export const entries = [
       reference_to: 'author',
       values: ['a2'],
     },
+    tags: ['test']
   },
   {
     content_type_uid: 'blog',
@@ -71,6 +75,7 @@ export const entries = [
         'b5',
       ],
     },
+    no: 6,
     authors: {
       reference_to: 'author',
       values: ['a3', 'a2'],
@@ -91,6 +96,7 @@ export const entries = [
       reference_to: 'author',
       values: ['a9'],
     },
+    no: 2,
     sys_keys: {
       content_type_uid: 'blog',
       locale: 'en-us',
@@ -107,10 +113,12 @@ export const entries = [
       reference_to: 'author',
       values: ['a10'],
     },
+    no: 0,
     sys_keys: {
       content_type_uid: 'blog',
       locale: 'en-us',
       uid: 'b1',
     },
+    tags: ['last']
   },
 ]

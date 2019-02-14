@@ -19,7 +19,7 @@ const Stack = Contentstack.Stack({
 
 function connect () {
   return new Promise((resolve, reject) => {
-    return Stack.connect()
+    return Stack.connect({dbName: 'sync-test', collectionName: 'core'})
       .then(resolve)
       .catch(reject)
   })
