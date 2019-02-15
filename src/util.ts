@@ -8,18 +8,6 @@ import { uniq } from 'lodash'
 
 /**
  * @summary
- *  Since the stored documents are nested under `data` key,
- *  this adds the 'data' key to the `fields` the user queries using the wrapper
- * @param {String} field - Field, which needs `data.` appended
- * @returns {String} - Returns field, which is prefixed by `data.`
- */
-export const append = (field) => {
-
-  return `data.${field}`
-}
-
-/**
- * @summary
  *  Validates the mongodb 'uri' passed
  * @param {String} uri - Mongodb connection 'uri' string
  * @returns {String} - Returns the `uri` after validating it, else throws an error
@@ -63,26 +51,4 @@ const getParents = (child, mapping) => {
   }
 
   return parents
-}
-
-export const mask = (json, filter) => {
-  filter.forEach((field) => {
-    maskKeys(json, field.split('.'), 0)
-  })
-}
-
-const maskKeys = (json, arr, pos) => {
-  const key = arr[pos]
-  if (json.hasOwnProperty(key)) {
-    if (pos === arr.length - 1) {
-      delete json[key]
-    } else {
-      pos++
-      maskKeys(json[key], arr, pos)
-    }
-  } else if (typeof json === 'object' && json instanceof Array && json.length) {
-    json.forEach((sub) => {
-      maskKeys(sub, arr, pos)
-    })
-  }
 }
