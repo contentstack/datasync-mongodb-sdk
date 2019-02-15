@@ -10,10 +10,14 @@ import { entries as blogs } from './data/blog'
 import { entries as categories } from './data/category'
 import { content_types } from './data/content_types'
 
-config.collectionName = 'conditional'
+config.collectionName = 'expressions'
 
 const Stack = Contentstack.Stack(config)
 let db
+
+function fnWhere () {
+  return (this.no === 1)
+}
 
 const itemPropertyChecks = (result) => {
   if (result instanceof Array) {
@@ -30,7 +34,7 @@ const itemPropertyChecks = (result) => {
   }
 }
 
-describe('# Conditional Operators', () => {
+describe('# Expressional Operators', () => {
   beforeAll(() => {
     return Stack.connect().then((dbInstance) => {
       db = dbInstance
@@ -55,44 +59,42 @@ describe('# Conditional Operators', () => {
       })
   })
   afterAll(() => {
-    return db.collection(config.collectionName).drop().then(() => {
-      return Stack.close()
-    })
+    // return db.collection(config.collectionName).drop().then(() => {
+    //   return Stack.close()
+    // })
   })
 
-  describe('check key existence', () => {
-    test('.exists()', () => {
+  describe('basic', () => {
+    test('.where()', () => {
       return Stack.contentType('blog')
         .entries()
-        .exists('tags')
-        .exists('single_file')
+        .where(fnWhere)
         .find()
         .then((result) => {
           (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect(entry).toHaveProperty('tags')
-            expect(entry).toHaveProperty('single_file')
+            expect(entry).toHaveProperty('no')
+            expect(entry.no).toEqual(1)
           })
+          itemPropertyChecks(result)
+          expect(result).toHaveProperty('entries')
+          expect((result as any).content_type_uid).toEqual('blog')
         }).catch((error) => {
           expect(error).toBeNull()
         })
     })
 
-    test('.notExists()', () => {
+    test('.regex()', () => {
       return Stack.contentType('blog')
         .entries()
-        .notExists('tags')
-        .notExists('single_file')
+        .regex('title', '/^Blog Two$/', 'g')
         .find()
         .then((result) => {
           (result as any).entries.forEach((entry) => {
             itemPropertyChecks(result)
             expect(result).toHaveProperty('entries')
             expect((result as any).content_type_uid).toEqual('blog')
-            expect(entry).not.toHaveProperty('tags')
-            expect(entry).not.toHaveProperty('single_file')
+            expect(entry).toHaveProperty('title')
+            expect(entry.title).toMatch(/^Blog Two$/)
           })
         }).catch((error) => {
           expect(error).toBeNull()

@@ -15,7 +15,7 @@ export declare const config: {
         noDelay: boolean;
         reconnectInterval: number;
         reconnectTries: number;
-        userNewUrlParser: boolean;
+        useNewUrlParser: boolean;
     };
     projections: {
         _id: number;

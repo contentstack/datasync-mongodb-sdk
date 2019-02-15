@@ -713,11 +713,19 @@ export class Stack {
     if (!(expr)) {
       throw new Error('Kindly provide a valid field and expr/fn value for \'.where()\'')
     } else if (this.q.query && typeof this.q.query === 'object') {
+      if (typeof expr === 'function') {
+        expr = expr.toString()
+      }
       this.q.query = merge(this.q.query, {
         $where: expr,
       })
     } else {
-      this.q.query.$where = expr
+      if (typeof expr === 'function') {
+        expr = expr.toString()
+      }
+      this.q.query = {
+        $where: expr,
+      }
     }
 
     return this
@@ -867,19 +875,16 @@ export class Stack {
     return new Promise((resolve, reject) => {
       const queryFilters = this.preProcess(query)
       this.collection = this.collection.find(queryFilters)
-      if (this.internal.sort) {
-        this.collection = this.collection.sort(this.internal.sort)
-      }
       // process it in a different manner
       if (this.internal.queryReferences) {
         return this.collection
-        // .find(queryFilters)
         .project(this.internal.projections)
         .toArray()
         .then((result) => {
           if (result === null || result.length === 0) {
             return resolve({ count: 0})
           }
+          this.internal.includeReferences = true
 
           return this.includeReferencesI(result, this.q.locale, {}, undefined)
             .then(() => {
@@ -898,7 +903,6 @@ export class Stack {
       }
 
       return this.collection
-        // .find(queryFilters)
         .project(this.internal.projections)
         .count()
         .then((result) => {

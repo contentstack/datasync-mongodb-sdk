@@ -6,9 +6,6 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = require("lodash");
-exports.append = (field) => {
-    return `data.${field}`;
-};
 exports.validateURI = (uri) => {
     if (typeof uri !== 'string' || uri.length === 0) {
         throw new Error(`Mongodb connection url: ${uri} must be of type string`);
@@ -36,26 +33,4 @@ const getParents = (child, mapping) => {
         }
     }
     return parents;
-};
-exports.mask = (json, filter) => {
-    filter.forEach((field) => {
-        maskKeys(json, field.split('.'), 0);
-    });
-};
-const maskKeys = (json, arr, pos) => {
-    const key = arr[pos];
-    if (json.hasOwnProperty(key)) {
-        if (pos === arr.length - 1) {
-            delete json[key];
-        }
-        else {
-            pos++;
-            maskKeys(json[key], arr, pos);
-        }
-    }
-    else if (typeof json === 'object' && json instanceof Array && json.length) {
-        json.forEach((sub) => {
-            maskKeys(sub, arr, pos);
-        });
-    }
 };

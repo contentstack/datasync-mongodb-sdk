@@ -18,7 +18,7 @@ export const config = {
     noDelay: true,
     reconnectInterval: 1000,
     reconnectTries: 20,
-    userNewUrlParser: true,
+    useNewUrlParser: true,
   },
   projections: {
     _id: 0,

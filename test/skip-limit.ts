@@ -10,10 +10,11 @@ import { entries as blogs } from './data/blog'
 import { entries as categories } from './data/category'
 import { content_types } from './data/content_types'
 
-config.collectionName = 'conditional'
+config.collectionName = 'skip_limit'
 
 const Stack = Contentstack.Stack(config)
 let db
+let tempVariable
 
 const itemPropertyChecks = (result) => {
   if (result instanceof Array) {
@@ -60,43 +61,79 @@ describe('# Conditional Operators', () => {
     })
   })
 
-  describe('check key existence', () => {
-    test('.exists()', () => {
+  describe('basic', () => {
+    test('.limit(1)', () => {
+      const limit = 1
+
       return Stack.contentType('blog')
         .entries()
-        .exists('tags')
-        .exists('single_file')
+        .limit(limit)
         .find()
         .then((result) => {
-          (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect(entry).toHaveProperty('tags')
-            expect(entry).toHaveProperty('single_file')
-          })
+          itemPropertyChecks(result)
+          expect(result).toHaveProperty('entries')
+          expect((result as any).content_type_uid).toEqual('blog')
+          expect((result as any).entries).toHaveLength(limit)
+          tempVariable = (result as any).entries[0]
         }).catch((error) => {
           expect(error).toBeNull()
         })
     })
 
-    test('.notExists()', () => {
+    test('.skip(1)', () => {
+      const skip = 1
+
       return Stack.contentType('blog')
+      .entries()
+      .find()
+      .then((r1) => {
+
+        return Stack.contentType('blog')
         .entries()
-        .notExists('tags')
-        .notExists('single_file')
+        .skip(skip)
         .find()
         .then((result) => {
           (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect(entry).not.toHaveProperty('tags')
-            expect(entry).not.toHaveProperty('single_file')
+            expect(entry).not.toMatchObject(tempVariable)
           })
-        }).catch((error) => {
-          expect(error).toBeNull()
+          itemPropertyChecks(result)
+          expect(result).toHaveProperty('entries')
+          expect((result as any).content_type_uid).toEqual('blog')
+          expect((result as any).entries).toHaveLength((r1 as any).entries.length - skip)
         })
+      })
+      .catch((error) => {
+        expect(error).toBeNull()
+      })
+    })
+  })
+
+  describe('skip-limit combination', () => {
+    test('.skip(1) + .limit(1)', () => {
+      const skip = 1
+      const limit = 1
+
+      return Stack.contentType('blog')
+      .entries()
+      .find()
+      .then((r1) => {
+
+        return Stack.contentType('blog')
+        .entries()
+        .skip(skip)
+        .limit(limit)
+        .find()
+        .then((result) => {
+          itemPropertyChecks(result)
+          expect(result).toHaveProperty('entries')
+          expect((result as any).content_type_uid).toEqual('blog')
+          expect((result as any).entries).toHaveLength(limit)
+          expect((result as any).entries[0]).not.toMatchObject((r1 as any).entries[0])
+        })
+      })
+      .catch((error) => {
+        expect(error).toBeNull()
+      })
     })
   })
 })
