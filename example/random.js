@@ -14,7 +14,7 @@ const Stack = Contentstack.Stack({
     }
   ],
   dbName: 'sync-test',
-  collectionName: 'references'
+  collectionName: 'count'
 })
 
 Stack.connect({collectionName: 'logical'}).then(() => {
@@ -26,13 +26,18 @@ Stack.connect({collectionName: 'logical'}).then(() => {
   //   .catch(console.error)
   Stack.contentType('blog')
     .entries()
-    .includeReferences()
+    // .includeReferences()
+    // .where(function () {
+    //   return (this.no === 1)
+    // })
+    .queryReferences({'authors.uid': 'a10'})
     // .only(['published_at'])
     // .except(['published_at'])
     // .ascending()
     // .descending()
     // .and([{uid: 'b1'}, {no: 1}])
-    .find()
+    // .find()
+    .count()
     .then(console.log)
     .catch(console.error)
 })

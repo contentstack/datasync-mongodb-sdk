@@ -446,12 +446,20 @@ class Stack {
             throw new Error('Kindly provide a valid field and expr/fn value for \'.where()\'');
         }
         else if (this.q.query && typeof this.q.query === 'object') {
+            if (typeof expr === 'function') {
+                expr = expr.toString();
+            }
             this.q.query = lodash_1.merge(this.q.query, {
                 $where: expr,
             });
         }
         else {
-            this.q.query.$where = expr;
+            if (typeof expr === 'function') {
+                expr = expr.toString();
+            }
+            this.q.query = {
+                $where: expr,
+            };
         }
         return this;
     }
@@ -535,9 +543,6 @@ class Stack {
         return new Promise((resolve, reject) => {
             const queryFilters = this.preProcess(query);
             this.collection = this.collection.find(queryFilters);
-            if (this.internal.sort) {
-                this.collection = this.collection.sort(this.internal.sort);
-            }
             if (this.internal.queryReferences) {
                 return this.collection
                     .project(this.internal.projections)
@@ -546,6 +551,7 @@ class Stack {
                     if (result === null || result.length === 0) {
                         return resolve({ count: 0 });
                     }
+                    this.internal.includeReferences = true;
                     return this.includeReferencesI(result, this.q.locale, {}, undefined)
                         .then(() => {
                         result = sift_1.default(this.internal.queryReferences, result);
