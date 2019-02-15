@@ -226,5 +226,101 @@ describe('# Sorting', () => {
         })
     })
   })
+
+  describe('combination - without fields', () => {
+    test('.ascending() + .descending()', () => {
+      return Stack.contentType('blog')
+        .entries()
+        .ascending()
+        .descending()
+        .find()
+        .then((result) => {
+          (result as any).entries.forEach((entry, index) => {
+            itemPropertyChecks(result)
+            expect(result).toHaveProperty('entries')
+            expect((result as any).content_type_uid).toEqual('blog')
+            expect((result as any).entries).toHaveLength(5)
+            
+            if (index === ((result as any).entries.length - 1)) {
+              index -= 1
+            }
+            (expect(entry.published_at) as any).compareValue((result as any).entries[index + 1].published_at, true)
+          })
+        }).catch((error) => {
+          expect(error).toBeNull()
+        })
+    })
+
+    test('.descending() + .ascending()', () => {
+      return Stack.contentType('blog')
+        .entries()
+        .descending()
+        .ascending()
+        .find()
+        .then((result) => {
+          (result as any).entries.forEach((entry, index) => {
+            itemPropertyChecks(result)
+            expect(result).toHaveProperty('entries')
+            expect((result as any).content_type_uid).toEqual('blog')
+            expect((result as any).entries).toHaveLength(5)
+            
+            if (index === ((result as any).entries.length - 1)) {
+              index -= 1
+            }
+            (expect(entry.published_at) as any).compareValue((result as any).entries[index + 1].published_at, false)
+          })
+        }).catch((error) => {
+          expect(error).toBeNull()
+        })
+    })
+  })
+
+  describe('combination - with fields', () => {
+    test('.ascending() + .descending()', () => {
+      return Stack.contentType('blog')
+        .entries()
+        .ascending('no')
+        .descending('no')
+        .find()
+        .then((result) => {
+          (result as any).entries.forEach((entry, index) => {
+            itemPropertyChecks(result)
+            expect(result).toHaveProperty('entries')
+            expect((result as any).content_type_uid).toEqual('blog')
+            expect((result as any).entries).toHaveLength(5)
+            
+            if (index === ((result as any).entries.length - 1)) {
+              index -= 1
+            }
+            (expect(entry.no) as any).compareValue((result as any).entries[index + 1].no, true)
+          })
+        }).catch((error) => {
+          expect(error).toBeNull()
+        })
+    })
+
+    test('.descending() + .ascending()', () => {
+      return Stack.contentType('blog')
+        .entries()
+        .descending('no')
+        .ascending('no')
+        .find()
+        .then((result) => {
+          (result as any).entries.forEach((entry, index) => {
+            itemPropertyChecks(result)
+            expect(result).toHaveProperty('entries')
+            expect((result as any).content_type_uid).toEqual('blog')
+            expect((result as any).entries).toHaveLength(5)
+            
+            if (index === ((result as any).entries.length - 1)) {
+              index -= 1
+            }
+            (expect(entry.no) as any).compareValue((result as any).entries[index + 1].no, false)
+          })
+        }).catch((error) => {
+          expect(error).toBeNull()
+        })
+    })
+  })
 })
 

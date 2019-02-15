@@ -8,6 +8,7 @@ import { assets } from './data/assets'
 import { entries as authors } from './data/author'
 import { entries as blogs } from './data/blog'
 import { entries as categories } from './data/category'
+import { entries as products } from './data/products'
 import { content_types } from './data/content_types'
 
 config.collectionName = 'core'
@@ -25,6 +26,9 @@ describe('# Core', () => {
     return db.collection(config.collectionName).insertMany(authors)
     .then(() => {
       return db.collection(config.collectionName).insertMany(blogs)
+    })
+    .then(() => {
+      return db.collection(config.collectionName).insertMany(products)
     })
     .then(() => {
       return db.collection(config.collectionName).insertMany(categories)
@@ -67,6 +71,30 @@ describe('# Core', () => {
             expect((result as any).content_type_uid).toEqual('blog')
             expect((result as any).locale).toEqual('en-us')
             expect((result as any).entries).toHaveLength(5)
+          })
+        }).catch((error) => {
+          expect(error).toBeNull()
+        })
+    })
+
+    test('find - language', () => {
+      return Stack.contentType('product')
+        .entries()
+        .language('es-es')
+        .find()
+        .then((result) => {
+          (result as any).entries.forEach((entry) => {
+            expect(entry).not.toHaveProperty('sys_keys')
+            expect(entry).not.toHaveProperty('_version')
+            expect(entry).not.toHaveProperty('content_type_uid')
+            expect(entry).not.toHaveProperty('created_at')
+            expect(entry).not.toHaveProperty('updated_at')
+            expect(result).toHaveProperty('entries')
+            expect(result).toHaveProperty('content_type_uid')
+            expect(result).toHaveProperty('locale')
+            expect((result as any).content_type_uid).toEqual('product')
+            expect((result as any).locale).toEqual('es-es')
+            expect((result as any).entries).toHaveLength(1)
           })
         }).catch((error) => {
           expect(error).toBeNull()
