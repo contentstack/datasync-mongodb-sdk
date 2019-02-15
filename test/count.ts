@@ -10,27 +10,13 @@ import { entries as blogs } from './data/blog'
 import { entries as categories } from './data/category'
 import { content_types } from './data/content_types'
 
-config.collectionName = 'conditional'
+config.collectionName = 'count'
 
 const Stack = Contentstack.Stack(config)
+const blogsCount = blogs.length
 let db
 
-const itemPropertyChecks = (result) => {
-  if (result instanceof Array) {
-    result.forEach((item) => {
-      expect(item).not.toHaveProperty('sys_keys')
-      expect(item).not.toHaveProperty('_version')
-      expect(item).not.toHaveProperty('content_type_uid')
-      expect(item).not.toHaveProperty('created_at')
-      expect(item).not.toHaveProperty('updated_at')
-    })
-    expect(result).toHaveProperty('content_type_uid')
-    expect(result).toHaveProperty('locale')
-    expect((result as any).locale).toEqual('en-us')
-  }
-}
-
-describe('# Conditional Operators', () => {
+describe('# Count', () => {
   beforeAll(() => {
     return Stack.connect().then((dbInstance) => {
       db = dbInstance
@@ -60,40 +46,31 @@ describe('# Conditional Operators', () => {
     })
   })
 
-  describe('check key existence', () => {
-    test('.exists()', () => {
+  describe('basic', () => {
+    test('.count()', () => {
       return Stack.contentType('blog')
         .entries()
-        .exists('tags')
-        .exists('single_file')
-        .find()
+        .count()
         .then((result) => {
-          (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect(entry).toHaveProperty('tags')
-            expect(entry).toHaveProperty('single_file')
-          })
+          expect(result).toHaveProperty('count')
+          expect((result as any).count).toEqual(blogsCount)
+          expect(Object.keys(result)).toHaveLength(1)
         }).catch((error) => {
           expect(error).toBeNull()
         })
     })
+  })
 
-    test('.notExists()', () => {
+  describe('querying', () => {
+    test('.count() + .queryReferences()', () => {
       return Stack.contentType('blog')
         .entries()
-        .notExists('tags')
-        .notExists('single_file')
-        .find()
+        .queryReferences({'authors.uid': 'a10'})
+        .count()
         .then((result) => {
-          (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect(entry).not.toHaveProperty('tags')
-            expect(entry).not.toHaveProperty('single_file')
-          })
+          expect(result).toHaveProperty('count')
+          expect((result as any).count).toEqual(1)
+          expect(Object.keys(result)).toHaveLength(1)
         }).catch((error) => {
           expect(error).toBeNull()
         })
