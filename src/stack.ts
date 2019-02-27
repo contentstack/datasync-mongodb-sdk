@@ -21,6 +21,7 @@ import { checkCyclic, validateURI } from './util'
 export class Stack {
   private q: any
   private config: any
+  private contentStore: any
   private client: any
   private collection: any
   private internal: any
@@ -28,6 +29,7 @@ export class Stack {
 
   constructor(stackConfig, existingDB?) {
     this.config = merge(config, stackConfig)
+    this.contentStore = this.config.contentStore
     this.q = {}
     this.internal = {}
     this.db = existingDB
@@ -114,7 +116,8 @@ export class Stack {
   public connect(overrides = {}) {
     return new Promise((resolve, reject) => {
       try {
-        const dbConfig = merge({}, this.config, overrides)
+        const dbConfig = merge({}, this.config, overrides).contentStore
+
         const uri = validateURI(dbConfig.uri || dbConfig.url)
         const options = dbConfig.options
         const dbName = dbConfig.dbName
@@ -432,7 +435,7 @@ export class Stack {
     const stack = new Stack(this.config, this.db)
     if (uid && typeof uid === 'string') {
       stack.q.content_type_uid = uid
-      stack.collection = stack.db.collection(stack.config.collectionName)
+      stack.collection = stack.db.collection(stack.contentStore.collectionName)
 
       return stack
     }
@@ -486,7 +489,7 @@ export class Stack {
       stack.q.uid = uid
     }
     stack.q.content_type_uid = '_assets'
-    stack.collection = stack.db.collection(stack.config.collectionName)
+    stack.collection = stack.db.collection(stack.contentStore.collectionName)
     stack.internal.limit = 1
     stack.internal.single = true
 
@@ -501,7 +504,7 @@ export class Stack {
   public assets() {
     const stack = new Stack(this.config, this.db)
     stack.q.content_type_uid = '_assets'
-    stack.collection = stack.db.collection(stack.config.collectionName)
+    stack.collection = stack.db.collection(stack.contentStore.collectionName)
 
     return stack
   }
@@ -519,7 +522,7 @@ export class Stack {
       stack.q.uid = uid
     }
     stack.q.content_type_uid = 'contentTypes'
-    stack.collection = stack.db.collection(stack.config.collectionName)
+    stack.collection = stack.db.collection(stack.contentStore.collectionName)
     stack.internal.limit = 1
     stack.internal.single = true
 
@@ -534,7 +537,7 @@ export class Stack {
   public schemas() {
     const stack = new Stack(this.config, this.db)
     stack.q.content_type_uid = 'contentTypes'
-    stack.collection = stack.db.collection(stack.config.collectionName)
+    stack.collection = stack.db.collection(stack.contentStore.collectionName)
 
     return stack
   }
@@ -626,7 +629,7 @@ export class Stack {
       }
     })
 
-    this.internal.except = merge(this.config.projections, this.internal.except)
+    this.internal.except = merge(this.contentStore.projections, this.internal.except)
 
     return this
   }
@@ -989,15 +992,15 @@ export class Stack {
     if (this.internal.only) {
       this.internal.projections = this.internal.only
     } else {
-      this.internal.projections = merge(this.config.projections, this.internal.except)
+      this.internal.projections = merge(this.contentStore.projections, this.internal.except)
     }
 
     if (!(this.internal.limit)) {
-      this.internal.limit = this.config.limit
+      this.internal.limit = this.contentStore.limit
     }
 
     if (!(this.internal.skip)) {
-      this.internal.skip = this.config.skip
+      this.internal.skip = this.contentStore.skip
     }
 
     if (!(this.q.locale)) {
@@ -1159,7 +1162,7 @@ export class Stack {
                 }
 
                 referencesFound.push(new Promise((rs, rj) => {
-                  return self.db.collection(this.config.collectionName)
+                  return self.db.collection(this.contentStore.collectionName)
                     .find(query)
                     .project(self.config.projections)
                     .toArray()

@@ -6,6 +6,7 @@
 export declare class Stack {
     private q;
     private config;
+    private contentStore;
     private client;
     private collection;
     private internal;
