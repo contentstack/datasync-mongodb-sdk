@@ -4,3 +4,7 @@ package-lock.json
 
 # Test coverages
 coverage
+
+# Examples
+example/**/*
+!example/index.js
