@@ -2,7 +2,7 @@
   "name": "contentstack-sync-mongodb-sdk",
   "version": "1.0.0",
   "description": "Contentstack sync utility's Mongodb SDK",
-  "main": "dist/contentstack.js",
+  "main": "dist/index.js",
   "scripts": {
     "clean": "rimraf dist typings coverage",
     "build-ts": "npm run clean && tsc",
