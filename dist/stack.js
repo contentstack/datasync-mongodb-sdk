@@ -472,6 +472,10 @@ class Stack {
         this.internal.includeSchema = true;
         return this;
     }
+    includeContentType() {
+        this.internal.includeSchema = true;
+        return this;
+    }
     includeReferences() {
         this.internal.includeReferences = true;
         return this;
@@ -730,64 +734,66 @@ class Stack {
             const referencesFound = [];
             for (const prop in entry) {
                 if (entry[prop] !== null && typeof entry[prop] === 'object') {
-                    if (entry[prop] && entry[prop].reference_to && ((!(this.internal.includeReferences)
-                        && entry[prop].reference_to === '_assets') || this.internal.includeReferences)) {
-                        if (entry[prop].values.length === 0) {
-                            entry[prop] = [];
-                        }
-                        else {
-                            let uids = entry[prop].values;
-                            if (typeof uids === 'string') {
-                                uids = [uids];
+                    if (entry[prop] && entry[prop].reference_to) {
+                        if ((!(this.internal.includeReferences)
+                            && entry[prop].reference_to === '_assets') || this.internal.includeReferences) {
+                            if (entry[prop].values.length === 0) {
+                                entry[prop] = [];
                             }
-                            if (entry[prop].reference_to !== '_assets') {
-                                uids = lodash_1.filter(uids, (uid) => {
-                                    return !(util_1.checkCyclic(uid, references));
-                                });
-                            }
-                            if (uids.length) {
-                                const query = {
-                                    content_type_uid: entry[prop].reference_to,
-                                    locale,
-                                    uid: {
-                                        $in: uids,
-                                    },
-                                };
-                                referencesFound.push(new Promise((rs, rj) => {
-                                    return self.db.collection(this.contentStore.collectionName)
-                                        .find(query)
-                                        .project(self.config.projections)
-                                        .toArray()
-                                        .then((result) => {
-                                        if (result.length === 0) {
-                                            entry[prop] = [];
-                                            return rs();
-                                        }
-                                        else if (parentUid) {
-                                            references[parentUid] = references[parentUid] || [];
-                                            references[parentUid] = lodash_1.uniq(references[parentUid].concat(lodash_1.map(result, 'uid')));
-                                        }
-                                        if (typeof entry[prop].values === 'string') {
-                                            entry[prop] = ((result === null) || result.length === 0) ? null : result[0];
-                                        }
-                                        else {
-                                            const referenceBucket = [];
-                                            query.uid.$in.forEach((entityUid) => {
-                                                const elem = lodash_1.find(result, (entity) => {
-                                                    return entity.uid === entityUid;
+                            else {
+                                let uids = entry[prop].values;
+                                if (typeof uids === 'string') {
+                                    uids = [uids];
+                                }
+                                if (entry[prop].reference_to !== '_assets') {
+                                    uids = lodash_1.filter(uids, (uid) => {
+                                        return !(util_1.checkCyclic(uid, references));
+                                    });
+                                }
+                                if (uids.length) {
+                                    const query = {
+                                        content_type_uid: entry[prop].reference_to,
+                                        locale,
+                                        uid: {
+                                            $in: uids,
+                                        },
+                                    };
+                                    referencesFound.push(new Promise((rs, rj) => {
+                                        return self.db.collection(this.contentStore.collectionName)
+                                            .find(query)
+                                            .project(self.config.projections)
+                                            .toArray()
+                                            .then((result) => {
+                                            if (result.length === 0) {
+                                                entry[prop] = [];
+                                                return rs();
+                                            }
+                                            else if (parentUid) {
+                                                references[parentUid] = references[parentUid] || [];
+                                                references[parentUid] = lodash_1.uniq(references[parentUid].concat(lodash_1.map(result, 'uid')));
+                                            }
+                                            if (typeof entry[prop].values === 'string') {
+                                                entry[prop] = ((result === null) || result.length === 0) ? null : result[0];
+                                            }
+                                            else {
+                                                const referenceBucket = [];
+                                                query.uid.$in.forEach((entityUid) => {
+                                                    const elem = lodash_1.find(result, (entity) => {
+                                                        return entity.uid === entityUid;
+                                                    });
+                                                    if (elem) {
+                                                        referenceBucket.push(elem);
+                                                    }
                                                 });
-                                                if (elem) {
-                                                    referenceBucket.push(elem);
-                                                }
-                                            });
-                                            entry[prop] = referenceBucket;
-                                        }
-                                        return self.includeReferencesI(entry[prop], locale, references, parentUid)
-                                            .then(rs)
+                                                entry[prop] = referenceBucket;
+                                            }
+                                            return self.includeReferencesI(entry[prop], locale, references, parentUid)
+                                                .then(rs)
+                                                .catch(rj);
+                                        })
                                             .catch(rj);
-                                    })
-                                        .catch(rj);
-                                }));
+                                    }));
+                                }
                             }
                         }
                     }

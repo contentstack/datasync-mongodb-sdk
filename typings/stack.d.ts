@@ -45,6 +45,7 @@ export declare class Stack {
     where(expr: any): this;
     includeCount(): this;
     includeSchema(): this;
+    includeContentType(): this;
     includeReferences(): this;
     excludeReferences(): this;
     queryReferences(query: any): this;

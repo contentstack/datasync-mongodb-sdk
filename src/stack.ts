@@ -758,6 +758,17 @@ export class Stack {
 
   /**
    * @summary
+   *  Includes 'content_type' key in response, which is the content type schema of the entries filtered/scanned
+   * @returns {this} - Returns `stack's` instance
+   */
+  public includeContentType() {
+    this.internal.includeSchema = true
+
+    return this
+  }
+
+  /**
+   * @summary
    *  Includes all references of the entries being scanned
    * @returns {this} - Returns `stack's` instance
    */
@@ -1138,66 +1149,68 @@ export class Stack {
       // iterate over each key in the object
       for (const prop in entry) {
         if (entry[prop] !== null && typeof entry[prop] === 'object') {
-          if (entry[prop] && entry[prop].reference_to && ((!(this.internal.includeReferences)
-            && entry[prop].reference_to === '_assets') || this.internal.includeReferences)) {
-            if (entry[prop].values.length === 0) {
-              entry[prop] = []
-            } else {
-              let uids = entry[prop].values
-              if (typeof uids === 'string') {
-                uids = [uids]
-              }
-              if (entry[prop].reference_to !== '_assets') {
-                uids = filter(uids, (uid) => {
-                  return !(checkCyclic(uid, references))
-                })
-              }
-              if (uids.length) {
-                const query = {
-                  content_type_uid: entry[prop].reference_to,
-                  locale,
-                  uid: {
-                    $in: uids,
-                  },
+          if (entry[prop] && entry[prop].reference_to) {
+            if ((!(this.internal.includeReferences)
+            && entry[prop].reference_to === '_assets') || this.internal.includeReferences) {
+              if (entry[prop].values.length === 0) {
+                entry[prop] = []
+              } else {
+                let uids = entry[prop].values
+                if (typeof uids === 'string') {
+                  uids = [uids]
                 }
+                if (entry[prop].reference_to !== '_assets') {
+                  uids = filter(uids, (uid) => {
+                    return !(checkCyclic(uid, references))
+                  })
+                }
+                if (uids.length) {
+                  const query = {
+                    content_type_uid: entry[prop].reference_to,
+                    locale,
+                    uid: {
+                      $in: uids,
+                    },
+                  }
 
-                referencesFound.push(new Promise((rs, rj) => {
-                  return self.db.collection(this.contentStore.collectionName)
-                    .find(query)
-                    .project(self.config.projections)
-                    .toArray()
-                    .then((result) => {
-                      if (result.length === 0) {
-                        entry[prop] = []
+                  referencesFound.push(new Promise((rs, rj) => {
+                    return self.db.collection(this.contentStore.collectionName)
+                      .find(query)
+                      .project(self.config.projections)
+                      .toArray()
+                      .then((result) => {
+                        if (result.length === 0) {
+                          entry[prop] = []
 
-                        return rs()
-                      } else if (parentUid) {
-                        references[parentUid] = references[parentUid] || []
-                        references[parentUid] = uniq(references[parentUid].concat(map(result, 'uid')))
-                      }
+                          return rs()
+                        } else if (parentUid) {
+                          references[parentUid] = references[parentUid] || []
+                          references[parentUid] = uniq(references[parentUid].concat(map(result, 'uid')))
+                        }
 
-                      if (typeof entry[prop].values === 'string') {
-                        entry[prop] = ((result === null) || result.length === 0) ? null : result[0]
-                      } else {
-                        // format the references in order
-                        const referenceBucket = []
-                        query.uid.$in.forEach((entityUid) => {
-                          const elem = find(result, (entity) => {
-                            return entity.uid === entityUid
+                        if (typeof entry[prop].values === 'string') {
+                          entry[prop] = ((result === null) || result.length === 0) ? null : result[0]
+                        } else {
+                          // format the references in order
+                          const referenceBucket = []
+                          query.uid.$in.forEach((entityUid) => {
+                            const elem = find(result, (entity) => {
+                              return entity.uid === entityUid
+                            })
+                            if (elem) {
+                              referenceBucket.push(elem)
+                            }
                           })
-                          if (elem) {
-                            referenceBucket.push(elem)
-                          }
-                        })
-                        entry[prop] = referenceBucket
-                      }
+                          entry[prop] = referenceBucket
+                        }
 
-                      return self.includeReferencesI(entry[prop], locale, references, parentUid)
-                        .then(rs)
-                        .catch(rj)
-                    })
-                    .catch(rj)
-                }))
+                        return self.includeReferencesI(entry[prop], locale, references, parentUid)
+                          .then(rs)
+                          .catch(rj)
+                      })
+                      .catch(rj)
+                  }))
+                }
               }
             }
           } else {
