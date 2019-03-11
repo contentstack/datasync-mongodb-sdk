@@ -7,6 +7,11 @@ export declare const config: {
     contentStore: {
         collectionName: string;
         dbName: string;
+        indexes: {
+            content_type_uid: number;
+            locale: number;
+            uid: number;
+        };
         limit: number;
         locales: any[];
         options: {

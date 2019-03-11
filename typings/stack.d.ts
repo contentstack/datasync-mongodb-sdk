@@ -15,6 +15,7 @@ export declare class Stack {
     ascending(field?: any): this;
     descending(field?: any): this;
     connect(overrides?: {}): Promise<{}>;
+    private createIndexes;
     close(): void;
     language(code: any): this;
     and(queries: any): this;

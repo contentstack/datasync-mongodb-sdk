@@ -127,13 +127,43 @@ export class Stack {
         return client.connect().then(() => {
           this.db = client.db(dbName)
 
-          return resolve(this.db)
+          resolve(this.db)
+
+          // Create indexes in the background
+          const bucket: any = []
+          const indexes = this.config.contentStore.indexes
+          const collectionName = this.config.contentStore.collectionName
+          for (let index in indexes) {
+            if (indexes[index] === 1 || indexes[index] === -1) {
+              bucket.push(this.createIndexes(this.config.contentStore.collectionName, index, indexes[index]))
+            }
+          }
+
+          Promise.all(bucket)
+            .then(() => {
+              console.info(`Indexes created successfully in '${collectionName}' collection`)    
+            })
+            .catch((error) => {
+              console.error(`Failed while creating indexes in '${collectionName}' collection`)
+              console.error(error)
+            })
         }).catch(reject)
       } catch (error) {
 
         return reject(error)
       }
     })
+  }
+
+  private createIndexes (collectionId, index, type) {
+    return this.db.collection(collectionId)
+      .createIndex({
+        [index]: type
+      })
+      .then(() => {
+        console.info(`Index '${index}' created successfully!`)
+        return
+      })
   }
 
   /**
@@ -1176,7 +1206,7 @@ export class Stack {
                   referencesFound.push(new Promise((rs, rj) => {
                     return self.db.collection(this.contentStore.collectionName)
                       .find(query)
-                      .project(self.config.projections)
+                      .project(self.config.contentStore.projections)
                       .toArray()
                       .then((result) => {
                         if (result.length === 0) {
