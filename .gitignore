@@ -8,3 +8,7 @@ coverage
 # Examples
 example/**/*
 !example/index.js
+
+# Random files
+newQueryBuilder.ts
+query-builder.ts
