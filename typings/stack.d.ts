@@ -50,7 +50,9 @@ export declare class Stack {
     includeReferences(): this;
     excludeReferences(): this;
     queryReferences(query: any): this;
+    queryReferencesBeta(query: any): this;
     getQuery(): any;
+    include(fields: any): this;
     find(query?: {}): Promise<{}>;
     count(query?: any): Promise<{}>;
     findOne(query?: {}): Promise<{}>;
@@ -59,4 +61,7 @@ export declare class Stack {
     private cleanup;
     private postProcess;
     private includeReferencesI;
+    private isPartOfInclude;
+    private includeSpecificReferences;
+    queryBuilder(query: any, language: any, ct: any): Promise<{}>;
 }
