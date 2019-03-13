@@ -7,6 +7,7 @@ export declare class Stack {
     private q;
     private config;
     private contentStore;
+    private types;
     private client;
     private collection;
     private internal;
@@ -61,7 +62,9 @@ export declare class Stack {
     private cleanup;
     private postProcess;
     private includeReferencesI;
+    private includeReferencesBeta;
     private isPartOfInclude;
     private includeSpecificReferences;
-    queryBuilder(query: any, language: any, ct: any): Promise<{}>;
+    private queryBuilder;
+    private excludeSpecificReferences;
 }

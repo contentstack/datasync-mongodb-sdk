@@ -22,6 +22,7 @@ export class Stack {
   private q: any
   private config: any
   private contentStore: any
+  private types: any
   private client: any
   private collection: any
   private internal: any
@@ -30,6 +31,7 @@ export class Stack {
   constructor(stackConfig, existingDB?) {
     this.config = merge(config, stackConfig)
     this.contentStore = this.config.contentStore
+    this.types = this.contentStore.internalContentTypes
     this.q = {}
     this.internal = {}
     this.db = existingDB
@@ -86,7 +88,6 @@ export class Stack {
     }
 
     if (!(field) || typeof field !== 'string') {
-      // throw new Error('Kindly provide a valid field name for \'.descending()\'')
       if (this.internal.sort && typeof this.internal.sort === 'object') {
         this.internal.sort.published_at = -1
       } else {
@@ -518,7 +519,7 @@ export class Stack {
     if (uid && typeof uid === 'string') {
       stack.q.uid = uid
     }
-    stack.q.content_type_uid = '_assets'
+    stack.q.content_type_uid = this.types.assets
     stack.collection = stack.db.collection(stack.contentStore.collectionName)
     stack.internal.limit = 1
     stack.internal.single = true
@@ -533,7 +534,7 @@ export class Stack {
    */
   public assets() {
     const stack = new Stack(this.config, this.db)
-    stack.q.content_type_uid = '_assets'
+    stack.q.content_type_uid = this.types.assets
     stack.collection = stack.db.collection(stack.contentStore.collectionName)
 
     return stack
@@ -551,7 +552,7 @@ export class Stack {
     if (uid && typeof uid === 'string') {
       stack.q.uid = uid
     }
-    stack.q.content_type_uid = 'contentTypes'
+    stack.q.content_type_uid = this.types.content_types
     stack.collection = stack.db.collection(stack.contentStore.collectionName)
     stack.internal.limit = 1
     stack.internal.single = true
@@ -566,7 +567,7 @@ export class Stack {
    */
   public schemas() {
     const stack = new Stack(this.config, this.db)
-    stack.q.content_type_uid = 'contentTypes'
+    stack.q.content_type_uid = this.types.content_types
     stack.collection = stack.db.collection(stack.contentStore.collectionName)
 
     return stack
@@ -879,85 +880,36 @@ export class Stack {
    * @returns {Object} - Returns a objects, that have been processed, filtered and referenced
    */
   public find(query = {}) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       let queryFilters = this.preProcess(query)
+      let formattedQuery
 
-      // if (this.internal.sort) {
-      //   this.collection = this.collection.find(queryFilters).sort(this.internal.sort)
-      // } else {
-      //   this.collection = this.collection.find(queryFilters)
+      // if (this.internal.includeSpecificReferences) {
+      //   const projections = await this.excludeSpecificReferences(this.internal.includeSpecificReferences, this.q.content_type_uid, this.internal.hasOwnProperty('only'))
+      //   console.log('projections', projections)
+      //   this.internal.projections = merge(this.internal.projections, projections)
+      //   console.log('this.internal.projections', this.internal.projections)
       // }
+
+      if (this.internal.queryReferencesBeta) {
+        formattedQuery = await this.queryBuilder(this.internal.queryReferencesBeta, this.q.locale, this.q.content_type_uid)
+        console.log('formatted query', JSON.stringify(formattedQuery))
+      }
+
+      queryFilters = merge(queryFilters, formattedQuery[0])
+      console.log('queryfilters', JSON.stringify(queryFilters))
+      
+      if (this.internal.sort) {
+        this.collection = this.collection.find(queryFilters).sort(this.internal.sort)
+      } else {
+        this.collection = this.collection.find(queryFilters)
+      }
 
       // process it in a different manner
       if (this.internal.queryReferences) {
         return this.queryOnReferences()
           .then(resolve)
           .catch(reject)
-      }
-
-      if (this.internal.queryReferencesBeta) {
-        return this.queryBuilder(this.internal.queryReferencesBeta, this.q.locale, this.q.content_type_uid)
-          .then((query) => {
-            queryFilters = merge(queryFilters, query)
-            this.collection = this.collection.find(queryFilters)
-
-            return this.collection
-            .project(this.internal.projections)
-            .limit(this.internal.limit)
-            .skip(this.internal.skip)
-            .toArray()
-            .then((result) => {
-              let contentType
-              if (this.internal.includeSchema && this.q.content_type_uid !== 'contentTypes' && this.q.content_type_uid !==
-                '_assets') {
-                contentType = remove(result, {uid: this.q.content_type_uid})
-                contentType = (typeof contentType === 'object' && contentType instanceof Array && contentType.length) ?
-                  contentType[0] : null
-              }
-    
-              if (this.internal.excludeReferences || this.q.content_type_uid === 'contentTypes' || this.q.content_type_uid
-                === '_assets') {
-                result = this.postProcess(result, contentType)
-    
-                return resolve(result)
-              } else if (this.internal.includeSpecificReferences) {
-                return this.includeSpecificReferences(result, this.q.locale, {}, undefined, this.internal.includeSpecificReferences)
-                .then(() => {
-                  result = this.postProcess(result, contentType)
-    
-                  return resolve(result)
-                })
-                .catch((refError) => {
-                  this.cleanup()
-    
-                  return reject(refError)
-                })
-              } else {
-    
-                return this.includeReferencesI(result, this.q.locale, {}, undefined)
-                  .then(() => {
-                    result = this.postProcess(result, contentType)
-    
-                    return resolve(result)
-                  })
-                  .catch((refError) => {
-                    this.cleanup()
-    
-                    return reject(refError)
-                  })
-              }
-            })
-            .catch((error) => {
-              this.cleanup()
-    
-              return reject(error)
-            })
-          })
-          .catch((error) => {
-            this.cleanup()
-
-            return reject(error)
-          })
       }
 
       return this.collection
@@ -967,15 +919,15 @@ export class Stack {
         .toArray()
         .then((result) => {
           let contentType
-          if (this.internal.includeSchema && this.q.content_type_uid !== 'contentTypes' && this.q.content_type_uid !==
-            '_assets') {
+          if (this.internal.includeSchema && this.q.content_type_uid !== this.types.content_types && this.q.content_type_uid !==
+            this.types.assets) {
             contentType = remove(result, {uid: this.q.content_type_uid})
             contentType = (typeof contentType === 'object' && contentType instanceof Array && contentType.length) ?
               contentType[0] : null
           }
 
-          if (this.internal.excludeReferences || this.q.content_type_uid === 'contentTypes' || this.q.content_type_uid
-            === '_assets') {
+          if (this.internal.excludeReferences || this.q.content_type_uid === this.types.content_types || this.q.content_type_uid
+            === this.types.assets) {
             result = this.postProcess(result, contentType)
 
             return resolve(result)
@@ -1147,7 +1099,7 @@ export class Stack {
       this.q.locale = this.config.locales[0].code
     }
 
-    if (this.q.content_type_uid === 'contentTypes') {
+    if (this.q.content_type_uid === this.types.content_types) {
       delete this.q.locale
     }
 
@@ -1198,7 +1150,7 @@ export class Stack {
     // }
     // result.forEach((item) => delete item._id)
     switch (this.q.content_type_uid) {
-    case '_assets':
+    case this.types.assets:
       if (this.internal.single) {
         result = {
           asset: (result === null) ? result : result[0],
@@ -1211,7 +1163,7 @@ export class Stack {
       result.content_type_uid = 'assets'
       result.locale = this.q.locale
       break
-    case 'contentTypes':
+    case this.types.content_types:
       if (this.internal.single) {
         result = {
           content_type: (result === null) ? result : result[0],
@@ -1280,7 +1232,7 @@ export class Stack {
         if (entry[prop] !== null && typeof entry[prop] === 'object') {
           if (entry[prop] && entry[prop].reference_to) {
             if ((!(this.internal.includeReferences)
-            && entry[prop].reference_to === '_assets') || this.internal.includeReferences) {
+            && entry[prop].reference_to === this.types.assets) || this.internal.includeReferences) {
               if (entry[prop].values.length === 0) {
                 entry[prop] = []
               } else {
@@ -1288,7 +1240,7 @@ export class Stack {
                 if (typeof uids === 'string') {
                   uids = [uids]
                 }
-                if (entry[prop].reference_to !== '_assets') {
+                if (entry[prop].reference_to !== this.types.assets) {
                   uids = filter(uids, (uid) => {
                     return !(checkCyclic(uid, references))
                   })
@@ -1354,6 +1306,97 @@ export class Stack {
     })
   }
 
+  private includeReferencesBeta(entry, locale, references, parentUid?) {
+    const self = this
+
+    return new Promise((resolve, reject) => {
+      if (entry === null || typeof entry !== 'object') {
+        return resolve()
+      }
+
+      // current entry becomes the parent
+      if (entry.uid) {
+        parentUid = entry.uid
+      }
+
+      const referencesFound = []
+
+      // iterate over each key in the object
+      for (const prop in entry) {
+        if (entry[prop] !== null && typeof entry[prop] === 'object') {
+          if (entry[prop] && entry[prop].reference_to) {
+            if (entry[prop].values.length === 0) {
+              entry[prop] = []
+            } else {
+              let uids = entry[prop].values
+              if (typeof uids === 'string') {
+                uids = [uids]
+              }
+              if (entry[prop].reference_to !== this.types.assets) {
+                uids = filter(uids, (uid) => {
+                  return !(checkCyclic(uid, references))
+                })
+              }
+              if (uids.length) {
+                const query = {
+                  content_type_uid: entry[prop].reference_to,
+                  locale,
+                  uid: {
+                    $in: uids,
+                  },
+                }
+
+                referencesFound.push(new Promise((rs, rj) => {
+                  return self.db.collection(this.contentStore.collectionName)
+                    .find(query)
+                    .project(self.config.contentStore.projections)
+                    .toArray()
+                    .then((result) => {
+                      if (result.length === 0) {
+                        entry[prop] = []
+
+                        return rs()
+                      } else if (parentUid) {
+                        references[parentUid] = references[parentUid] || []
+                        references[parentUid] = uniq(references[parentUid].concat(map(result, 'uid')))
+                      }
+
+                      if (typeof entry[prop].values === 'string') {
+                        entry[prop] = ((result === null) || result.length === 0) ? null : result[0]
+                      } else {
+                        // format the references in order
+                        const referenceBucket = []
+                        query.uid.$in.forEach((entityUid) => {
+                          const elem = find(result, (entity) => {
+                            return entity.uid === entityUid
+                          })
+                          if (elem) {
+                            referenceBucket.push(elem)
+                          }
+                        })
+                        entry[prop] = referenceBucket
+                      }
+
+                      return self.includeReferencesBeta(entry[prop], locale, references, parentUid)
+                        .then(rs)
+                        .catch(rj)
+                    })
+                    .catch(rj)
+                }))
+              }
+            }
+          } else {
+            referencesFound.push(self.includeReferencesBeta(entry[prop], locale, references, parentUid))
+          }
+        }
+      }
+
+      return Promise.all(referencesFound)
+        .then(resolve)
+        .catch(reject)
+    })
+  }
+
   private isPartOfInclude(pth, include) {
     for (let i = 0, j = include.length; i < j; i++) {
       // const regexp = new RegExp(include[i])
@@ -1406,7 +1449,7 @@ export class Stack {
           }
 
           if (entry[prop] && entry[prop].reference_to) {
-            if (entry[prop].reference_to === '_assets' || this.isPartOfInclude(currentPth, includePths)) {
+            if (entry[prop].reference_to === this.types.assets || this.isPartOfInclude(currentPth, includePths)) {
               if (entry[prop].values.length === 0) {
                 entry[prop] = []
               } else {
@@ -1414,7 +1457,7 @@ export class Stack {
                 if (typeof uids === 'string') {
                   uids = [uids]
                 }
-                if (entry[prop].reference_to !== '_assets') {
+                if (entry[prop].reference_to !== this.types.assets) {
                   uids = filter(uids, (uid) => {
                     return !(checkCyclic(uid, references))
                   })
@@ -1480,75 +1523,92 @@ export class Stack {
     })
   }
 
-  queryBuilder(query, language, ct) {
+  private async queryBuilder(query, locale, uid) {
     return new Promise((resolve, reject) => {
-      if (query && Object.keys(query).length && ct) {
+      if (query && Object.keys(query).length && uid) {
         // find content type's schema
         return this.db.collection(this.contentStore.collectionName)
           .find({
-            content_type_uid: 'contentTypes',
-            locale: language,
-            uid: ct
+            content_type_uid: this.types.content_types,
+            uid
           })
           .project({
-            reference_to: 1
+            references: 1
           })
           .limit(1)
           .toArray()
           .then((result) => {
+            console.log('result', result)
             if (result === null || result.length === 0) {
-              return resolve()
+              return resolve(query)
             }
-            const references = result[0].reference_to
+            const references = result[0].references
 
             if (references && Object.keys(references).length > 0) {
               const promises = []
 
               for (const field in query) {
-                let filterField: any = field
-                let refQuery, refContentType
+                if (query[field] === null) {
+                  delete query[field]
+                } else if (typeof query[field] === 'object' && query[field] instanceof Array && query[field].length) {
+                  promises.push(this.queryBuilder(query[field], locale, uid))
+                } else {
+                  let filterField: any = field
+                  let refQuery, refContentType
+                  let refFieldM
+                  for (let refField in references) {
+                    // if the query's field matches the reference field exactly
+                    if (field.indexOf(refField) === 0) {
+                      refFieldM = refField
+                      let newfilterField = filterField.replace(refField, '')
+                      if (newfilterField.charAt(0) === '.') {
+                        newfilterField = newfilterField.substr(1)
+                      }
 
-                for (let refField in references) {
-                  // if the query's field matches the reference field exactly
-                  if (field.indexOf(refField) === 0) {
-                    filterField = filterField.split('.')
-                    filterField[filterField.length - 1] = 'uid'
-                    filterField = filterField.join('.')
+                      refQuery = refQuery || {}
+                      refContentType = references[refField]
+                      // no idea
+                      refQuery[newfilterField] = query[field]
+                      refQuery.content_type_uid = refContentType
+                      refQuery.locale = locale
+                      delete query[field]
+                    }
+                  }
 
-                    refQuery = refQuery || {}
-                    refContentType = references[refField]
-                    // no idea
-                    refQuery[filterField] = query[field]
-                    refQuery.content_type_uid = refContentType
-                    refQuery.locale = language
-                    delete query[field]
+                  if (refQuery && Object.keys(refQuery).length) {
+                    promises.push(
+                      this.db.collection(this.contentStore.collectionName)
+                        .find(refQuery)
+                        .project({uid: 1})
+                        .toArray()
+                        .then((result) => {
+                          console.log('result', result)
+                          console.log('refQuery', refQuery)
+                          if (result === null || result.length === 0) {
+                            query[`${refFieldM}.values`] = {
+                              $in: []
+                            }                        
+                          } else {
+                            console.log('filterfield> ', `${refFieldM}.values`)
+                            query[`${refFieldM}.values`] = {
+                              $in: map(result, 'uid')
+                            }
+                          }
+
+                          return query
+                        })
+                    )
                   }
                 }
-
-                if (refQuery && Object.keys(refQuery).length) {
-                  promises.push(
-                    this.db.collection(this.contentStore.collectionName)
-                      .find(refQuery)
-                      .project({uid: 1})
-                      .toArray()
-                      .then((result) => {
-                        if (result === null || result.length === 0) {
-                          query[filterField] = {
-                            $in: []
-                          }                        
-                        } else {
-                          query[filterField] = {
-                            $in: map(result, 'uid')
-                          }
-                        }
-                      })
-                  )
-                } else if (query[field] !== null && typeof query[field] === 'object' && query[field] instanceof Array && query[field].length) {
-                  promises.push(this.queryBuilder(query[field], language, ct))
-                }
               }
+
+              return Promise.all(promises)
+                .then(resolve)
+                .catch(reject)
             } else {
-              return resolve(query)
+              // $and $or $nor $where
+              // setting this to an empty object - no references found on the content type!
+              return resolve({})
             }
           })
           .catch(reject)
@@ -1558,4 +1618,45 @@ export class Stack {
     })
   }
 
+  /**
+   * [
+   *  'category.authors'
+   *  'category'
+   *  'authors.types'
+   * ]
+   */
+
+  private excludeSpecificReferences (includes, uid, isOnly) {
+    return new Promise((resolve) => {
+      return this.db.collection(this.contentStore.collectionName)
+        .find({uid})
+        .project({references: 1})
+        .limit(1)
+        .toArray()
+        .then((result) => {
+          if (result === null || result.length === 0) {
+            return resolve({})
+          }
+          const excludeQuery = {}
+          const references = result[0].references
+
+          for (const referenceField in references) {
+            let flag = false
+
+            for (let i = 0, j = includes.length; i < j; i++) {
+              if (includes[i].includes(referenceField)) {
+                flag = true
+                break
+              }
+            }
+
+            if (!flag) {
+              excludeQuery[referenceField] = (isOnly) ? 1: 0
+            }
+          }
+
+          return resolve(excludeQuery)
+        })
+    })
+  }
 }

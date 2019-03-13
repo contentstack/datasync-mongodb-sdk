@@ -14,6 +14,10 @@ exports.config = {
             locale: 1,
             uid: 1
         },
+        internalContentTypes: {
+            content_types: '_content_types',
+            assets: '_assets'
+        },
         limit: 100,
         locales: [],
         options: {
