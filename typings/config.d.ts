@@ -12,6 +12,10 @@ export declare const config: {
             locale: number;
             uid: number;
         };
+        internalContentTypes: {
+            content_types: string;
+            assets: string;
+        };
         limit: number;
         locales: any[];
         options: {
