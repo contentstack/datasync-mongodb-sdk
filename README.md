@@ -1,7 +1,7 @@
 [![Contentstack](https://www.contentstack.com/docs/static/images/contentstack.png)](https://www.contentstack.com/)
 ## Contentstack Sync Mongodb SDK
 
-Contentstack is a headless CMS with an API-first approach. It is a CMS that developers can use to build powerful cross-platform applications in their favorite languages. Build your application frontend, and Contentstack will take care of the rest. [Read More](https://www.contentstack.com/). 
+Contentstack is a headless CMS with an API-first approach. It is a CMS that developers can use to build powerful cross-platform applications in their favorite languages. Build your application frontend, and Contentstack will take care of the rest. [Read More](https://www.contentstack.com/).
 
 [Contentstack sync utility](https://www.contentstack.com/docs/tools-and-frameworks) provides Mongodb SDK to query applications that have locally strored contents in mongodb. Given below is the detailed guide and helpful resources to get started with Mongodb SDK.
 
