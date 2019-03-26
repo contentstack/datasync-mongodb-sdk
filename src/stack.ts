@@ -15,8 +15,7 @@ import { checkCyclic, validateURI } from './util'
  *  Expose SDK query methods on Stack
  * @description
  *  Provides a range of connection/disconnect, filters and projections on mongodb
- * @returns
- *  'Stack' instance
+ * @returns { Stack } instance
  */
 export class Stack {
   private q: any
