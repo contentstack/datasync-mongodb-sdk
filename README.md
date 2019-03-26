@@ -1,14 +1,22 @@
 [![Contentstack](https://www.contentstack.com/docs/static/images/contentstack.png)](https://www.contentstack.com/)
 ## Contentstack Sync Mongodb SDK
 
-Contentstack is a headless CMS with an API-first approach. It is a CMS that developers can use to build powerful cross-platform applications in their favorite languages. Build your application frontend, and Contentstack will take care of the rest. [Read More](https://www.contentstack.com/).
+The Contentstack sync utility lets you sync your Contentstack data on your server, enabling you to save data locally and serve content directly from your server.
 
-[Contentstack sync utility](https://www.contentstack.com/docs/tools-and-frameworks) provides Mongodb SDK to query applications that have locally strored contents in mongodb. Given below is the detailed guide and helpful resources to get started with Mongodb SDK.
+The Cotentstack mongodb content store library is part of Contentstack sync utility's content storage drivers and is used to store data in the MongoDB database and [contentstack-sync-mongodb-sdk]() library is used to query data stored there.
+
+Learn how Contentstack helps you store your data locally with the help of the Contentstack sync utility [here]().
+
+Currently, Contentstack offers the following databases for storing the synced data:
+- Filesystem data store: [contentstack-content-store-filesystem](https://github.com/contentstack/contentstack-content-store-filesystem) used to store data in your system's filesystem. You can use filesystem SDK [contentstack-sync-filesystem-sdk]((https://github.com/contentstack/contentstack-sync-filesystem-sdk) to query data from filesystem.
+- Filesystem asset store: [contentstack-asset-store-filesystem](https://github.com/contentstack/contentstack-asset-store-filesystem)
+- Mongodb data store: [contentstack-content-store-mongodb](https://github.com/contentstack/contentstack-content-store-mongodb) used to store data in your MongoDB. You can use MongoDB SDK [contentstack-sync-mongodb-sdk]((https://github.com/contentstack/contentstack-sync-mongodb-sdk) to query data from mongodb.
 
 ### Prerequisite
 
-- nodejs, v6 or higher
-- mongodb, v3.6 or higher
+- nodejs, v8+
+- Data synced via mongodb content store
+- MongoDB, v3.6 or higher
 
 ### Setup and Installation
 
