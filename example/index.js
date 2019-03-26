@@ -1,8 +1,6 @@
 const Contentstack = require('../dist').Contentstack
 
 const Stack = Contentstack.Stack({
-  api_key: '',
-  access_token: '',
   locales: [
     {
       code: 'en-us',

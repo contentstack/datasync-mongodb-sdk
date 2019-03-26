@@ -8,6 +8,7 @@ export declare const config: {
         collectionName: string;
         dbName: string;
         indexes: {
+            published_at: number;
             content_type_uid: number;
             locale: number;
             uid: number;

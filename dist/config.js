@@ -10,12 +10,14 @@ exports.config = {
         collectionName: 'contents',
         dbName: 'contentstack-persistent-db',
         indexes: {
+            published_at: -1,
             content_type_uid: 1,
             locale: 1,
             uid: 1
         },
         limit: 100,
         locales: [],
+        // http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html
         options: {
             autoReconnect: true,
             connectTimeoutMS: 15000,
