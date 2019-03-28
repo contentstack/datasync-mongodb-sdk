@@ -94,87 +94,6 @@
     
 
     
-        <h3 class="subsection-title">Members</h3>
-
-        
-            
-<h4 class="name" id="greaterThan"><span class="type-signature"></span>greaterThan<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Comparison $gt query wrapper
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line397">line 397</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>Stack
- .contentType('')
- .entries()
- .greaterThan('age', 60)
- .find()
- .then((result) => {
-   // filtered entries, where { age > 60 }
- })
- .catch((error) => {
-   // handle query errors
- })</code></pre>
-
-
-
-        
-    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -189,11 +108,13 @@
     
 
     
+    <p class="summary">Logical AND query wrapper</p>
+    
 
 
 
 <div class="description">
-    Logical AND query wrapper
+    Accepts 2 queries and returns only those documents, that satisfy both the query conditions
 </div>
 
 
@@ -286,7 +207,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line235">line 235</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line237">line 237</a>
     </li></ul></dd>
     
 
@@ -641,7 +562,7 @@ When the sort option consumes more than 32 megabytes, MongoDB will return an err
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line764">line 764</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line812">line 812</a>
     </li></ul></dd>
     
 
@@ -762,7 +683,7 @@ When the sort option consumes more than 32 megabytes, MongoDB will return an err
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line795">line 795</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line843">line 843</a>
     </li></ul></dd>
     
 
@@ -1087,11 +1008,19 @@ When the sort option consumes more than 32 megabytes, MongoDB will return an err
     
 
     
+    <p class="summary">Comparison $in query wrapper</p>
+    
 
 
 
 <div class="description">
-    Comparison $in query wrapper
+    Compares the field/key provided against the provided value. Only documents that have value contained in the field/key provided are returned.
+
+Check mongodb query here: <a href="https://docs.mongodb.com/manual/reference/operator/query/in/">https://docs.mongodb.com/manual/reference/operator/query/in/</a>.
+
+Res: <a href="https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing">https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing</a>.
+
+Comparison ordering <a href="https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order">https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order</a>
 </div>
 
 
@@ -1207,7 +1136,7 @@ When the sort option consumes more than 32 megabytes, MongoDB will return an err
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line515">line 515</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line534">line 534</a>
     </li></ul></dd>
     
 
@@ -1282,12 +1211,10 @@ When the sort option consumes more than 32 megabytes, MongoDB will return an err
     
 
     
+    <p class="summary">Content type to query on</p>
+    
 
 
-
-<div class="description">
-    Content type to query on
-</div>
 
 
 
@@ -1379,7 +1306,7 @@ When the sort option consumes more than 32 megabytes, MongoDB will return an err
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line676">line 676</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line726">line 726</a>
     </li></ul></dd>
     
 
@@ -1550,7 +1477,7 @@ When the sort option consumes more than 32 megabytes, MongoDB will return an err
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1394">line 1394</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1450">line 1450</a>
     </li></ul></dd>
     
 
@@ -1847,7 +1774,7 @@ When the sort option consumes more than 32 megabytes, MongoDB will return an err
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line739">line 739</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line787">line 787</a>
     </li></ul></dd>
     
 
@@ -1921,12 +1848,10 @@ When the sort option consumes more than 32 megabytes, MongoDB will return an err
     
 
     
+    <p class="summary">Query for a single entry</p>
+    
 
 
-
-<div class="description">
-    Query for a single entry
-</div>
 
 
 
@@ -2020,7 +1945,7 @@ When the sort option consumes more than 32 megabytes, MongoDB will return an err
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line706">line 706</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line755">line 755</a>
     </li></ul></dd>
     
 
@@ -2143,7 +2068,7 @@ Note: On calling this, assets will not be binded in the result being returned.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1251">line 1251</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1302">line 1302</a>
     </li></ul></dd>
     
 
@@ -2218,11 +2143,19 @@ Note: On calling this, assets will not be binded in the result being returned.
     
 
     
+    <p class="summary">Element $exists query wrapper, checks if a field exists</p>
+    
 
 
 
 <div class="description">
-    Element $exists query wrapper, checks if a field exists
+    Compares the field/key provided against the provided value. Only documents that have the field/key specified are returned.
+
+Check mongodb query here: <a href="https://docs.mongodb.com/manual/reference/operator/query/exists/">https://docs.mongodb.com/manual/reference/operator/query/exists/</a>.
+
+Res: <a href="https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing">https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing</a>.
+
+Comparison ordering <a href="https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order">https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order</a>
 </div>
 
 
@@ -2338,7 +2271,7 @@ Note: On calling this, assets will not be binded in the result being returned.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line595">line 595</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line630">line 630</a>
     </li></ul></dd>
     
 
@@ -2512,7 +2445,7 @@ previously build queries</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1321">line 1321</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1372">line 1372</a>
     </li></ul></dd>
     
 
@@ -2684,7 +2617,7 @@ Does all the processing, filtering, referencing after querying the DB
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1453">line 1453</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1515">line 1515</a>
     </li></ul></dd>
     
 
@@ -2806,7 +2739,7 @@ Does all the processing, filtering, referencing after querying the DB
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1305">line 1305</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1356">line 1356</a>
     </li></ul></dd>
     
 
@@ -2871,15 +2804,18 @@ Does all the processing, filtering, referencing after querying the DB
     
 
     
-    <h4 class="name" id="greaterThanOrEqualTo"><span class="type-signature"></span>greaterThanOrEqualTo<span class="signature">(key, value)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    <h4 class="name" id="greaterThan"><span class="type-signature"></span>greaterThan<span class="signature">(key, value)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
     
 
+    
+    <p class="summary">Comparison $gt query wrapper</p>
     
 
 
 
 <div class="description">
-    Comparison $gte query wrapper
+    Compares the field/key provided against the provided value. Only documents that have greater value than the one provided are returned.
+Check <a href="https://docs.mongodb.com/manual/reference/operator/query/gt/">https://docs.mongodb.com/manual/reference/operator/query/gt/</a>and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
 </div>
 
 
@@ -2995,7 +2931,205 @@ Does all the processing, filtering, referencing after querying the DB
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line437">line 437</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line403">line 403</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('')
+ .entries()
+ .greaterThan('age', 60)
+ .find()
+ .then((result) => {
+   // filtered entries, where { age > 60 }
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="greaterThanOrEqualTo"><span class="type-signature"></span>greaterThanOrEqualTo<span class="signature">(key, value)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+    <p class="summary">Comparison $gte query wrapper</p>
+    
+
+
+
+<div class="description">
+    Compares the field/key provided against the provided value. Only documents that have greater than or equal value than the one provided are returned.
+Check https://docs.mongodb.com/manual/reference/operator/query/gte/ and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Field to compare against</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Value to compare with</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line445">line 445</a>
     </li></ul></dd>
     
 
@@ -3053,6 +3187,129 @@ Does all the processing, filtering, referencing after querying the DB
  .find()
  .then((result) => {
    // filtered entries, where { age >= 60 }
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="includeCount"><span class="type-signature"></span>includeCount<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Includes 'count' key in response, which is the total count of the items being returned
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1210">line 1210</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('blog')
+ .entries()
+ .includeCount()
+ .find()
+ .then((result) => {
+   // returns entries, along with a 'count' property, with the total count of entries being returned
  })
  .catch((error) => {
    // handle query errors
@@ -3243,11 +3500,14 @@ Does all the processing, filtering, referencing after querying the DB
     
 
     
+    <p class="summary">Comparison $lt query wrapper</p>
+    
 
 
 
 <div class="description">
-    Comparison $lt query wrapper
+    Compares the field/key provided against the provided value. Only documents that have lower value than the one provided are returned.
+Check https://docs.mongodb.com/manual/reference/operator/query/lt/ and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
 </div>
 
 
@@ -3363,7 +3623,7 @@ Does all the processing, filtering, referencing after querying the DB
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line317">line 317</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line319">line 319</a>
     </li></ul></dd>
     
 
@@ -3438,11 +3698,14 @@ Does all the processing, filtering, referencing after querying the DB
     
 
     
+    <p class="summary">Comparison $lte query wrapper</p>
+    
 
 
 
 <div class="description">
-    Comparison $lte query wrapper
+    Compares the field/key provided against the provided value. Only documents that have lower or equal value than the one provided are returned.
+Check https://docs.mongodb.com/manual/reference/operator/query/lte/ and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
 </div>
 
 
@@ -3558,7 +3821,7 @@ Does all the processing, filtering, referencing after querying the DB
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line357">line 357</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line361">line 361</a>
     </li></ul></dd>
     
 
@@ -3633,11 +3896,19 @@ Does all the processing, filtering, referencing after querying the DB
     
 
     
+    <p class="summary">Comparison $nin query wrapper</p>
+    
 
 
 
 <div class="description">
-    Comparison $nin query wrapper
+    Compares the field/key provided against the provided value. Only documents that have value not contained in the field/key provided are returned.
+
+Check mongodb query here: <a href="https://docs.mongodb.com/manual/reference/operator/query/nin/">https://docs.mongodb.com/manual/reference/operator/query/nin/</a>.
+
+Res: <a href="https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing">https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing</a>.
+
+Comparison ordering <a href="https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order">https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order</a>
 </div>
 
 
@@ -3753,7 +4024,7 @@ Does all the processing, filtering, referencing after querying the DB
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line555">line 555</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line582">line 582</a>
     </li></ul></dd>
     
 
@@ -3828,11 +4099,19 @@ Does all the processing, filtering, referencing after querying the DB
     
 
     
+    <p class="summary">Comparison $ne query wrapper</p>
+    
 
 
 
 <div class="description">
-    Comparison $ne query wrapper
+    Compares the field/key provided against the provided value. Only documents that have value not equals than the one provided are returned.
+
+Check mongodb query here: <a href="https://docs.mongodb.com/manual/reference/operator/query/ne/">https://docs.mongodb.com/manual/reference/operator/query/ne/</a>.
+
+Res: <a href="https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing">https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing</a>.
+
+Comparison ordering <a href="https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order">https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order</a>
 </div>
 
 
@@ -3948,7 +4227,7 @@ Does all the processing, filtering, referencing after querying the DB
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line476">line 476</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line487">line 487</a>
     </li></ul></dd>
     
 
@@ -4023,11 +4302,19 @@ Does all the processing, filtering, referencing after querying the DB
     
 
     
+    <p class="summary">Property $exists query wrapper, checks if a field does not exists</p>
+    
 
 
 
 <div class="description">
-    Property $exists query wrapper, checks if a field does not exists
+    Compares the field/key provided against the provided value. Only documents that do not have the key are returned.
+
+Check mongodb query here: <a href="https://docs.mongodb.com/manual/reference/operator/query/exists/">https://docs.mongodb.com/manual/reference/operator/query/exists/</a>.
+
+Res: <a href="https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing">https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing</a>.
+
+Comparison ordering <a href="https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order">https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order</a>
 </div>
 
 
@@ -4143,7 +4430,7 @@ Does all the processing, filtering, referencing after querying the DB
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line636">line 636</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line678">line 678</a>
     </li></ul></dd>
     
 
@@ -4218,11 +4505,13 @@ Does all the processing, filtering, referencing after querying the DB
     
 
     
+    <p class="summary">Logical OR query wrapper</p>
+    
 
 
 
 <div class="description">
-    Logical OR query wrapper
+    Accepts 2 queries and returns only those documents, that satisfy either of the query conditions
 </div>
 
 
@@ -4315,7 +4604,7 @@ Does all the processing, filtering, referencing after querying the DB
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line276">line 276</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line278">line 278</a>
     </li></ul></dd>
     
 
@@ -4447,7 +4736,7 @@ Use `.query()` filters to reduce the total no of documents being scanned
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1276">line 1276</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1327">line 1327</a>
     </li></ul></dd>
     
 
@@ -4620,7 +4909,7 @@ Use `.query()` filters to reduce the total no of documents being scanned
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line819">line 819</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line867">line 867</a>
     </li></ul></dd>
     
 
@@ -4741,7 +5030,7 @@ Use `.query()` filters to reduce the total no of documents being scanned
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line851">line 851</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line899">line 899</a>
     </li></ul></dd>
     
 
@@ -4983,6 +5272,357 @@ Use `.query()` filters to reduce the total no of documents being scanned
 
 
         
+            
+
+    
+
+    
+    <h4 class="name" id="tags"><span class="type-signature"></span>tags<span class="signature">(values)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+    <p class="summary">Match entries that match a specific tags</p>
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>values</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Array of tag values</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1117">line 1117</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('blog')
+ .entries()
+ .tags(["new", "fresh"])
+ .find()
+ .then((result) => {
+   // returns entries filtered based on their tag fields
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="where"><span class="type-signature"></span>where<span class="signature">(expr)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+    <p class="summary">Pass JS expression or a full function to the query system</p>
+    
+
+
+
+<div class="description">
+    Use the $where operator to pass either a string containing a JavaScript expression or a full JavaScript function to the query system.
+The $where provides greater flexibility, but requires that the database processes the JavaScript expression or function for each document in the collection.
+Reference the document in the JavaScript expression or function using either this or obj.
+Only apply the $where query operator to top-level documents.
+The $where query operator will not work inside a nested document, for instance, in an $elemMatch query.
+Ref. - https://docs.mongodb.com/manual/reference/operator/query/where/index.html
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>expr</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Pass either a string containing a JavaScript expression or a full JavaScript function to the query system.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1160">line 1160</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('blog')
+ .entries()
+ .where(function() {
+   return (hex_md5(this.name) === "9b53e667f30cd329dca1ec9e6a83e994")
+ })
+ .find()
+ .then((result) => {
+   // returns entries filtered based on the $where condition provided
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
     
 
     
@@ -4998,13 +5638,13 @@ Use `.query()` filters to reduce the total no of documents being scanned
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="global.html#Stack">Stack</a></li></ul><h3>Global</h3><ul><li><a href="global.html#and">and</a></li><li><a href="global.html#ascending">ascending</a></li><li><a href="global.html#asset">asset</a></li><li><a href="global.html#assets">assets</a></li><li><a href="global.html#close">close</a></li><li><a href="global.html#connect">connect</a></li><li><a href="global.html#containedIn">containedIn</a></li><li><a href="global.html#contentType">contentType</a></li><li><a href="global.html#count">count</a></li><li><a href="global.html#descending">descending</a></li><li><a href="global.html#entries">entries</a></li><li><a href="global.html#entry">entry</a></li><li><a href="global.html#excludeReferences">excludeReferences</a></li><li><a href="global.html#exists">exists</a></li><li><a href="global.html#find">find</a></li><li><a href="global.html#findOne">findOne</a></li><li><a href="global.html#getQuery">getQuery</a></li><li><a href="global.html#greaterThan">greaterThan</a></li><li><a href="global.html#greaterThanOrEqualTo">greaterThanOrEqualTo</a></li><li><a href="global.html#language">language</a></li><li><a href="global.html#lessThan">lessThan</a></li><li><a href="global.html#lessThanOrEqualTo">lessThanOrEqualTo</a></li><li><a href="global.html#notContainedIn">notContainedIn</a></li><li><a href="global.html#notEqualTo">notEqualTo</a></li><li><a href="global.html#notExists">notExists</a></li><li><a href="global.html#or">or</a></li><li><a href="global.html#queryReferences">queryReferences</a></li><li><a href="global.html#schema">schema</a></li><li><a href="global.html#schemas">schemas</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="global.html#Stack">Stack</a></li></ul><h3>Global</h3><ul><li><a href="global.html#and">and</a></li><li><a href="global.html#ascending">ascending</a></li><li><a href="global.html#asset">asset</a></li><li><a href="global.html#assets">assets</a></li><li><a href="global.html#close">close</a></li><li><a href="global.html#connect">connect</a></li><li><a href="global.html#containedIn">containedIn</a></li><li><a href="global.html#contentType">contentType</a></li><li><a href="global.html#count">count</a></li><li><a href="global.html#descending">descending</a></li><li><a href="global.html#entries">entries</a></li><li><a href="global.html#entry">entry</a></li><li><a href="global.html#excludeReferences">excludeReferences</a></li><li><a href="global.html#exists">exists</a></li><li><a href="global.html#find">find</a></li><li><a href="global.html#findOne">findOne</a></li><li><a href="global.html#getQuery">getQuery</a></li><li><a href="global.html#greaterThan">greaterThan</a></li><li><a href="global.html#greaterThanOrEqualTo">greaterThanOrEqualTo</a></li><li><a href="global.html#includeCount">includeCount</a></li><li><a href="global.html#language">language</a></li><li><a href="global.html#lessThan">lessThan</a></li><li><a href="global.html#lessThanOrEqualTo">lessThanOrEqualTo</a></li><li><a href="global.html#notContainedIn">notContainedIn</a></li><li><a href="global.html#notEqualTo">notEqualTo</a></li><li><a href="global.html#notExists">notExists</a></li><li><a href="global.html#or">or</a></li><li><a href="global.html#queryReferences">queryReferences</a></li><li><a href="global.html#schema">schema</a></li><li><a href="global.html#schemas">schemas</a></li><li><a href="global.html#tags">tags</a></li><li><a href="global.html#where">where</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Mar 28 2019 12:10:10 GMT+0530 (IST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Mar 28 2019 13:13:50 GMT+0530 (IST)
 </footer>
 
 <script> prettyPrint(); </script>
