@@ -19,11 +19,11 @@ Contentstack is a headless CMS with an API-first approach. It is a CMS that deve
 |dbName|string|contentstack-persistent-db|**Optional** The MongoDB database name|
 |collectionName|string|contents|**Optional** MongoDB database's collection name|
 |uri|string|mongodb://localhost:27017 |**Optional.** The MongoDB connection URI|
+|limit|number|100|**Optional.** Caps the total no of objects returned in a single call|
+|skip|number|0|**Optional.** Number of objects skipped before the result is returned|
 | indexes | object |**[see config below](https://github.com/contentstack/datasync-content-store-mongodb#detailed-configs)** |**Optional.** Option to create db indexes via configuration|
 |projections|object|**[see config below](https://github.com/contentstack/datasync-content-store-mongodb#detailed-configs)** |**Optional.** Mongodb projections. Keys provided here would be displayed/filtered out when fetching the result|
 |options|object|**[see config below](https://github.com/contentstack/datasync-content-store-mongodb#detailed-configs)** |**Optional.** MongoDB connection options [Ref.](http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html) for more info|
-|limit|number|**Optional.** Caps the total no of objects returned in a single call|
-|skip|number|**Optional.** Number of objects skipped before the result is returned|
 
 ### Detailed configs
 

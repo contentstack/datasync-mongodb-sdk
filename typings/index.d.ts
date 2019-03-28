@@ -21,13 +21,16 @@ import { Stack } from './stack';
  *  ]
  * })
  *
- * @returns {Stack}
+ * @returns {Stack} Returns Stack method, which's used to create an instance of Stack
  */
 export declare class Contentstack {
     /**
-     * @summary
-     * 	Initialize Stack instance
-     * @param {Object} stack_arguments - Stack config
+     * @public
+     * @method Stack
+     * @summary Initialize Stack instance
+     * @param {object} config Stack config
+     * @param {object} db Existing db connection
+     * @returns {Stack} - Returns an instance of `Stack`
      */
     static Stack(config?: any, db?: any): Stack;
 }
