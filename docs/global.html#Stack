@@ -285,7 +285,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1013">line 1013</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1061">line 1061</a>
     </li></ul></dd>
     
 
@@ -408,7 +408,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1224">line 1224</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1275">line 1275</a>
     </li></ul></dd>
     
 
@@ -479,129 +479,6 @@
     
 
     
-    <h4 class="name" id="includeCount"><span class="type-signature"></span>includeCount<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Includes 'count' key in response, which is the total count of the items being returned
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1180">line 1180</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    Returns an instance of 'stack'
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="global.html#Stack">Stack</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>Stack
- .contentType('blog')
- .entries()
- .includeCount()
- .find()
- .then((result) => {
-   // returns entries, along with a 'count' property, with the total count of entries being returned
- })
- .catch((error) => {
-   // handle query errors
- })</code></pre>
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id="includeReferences"><span class="type-signature"></span>includeReferences<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
     
 
@@ -655,7 +532,7 @@ Note: This is a slow method, since it iteratively queries all the references and
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1247">line 1247</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1298">line 1298</a>
     </li></ul></dd>
     
 
@@ -778,7 +655,7 @@ Note: This is a slow method, since it iteratively queries all the references and
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1202">line 1202</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1253">line 1253</a>
     </li></ul></dd>
     
 
@@ -951,7 +828,7 @@ Defaults to 100 (internally, which is overridden)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line897">line 897</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line945">line 945</a>
     </li></ul></dd>
     
 
@@ -1124,7 +1001,7 @@ Defaults to 100 (internally, which is overridden)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line981">line 981</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1029">line 1029</a>
     </li></ul></dd>
     
 
@@ -1296,7 +1173,7 @@ Defaults to 100 (internally, which is overridden)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line952">line 952</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1000">line 1000</a>
     </li></ul></dd>
     
 
@@ -1530,7 +1407,7 @@ Defaults to 100 (internally, which is overridden)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1047">line 1047</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1095">line 1095</a>
     </li></ul></dd>
     
 
@@ -1703,7 +1580,7 @@ Defaults to 0 (internally, which is overridden)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line926">line 926</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line974">line 974</a>
     </li></ul></dd>
     
 
@@ -1762,359 +1639,6 @@ Defaults to 0 (internally, which is overridden)
  .then((result) => {
    // returnes entries, after first skipping 20 entries of 'blog' content type
    // if not provided, by default - the skip value provided in config is considered
- })
- .catch((error) => {
-   // handle query errors
- })</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="tags"><span class="type-signature"></span>tags<span class="signature">(values)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Match entries that match a specific tags
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>values</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Array of tag values</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1088">line 1088</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    Returns an instance of 'stack'
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="global.html#Stack">Stack</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>Stack
- .contentType('blog')
- .entries()
- .tags(["new", "fresh"])
- .find()
- .then((result) => {
-   // returns entries filtered based on their tag fields
- })
- .catch((error) => {
-   // handle query errors
- })</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="where"><span class="type-signature"></span>where<span class="signature">(expr)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
-    
-
-    
-    <p class="summary">Pass JS expression or a full function to the query system</p>
-    
-
-
-
-<div class="description">
-    Use the $where operator to pass either a string containing a JavaScript expression or a full JavaScript function to the query system.
-The $where provides greater flexibility, but requires that the database processes the JavaScript expression or function for each document in the collection.
-Reference the document in the JavaScript expression or function using either this or obj.
-Only apply the $where query operator to top-level documents.
-The $where query operator will not work inside a nested document, for instance, in an $elemMatch query.
-Ref. - https://docs.mongodb.com/manual/reference/operator/query/where/index.html
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>expr</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Pass either a string containing a JavaScript expression or a full JavaScript function to the query system.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1139">line 1139</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    Returns an instance of 'stack'
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="global.html#Stack">Stack</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>Stack
- .contentType('blog')
- .entries()
- .where(function() {
-   return (hex_md5(this.name) === "9b53e667f30cd329dca1ec9e6a83e994")
- })
- .find()
- .then((result) => {
-   // returns entries filtered based on the $where condition provided
  })
  .catch((error) => {
    // handle query errors
@@ -2388,7 +1912,7 @@ Ref. - https://docs.mongodb.com/manual/reference/operator/query/where/index.html
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1013">line 1013</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1061">line 1061</a>
     </li></ul></dd>
     
 
@@ -2511,7 +2035,7 @@ Ref. - https://docs.mongodb.com/manual/reference/operator/query/where/index.html
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1224">line 1224</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1275">line 1275</a>
     </li></ul></dd>
     
 
@@ -2582,129 +2106,6 @@ Ref. - https://docs.mongodb.com/manual/reference/operator/query/where/index.html
     
 
     
-    <h4 class="name" id="includeCount"><span class="type-signature"></span>includeCount<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Includes 'count' key in response, which is the total count of the items being returned
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1180">line 1180</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    Returns an instance of 'stack'
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="global.html#Stack">Stack</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>Stack
- .contentType('blog')
- .entries()
- .includeCount()
- .find()
- .then((result) => {
-   // returns entries, along with a 'count' property, with the total count of entries being returned
- })
- .catch((error) => {
-   // handle query errors
- })</code></pre>
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id="includeReferences"><span class="type-signature"></span>includeReferences<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
     
 
@@ -2758,7 +2159,7 @@ Note: This is a slow method, since it iteratively queries all the references and
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1247">line 1247</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1298">line 1298</a>
     </li></ul></dd>
     
 
@@ -2881,7 +2282,7 @@ Note: This is a slow method, since it iteratively queries all the references and
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1202">line 1202</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1253">line 1253</a>
     </li></ul></dd>
     
 
@@ -3054,7 +2455,7 @@ Defaults to 100 (internally, which is overridden)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line897">line 897</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line945">line 945</a>
     </li></ul></dd>
     
 
@@ -3227,7 +2628,7 @@ Defaults to 100 (internally, which is overridden)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line981">line 981</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1029">line 1029</a>
     </li></ul></dd>
     
 
@@ -3399,7 +2800,7 @@ Defaults to 100 (internally, which is overridden)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line952">line 952</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1000">line 1000</a>
     </li></ul></dd>
     
 
@@ -3633,7 +3034,7 @@ Defaults to 100 (internally, which is overridden)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1047">line 1047</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1095">line 1095</a>
     </li></ul></dd>
     
 
@@ -3806,7 +3207,7 @@ Defaults to 0 (internally, which is overridden)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line926">line 926</a>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line974">line 974</a>
     </li></ul></dd>
     
 
@@ -3873,359 +3274,6 @@ Defaults to 0 (internally, which is overridden)
 
 
         
-            
-
-    
-
-    
-    <h4 class="name" id="tags"><span class="type-signature"></span>tags<span class="signature">(values)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Match entries that match a specific tags
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>values</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Array of tag values</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1088">line 1088</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    Returns an instance of 'stack'
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="global.html#Stack">Stack</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>Stack
- .contentType('blog')
- .entries()
- .tags(["new", "fresh"])
- .find()
- .then((result) => {
-   // returns entries filtered based on their tag fields
- })
- .catch((error) => {
-   // handle query errors
- })</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="where"><span class="type-signature"></span>where<span class="signature">(expr)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
-    
-
-    
-    <p class="summary">Pass JS expression or a full function to the query system</p>
-    
-
-
-
-<div class="description">
-    Use the $where operator to pass either a string containing a JavaScript expression or a full JavaScript function to the query system.
-The $where provides greater flexibility, but requires that the database processes the JavaScript expression or function for each document in the collection.
-Reference the document in the JavaScript expression or function using either this or obj.
-Only apply the $where query operator to top-level documents.
-The $where query operator will not work inside a nested document, for instance, in an $elemMatch query.
-Ref. - https://docs.mongodb.com/manual/reference/operator/query/where/index.html
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>expr</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Pass either a string containing a JavaScript expression or a full JavaScript function to the query system.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1139">line 1139</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    Returns an instance of 'stack'
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="global.html#Stack">Stack</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>Stack
- .contentType('blog')
- .entries()
- .where(function() {
-   return (hex_md5(this.name) === "9b53e667f30cd329dca1ec9e6a83e994")
- })
- .find()
- .then((result) => {
-   // returns entries filtered based on the $where condition provided
- })
- .catch((error) => {
-   // handle query errors
- })</code></pre>
-
-
-
-        
     
 
     
@@ -4241,13 +3289,13 @@ Ref. - https://docs.mongodb.com/manual/reference/operator/query/where/index.html
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="global.html#Stack">Stack</a></li></ul><h3>Global</h3><ul><li><a href="global.html#and">and</a></li><li><a href="global.html#ascending">ascending</a></li><li><a href="global.html#asset">asset</a></li><li><a href="global.html#assets">assets</a></li><li><a href="global.html#close">close</a></li><li><a href="global.html#connect">connect</a></li><li><a href="global.html#containedIn">containedIn</a></li><li><a href="global.html#contentType">contentType</a></li><li><a href="global.html#count">count</a></li><li><a href="global.html#descending">descending</a></li><li><a href="global.html#entries">entries</a></li><li><a href="global.html#entry">entry</a></li><li><a href="global.html#excludeReferences">excludeReferences</a></li><li><a href="global.html#exists">exists</a></li><li><a href="global.html#find">find</a></li><li><a href="global.html#findOne">findOne</a></li><li><a href="global.html#getQuery">getQuery</a></li><li><a href="global.html#greaterThan">greaterThan</a></li><li><a href="global.html#greaterThanOrEqualTo">greaterThanOrEqualTo</a></li><li><a href="global.html#language">language</a></li><li><a href="global.html#lessThan">lessThan</a></li><li><a href="global.html#lessThanOrEqualTo">lessThanOrEqualTo</a></li><li><a href="global.html#notContainedIn">notContainedIn</a></li><li><a href="global.html#notEqualTo">notEqualTo</a></li><li><a href="global.html#notExists">notExists</a></li><li><a href="global.html#or">or</a></li><li><a href="global.html#queryReferences">queryReferences</a></li><li><a href="global.html#schema">schema</a></li><li><a href="global.html#schemas">schemas</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="global.html#Stack">Stack</a></li></ul><h3>Global</h3><ul><li><a href="global.html#and">and</a></li><li><a href="global.html#ascending">ascending</a></li><li><a href="global.html#asset">asset</a></li><li><a href="global.html#assets">assets</a></li><li><a href="global.html#close">close</a></li><li><a href="global.html#connect">connect</a></li><li><a href="global.html#containedIn">containedIn</a></li><li><a href="global.html#contentType">contentType</a></li><li><a href="global.html#count">count</a></li><li><a href="global.html#descending">descending</a></li><li><a href="global.html#entries">entries</a></li><li><a href="global.html#entry">entry</a></li><li><a href="global.html#excludeReferences">excludeReferences</a></li><li><a href="global.html#exists">exists</a></li><li><a href="global.html#find">find</a></li><li><a href="global.html#findOne">findOne</a></li><li><a href="global.html#getQuery">getQuery</a></li><li><a href="global.html#greaterThan">greaterThan</a></li><li><a href="global.html#greaterThanOrEqualTo">greaterThanOrEqualTo</a></li><li><a href="global.html#includeCount">includeCount</a></li><li><a href="global.html#language">language</a></li><li><a href="global.html#lessThan">lessThan</a></li><li><a href="global.html#lessThanOrEqualTo">lessThanOrEqualTo</a></li><li><a href="global.html#notContainedIn">notContainedIn</a></li><li><a href="global.html#notEqualTo">notEqualTo</a></li><li><a href="global.html#notExists">notExists</a></li><li><a href="global.html#or">or</a></li><li><a href="global.html#queryReferences">queryReferences</a></li><li><a href="global.html#schema">schema</a></li><li><a href="global.html#schemas">schemas</a></li><li><a href="global.html#tags">tags</a></li><li><a href="global.html#where">where</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Mar 28 2019 12:10:10 GMT+0530 (IST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Mar 28 2019 13:13:50 GMT+0530 (IST)
 </footer>
 
 <script> prettyPrint(); </script>
