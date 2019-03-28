@@ -23,13 +23,16 @@ const stack_1 = require("./stack");
  *  ]
  * })
  *
- * @returns {Stack}
+ * @returns {Stack} Returns Stack method, which's used to create an instance of Stack
  */
 class Contentstack {
     /**
-     * @summary
-     * 	Initialize Stack instance
-     * @param {Object} stack_arguments - Stack config
+     * @public
+     * @method Stack
+     * @summary Initialize Stack instance
+     * @param {object} config Stack config
+     * @param {object} db Existing db connection
+     * @returns {Stack} - Returns an instance of `Stack`
      */
     static Stack(config, db) {
         return new stack_1.Stack(config, db);
