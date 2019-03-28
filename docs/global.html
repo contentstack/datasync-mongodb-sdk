@@ -1,0 +1,5013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Global</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Global</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2></h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="greaterThan"><span class="type-signature"></span>greaterThan<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Comparison $gt query wrapper
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line397">line 397</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('')
+ .entries()
+ .greaterThan('age', 60)
+ .find()
+ .then((result) => {
+   // filtered entries, where { age > 60 }
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="and"><span class="type-signature"></span>and<span class="signature">(queries)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Logical AND query wrapper
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>queries</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Query filter</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line235">line 235</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('')
+ .entries()
+ .and([
+   {
+     title: 'John'
+   },
+   {
+     age: 30
+   }
+ ])
+ .find()
+ .then((result) => {
+   // filtered entries, where { title: 'John', age: 30 }
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="ascending"><span class="type-signature"></span>ascending<span class="signature">(field)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+    <p class="summary">Sorts the documents based on the 'sort' key</p>
+    
+
+
+
+<div class="description">
+    The sort function requires that the entire sort be able to complete within 32 megabytes.
+When the sort option consumes more than 32 megabytes, MongoDB will return an error.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>field</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The field to sort in ascending order</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line31">line 31</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('')
+ .entries()
+ .ascending()
+ .find()
+ .then((result) => {
+   // result sorted in ascending manner with respect to 'published_at' field (by default)
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="asset"><span class="type-signature"></span>asset<span class="signature">(uid)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Query for a single asset
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>uid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Asset uid to be found, if not provided,
+ by default returns the 1st element from assets.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line764">line 764</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .asset()
+ .find()
+ .then((result) => {
+   // returns the asset based on its 'uid', if not provided, it would return the 1st asset found
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="assets"><span class="type-signature"></span>assets<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Query for a set of assets
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line795">line 795</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .assets()
+ .find()
+ .then((result) => {
+   // returns assets filtered based on 'blog' content type
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="close"><span class="type-signature"></span>close<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+    <p class="summary">Closes connection with mongodb</p>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line198">line 198</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="connect"><span class="type-signature"></span>connect<span class="signature">(overrides)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    
+
+    
+    <p class="summary">Establish connection to mongodb</p>
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>overrides</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Config overrides/mongodb specific config</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line132">line 132</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Mongodb 'db' instance
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .connect({overrides})
+ .then((result) => {
+   // mongodb connection object
+   // indexes will be created on the collection in the background if provided in config
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="containedIn"><span class="type-signature"></span>containedIn<span class="signature">(key, value)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Comparison $in query wrapper
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Field to compare against</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Value to compare with</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line515">line 515</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('')
+ .entries()
+ .containedIn('emails', 'john.doe@some.com')
+ .find()
+ .then((result) => {
+   // filtered entries, where 'john.doe@some.com' exists in 'emails' field (array)
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="contentType"><span class="type-signature"></span>contentType<span class="signature">(uid)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Content type to query on
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>uid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Content type uid</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line676">line 676</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('blog')
+ .entries()
+ .find()
+ .then((result) => {
+   // returns entries filtered based on 'blog' content type
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="count"><span class="type-signature"></span>count<span class="signature">(query)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Returns the count of the entries/assets that match the filter
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>query</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Optional query filter object</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1394">line 1394</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns count of the entries/asset's matched
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('blog')
+ .entries()
+ .count()
+ .then((result) => {
+   // returns entries, without any of its assets Or references
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="descending"><span class="type-signature"></span>descending<span class="signature">(field)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+    <p class="summary">Sorts the documents based on the 'sort' key</p>
+    
+
+
+
+<div class="description">
+    The sort function requires that the entire sort be able to complete within 32 megabytes.
+When the sort option consumes more than 32 megabytes, MongoDB will return an error.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>field</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The field to sort in descending order</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line81">line 81</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('')
+ .entries()
+ .descending('title')
+ .find()
+ .then((result) => {
+   // result sorted in descending manner with respect to 'title' field
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="entries"><span class="type-signature"></span>entries<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Query for a set of entries on a content type
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line739">line 739</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('blog')
+ .entries()
+ .find()
+ .then((result) => {
+   // returns entries filtered based on 'blog' content type
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="entry"><span class="type-signature"></span>entry<span class="signature">(uid)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Query for a single entry
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>uid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Entry uid to be found, if not provided,
+ by default returns the 1st element in the content type.
+ Useful for `singleton` content types</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line706">line 706</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('blog')
+ .entry()
+ .find()
+ .then((result) => {
+   // returns the entry based on its 'uid', if not provided, it would return the 1st entry found in 'blog' content type
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="excludeReferences"><span class="type-signature"></span>excludeReferences<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Excludes all references of the entries being scanned
+Note: On calling this, assets will not be binded in the result being returned.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1251">line 1251</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('blog')
+ .entries()
+ .excludeReferences()
+ .find()
+ .then((result) => {
+   // returns entries, without any of its assets Or references
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="exists"><span class="type-signature"></span>exists<span class="signature">(key, value)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Element $exists query wrapper, checks if a field exists
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Field to compare against</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Value to compare with</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line595">line 595</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('')
+ .entries()
+ .exists('emails')
+ .find()
+ .then((result) => {
+   // filtered entries, where 'emails' property exists
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="find"><span class="type-signature"></span>find<span class="signature">(query)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Queries the db using the query built/passed
+Does all the processing, filtering, referencing after querying the DB
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>query</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Optional query object, that overrides all the
+previously build queries</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1321">line 1321</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    - Returns a objects, that have been processed, filtered and referenced
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('blog')
+ .entries()
+ .find()
+ .then((result) => {
+   // returns blog content type's entries
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="findOne"><span class="type-signature"></span>findOne<span class="signature">(query)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Queries the db using the query built/passed. Returns a single entry/asset/content type object
+Does all the processing, filtering, referencing after querying the DB
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>query</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Optional query object, that overrides all the previously build queries</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1453">line 1453</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    - Returns an object, that has been processed, filtered and referenced
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('blog')
+ .entries()
+ .findOne()
+ .then((result) => {
+   // returns an entry
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getQuery"><span class="type-signature"></span>getQuery<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Returns the query build thusfar
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1305">line 1305</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const query = Stack
+ .contentType('blog')
+ .entries()
+ .getQuery()
+// exposes details of the queries formed inside the SDK</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="greaterThanOrEqualTo"><span class="type-signature"></span>greaterThanOrEqualTo<span class="signature">(key, value)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Comparison $gte query wrapper
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Field to compare against</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Value to compare with</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line437">line 437</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('')
+ .entries()
+ .greaterThanOrEqualTo('age', 60)
+ .find()
+ .then((result) => {
+   // filtered entries, where { age >= 60 }
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="language"><span class="type-signature"></span>language<span class="signature">(code)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Locale to query on
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>code</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Query locale's code</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line206">line 206</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('')
+ .entries()
+ .language('es-es')
+ .find()
+ .then((result) => {
+   // results in entries fetched from 'es-es' locale
+   // if not provided, defaults to the 1st locale provided in the 'locales' key, provided in config
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="lessThan"><span class="type-signature"></span>lessThan<span class="signature">(key, value)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Comparison $lt query wrapper
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Field to compare against</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Value to compare with</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line317">line 317</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('')
+ .entries()
+ .lessThan('age', 18)
+ .find()
+ .then((result) => {
+   // filtered entries, where { age &lt; 18 }
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="lessThanOrEqualTo"><span class="type-signature"></span>lessThanOrEqualTo<span class="signature">(key, value)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Comparison $lte query wrapper
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Field to compare against</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Value to compare with</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line357">line 357</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('')
+ .entries()
+ .lessThanOrEqualTo('age', 18)
+ .find()
+ .then((result) => {
+   // filtered entries, where { age &lt;= 18 }
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="notContainedIn"><span class="type-signature"></span>notContainedIn<span class="signature">(key, value)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Comparison $nin query wrapper
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Field to compare against</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Value to compare with</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line555">line 555</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('')
+ .entries()
+ .notContainedIn('emails', 'john.doe@some.com')
+ .find()
+ .then((result) => {
+   // filtered entries, where 'john.doe@some.com' does not exist in 'emails' field (array)
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="notEqualTo"><span class="type-signature"></span>notEqualTo<span class="signature">(key, value)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Comparison $ne query wrapper
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Field to compare against</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Value to compare with</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line476">line 476</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('')
+ .entries()
+ .notEqualTo('age', 25)
+ .find()
+ .then((result) => {
+   // filtered entries, where { age != 25 }
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="notExists"><span class="type-signature"></span>notExists<span class="signature">(key, value)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Property $exists query wrapper, checks if a field does not exists
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Field to compare against</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Value to compare with</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line636">line 636</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('')
+ .entries()
+ .notExists('emails')
+ .find()
+ .then((result) => {
+   // filtered entries, where 'emails' property does not exist
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="or"><span class="type-signature"></span>or<span class="signature">(queries)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Logical OR query wrapper
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>queries</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Query filter</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line276">line 276</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('')
+ .entries()
+ .or([
+   {
+     title: 'John'
+   },
+   {
+     title: 'Jane'
+   }
+ ])
+ .find()
+ .then((result) => {
+   // filtered entries, where { title: 'John' } OR { title: 'Jane' }
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="queryReferences"><span class="type-signature"></span>queryReferences<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Wrapper, that allows querying on the entry's references.
+Note: This is a slow method, since it scans all documents and fires the `reference` query on them. Once the references are binded, the query object passed is used for filtering
+Use `.query()` filters to reduce the total no of documents being scanned
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line1276">line 1276</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .contentType('blog')
+ .entries()
+ .queryReferences({"authors.name": "John Doe"})
+ .find()
+ .then((result) => {
+   // returns entries, who's reference author's name equals "John Doe"
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="schema"><span class="type-signature"></span>schema<span class="signature">(uid)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Query for a single content type's schema
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>uid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Content type uid to be found, if not provided,
+ by default returns the 1st element from content types</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line819">line 819</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .schema('blog')
+ .find()
+ .then((result) => {
+   // returns content 'blog' content type's schema
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="schemas"><span class="type-signature"></span>schemas<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Query for a set of content type schemas
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="stack.js.html">stack.js</a>, <a href="stack.js.html#line851">line 851</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an instance of 'stack'
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Stack
+ .schemas()
+ .find()
+ .then((result) => {
+   // returns a set of content type schemas
+ })
+ .catch((error) => {
+   // handle query errors
+ })</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="Stack"><span class="type-signature"></span>Stack<span class="signature">(config, db)</span><span class="type-signature"> &rarr; {<a href="global.html#Stack">Stack</a>}</span></h4>
+    
+
+    
+    <p class="summary">Initialize Stack instance</p>
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>config</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Stack config</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>db</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Existing db connection</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line29">line 29</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    - Returns an instance of `Stack`
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Stack">Stack</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="global.html#Stack">Stack</a></li></ul><h3>Global</h3><ul><li><a href="global.html#and">and</a></li><li><a href="global.html#ascending">ascending</a></li><li><a href="global.html#asset">asset</a></li><li><a href="global.html#assets">assets</a></li><li><a href="global.html#close">close</a></li><li><a href="global.html#connect">connect</a></li><li><a href="global.html#containedIn">containedIn</a></li><li><a href="global.html#contentType">contentType</a></li><li><a href="global.html#count">count</a></li><li><a href="global.html#descending">descending</a></li><li><a href="global.html#entries">entries</a></li><li><a href="global.html#entry">entry</a></li><li><a href="global.html#excludeReferences">excludeReferences</a></li><li><a href="global.html#exists">exists</a></li><li><a href="global.html#find">find</a></li><li><a href="global.html#findOne">findOne</a></li><li><a href="global.html#getQuery">getQuery</a></li><li><a href="global.html#greaterThan">greaterThan</a></li><li><a href="global.html#greaterThanOrEqualTo">greaterThanOrEqualTo</a></li><li><a href="global.html#language">language</a></li><li><a href="global.html#lessThan">lessThan</a></li><li><a href="global.html#lessThanOrEqualTo">lessThanOrEqualTo</a></li><li><a href="global.html#notContainedIn">notContainedIn</a></li><li><a href="global.html#notEqualTo">notEqualTo</a></li><li><a href="global.html#notExists">notExists</a></li><li><a href="global.html#or">or</a></li><li><a href="global.html#queryReferences">queryReferences</a></li><li><a href="global.html#schema">schema</a></li><li><a href="global.html#schemas">schemas</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Mar 28 2019 12:10:10 GMT+0530 (IST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
