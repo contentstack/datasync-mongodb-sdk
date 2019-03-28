@@ -1,6 +1,6 @@
 "use strict";
 /*!
- * Contentstack Sync Mongodb SDK
+ * Contentstack DataSync Mongodb SDK
  * Copyright (c) 2019 Contentstack LLC
  * MIT Licensed
  */

@@ -1,5 +1,5 @@
 /*!
- * Contentstack Sync Mongodb SDK
+ * Contentstack DataSync Mongodb SDK
  * Copyright (c) 2019 Contentstack LLC
  * MIT Licensed
  */
@@ -120,10 +120,10 @@ export declare class Stack {
      */
     language(code: any): this;
     /**
+     * @public
      * @method and
-     * @description
-     * Logical AND query wrapper
-     *
+     * @summary Logical AND query wrapper
+     * @description Accepts 2 queries and returns only those documents, that satisfy both the query conditions
      * @param {object} queries Query filter
      * @example
      * Stack
@@ -149,10 +149,10 @@ export declare class Stack {
      */
     and(queries: any): this;
     /**
+     * @public
      * @method or
-     * @description
-     * Logical OR query wrapper
-     *
+     * @summary Logical OR query wrapper
+     * @description Accepts 2 queries and returns only those documents, that satisfy either of the query conditions
      * @param {object} queries Query filter
      * @example
      * Stack
@@ -178,10 +178,12 @@ export declare class Stack {
      */
     or(queries: any): this;
     /**
+     * @public
      * @method lessThan
+     * @summary Comparison $lt query wrapper
      * @description
-     * Comparison $lt query wrapper
-     *
+     * Compares the field/key provided against the provided value. Only documents that have lower value than the one provided are returned.
+     * Check https://docs.mongodb.com/manual/reference/operator/query/lt/ and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
      * @param {string} key Field to compare against
      * @param {*} value Value to compare with
      * @example
@@ -201,10 +203,12 @@ export declare class Stack {
      */
     lessThan(key: any, value: any): this;
     /**
+     * @public
      * @method lessThanOrEqualTo
+     * @summary Comparison $lte query wrapper
      * @description
-     * Comparison $lte query wrapper
-     *
+     * Compares the field/key provided against the provided value. Only documents that have lower or equal value than the one provided are returned.
+     * Check https://docs.mongodb.com/manual/reference/operator/query/lte/ and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
      * @param {string} key Field to compare against
      * @param {*} value Value to compare with
      * @example
@@ -224,10 +228,12 @@ export declare class Stack {
      */
     lessThanOrEqualTo(key: any, value: any): this;
     /**
-     * @member greaterThan
+     * @public
+     * @method greaterThan
+     * @summary Comparison $gt query wrapper
      * @description
-     * Comparison $gt query wrapper
-     *
+     * Compares the field/key provided against the provided value. Only documents that have greater value than the one provided are returned.
+     * Check {@link https://docs.mongodb.com/manual/reference/operator/query/gt/ }and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
      * @param {string} key Field to compare against
      * @param {*} value Value to compare with
      * @example
@@ -247,9 +253,12 @@ export declare class Stack {
      */
     greaterThan(key: any, value: any): this;
     /**
+     * @public
      * @method greaterThanOrEqualTo
+     * @summary Comparison $gte query wrapper
      * @description
-     * Comparison $gte query wrapper
+     * Compares the field/key provided against the provided value. Only documents that have greater than or equal value than the one provided are returned.
+     * Check https://docs.mongodb.com/manual/reference/operator/query/gte/ and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
      * @param {string} key - Field to compare against
      * @param {*} value - Value to compare with
      * @example
@@ -269,9 +278,17 @@ export declare class Stack {
      */
     greaterThanOrEqualTo(key: any, value: any): this;
     /**
+     * @public
      * @method notEqualTo
+     * @summary Comparison $ne query wrapper
      * @description
-     * Comparison $ne query wrapper
+     * Compares the field/key provided against the provided value. Only documents that have value not equals than the one provided are returned.
+     *
+     * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/ne/}.
+     *
+     * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
+     *
+     * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
      * @param {string} key Field to compare against
      * @param {*} value Value to compare with
      * @example
@@ -291,9 +308,17 @@ export declare class Stack {
      */
     notEqualTo(key: any, value: any): this;
     /**
+     * @public
      * @method containedIn
+     * @summary Comparison $in query wrapper
      * @description
-     * Comparison $in query wrapper
+     * Compares the field/key provided against the provided value. Only documents that have value contained in the field/key provided are returned.
+     *
+     * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/in/}.
+     *
+     * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
+     *
+     * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
      * @param {string} key Field to compare against
      * @param {*} value Value to compare with
      *
@@ -314,9 +339,17 @@ export declare class Stack {
      */
     containedIn(key: any, value: any): this;
     /**
+     * @public
      * @method notContainedIn
+     * @summary Comparison $nin query wrapper
      * @description
-     * Comparison $nin query wrapper
+     * Compares the field/key provided against the provided value. Only documents that have value not contained in the field/key provided are returned.
+     *
+     * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/nin/}.
+     *
+     * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
+     *
+     * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
      * @param {string} key Field to compare against
      * @param {*} value Value to compare with
      *
@@ -337,10 +370,17 @@ export declare class Stack {
      */
     notContainedIn(key: any, value: any): this;
     /**
+     * @public
      * @method exists
+     * @summary Element $exists query wrapper, checks if a field exists
      * @description
-     * Element $exists query wrapper, checks if a field exists
+     * Compares the field/key provided against the provided value. Only documents that have the field/key specified are returned.
      *
+     * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/exists/}.
+     *
+     * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
+     *
+     * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
      * @param {string} key Field to compare against
      * @param {*} value Value to compare with
      *
@@ -361,10 +401,18 @@ export declare class Stack {
      */
     exists(key: any): this;
     /**
+     * @public
      * @method notExists
-     * @description
+     * @summary
      * Property $exists query wrapper, checks if a field does not exists
+     * @description
+     * Compares the field/key provided against the provided value. Only documents that do not have the key are returned.
      *
+     * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/exists/}.
+     *
+     * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
+     *
+     * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
      * @param {string} key Field to compare against
      * @param {*} value Value to compare with
      * @example
@@ -384,10 +432,9 @@ export declare class Stack {
      */
     notExists(key: any): this;
     /**
+     * @public
      * @method contentType
-     * @description
-     * Content type to query on
-     *
+     * @summary Content type to query on
      * @param {string} uid Content type uid
      * @example
      * Stack
@@ -405,11 +452,10 @@ export declare class Stack {
      */
     contentType(uid: any): Stack;
     /**
+     * @public
      * @method entry
-     * @description
-     * Query for a single entry
-     *
-     * @param {string} uid - Entry uid to be found, if not provided,
+     * @summary Query for a single entry
+     * @param {string} uid Entry uid to be found, if not provided,
      *  by default returns the 1st element in the content type.
      *  Useful for `singleton` content types
      * @example
@@ -658,7 +704,9 @@ export declare class Stack {
      */
     regex(field: any, pattern: any, options?: string): this;
     /**
-     * Match entries that match a specific tags
+     * @public
+     * @method tags
+     * @summary Match entries that match a specific tags
      *
      * @param {array} values Array of tag values
      * @example
@@ -678,9 +726,8 @@ export declare class Stack {
      */
     tags(values: any): this;
     /**
-     * @summary
-     * Pass JS expression or a full function to the query system
-     *
+     * @method where
+     * @summary Pass JS expression or a full function to the query system
      * @description
      * Use the $where operator to pass either a string containing a JavaScript expression or a full JavaScript function to the query system.
      * The $where provides greater flexibility, but requires that the database processes the JavaScript expression or function for each document in the collection.
@@ -688,7 +735,7 @@ export declare class Stack {
      * Only apply the $where query operator to top-level documents.
      * The $where query operator will not work inside a nested document, for instance, in an $elemMatch query.
      * Ref. - https://docs.mongodb.com/manual/reference/operator/query/where/index.html
-     * @param {*} expr - Pass either a string containing a JavaScript expression or a full JavaScript function to the query system.
+     * @param {*} expr Pass either a string containing a JavaScript expression or a full JavaScript function to the query system.
      * @example
      * Stack
      *  .contentType('blog')
@@ -708,6 +755,8 @@ export declare class Stack {
      */
     where(expr: any): this;
     /**
+     * @public
+     * @method includeCount
      * @description
      * Includes 'count' key in response, which is the total count of the items being returned
      *
