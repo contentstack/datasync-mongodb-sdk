@@ -1,6 +1,4 @@
 export const config = {
-  collectionName: 'automation',
-  dbName: 'sync-test',
   locales: [
     {
       code: 'en-us',
@@ -11,4 +9,8 @@ export const config = {
       relative_url_prefix: '/es/',
     },
   ],
+  contentStore: {
+    collectionName: 'automation',
+    dbName: 'sync-test',
+  }
 }

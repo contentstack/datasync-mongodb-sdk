@@ -11,8 +11,8 @@ import { entries as categories } from './data/category'
 import { entries as products } from './data/products'
 import { content_types } from './data/content_types'
 
-config.collectionName = 'core'
-
+config.contentStore.collectionName = 'core'
+const collectionName = config.contentStore.collectionName
 const Stack = Contentstack.Stack(config)
 let db
 
@@ -23,28 +23,28 @@ describe('# Core', () => {
     })
   })
   beforeAll(() => {
-    return db.collection(config.collectionName).insertMany(authors)
+    return db.collection(collectionName).insertMany(authors)
     .then(() => {
-      return db.collection(config.collectionName).insertMany(blogs)
+      return db.collection(collectionName).insertMany(blogs)
     })
     .then(() => {
-      return db.collection(config.collectionName).insertMany(products)
+      return db.collection(collectionName).insertMany(products)
     })
     .then(() => {
-      return db.collection(config.collectionName).insertMany(categories)
+      return db.collection(collectionName).insertMany(categories)
     })
     .then(() => {
-      return db.collection(config.collectionName).insertMany(assets)
+      return db.collection(collectionName).insertMany(assets)
     })
     .then(() => {
-      return db.collection(config.collectionName).insertMany(content_types)
+      return db.collection(collectionName).insertMany(content_types)
     })
     .catch((error) => {
       expect(error).toBeNull()
     })
   })
   afterAll(() => {
-    return db.collection(config.collectionName).drop().then(() => {
+    return db.collection(collectionName).drop().then(() => {
       return Stack.close()
     })
   })

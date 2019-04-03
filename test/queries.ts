@@ -10,8 +10,8 @@ import { entries as blogs } from './data/blog'
 import { entries as categories } from './data/category'
 import { content_types } from './data/content_types'
 
-config.collectionName = 'queries'
-
+config.contentStore.collectionName = 'queries'
+const collectionName = config.contentStore.collectionName
 const Stack = Contentstack.Stack(config)
 let db
 
@@ -74,25 +74,25 @@ describe('# Querying', () => {
     })
   })
   beforeAll(() => {
-    return db.collection(config.collectionName).insertMany(authors)
+    return db.collection(collectionName).insertMany(authors)
       .then(() => {
-        return db.collection(config.collectionName).insertMany(blogs)
+        return db.collection(collectionName).insertMany(blogs)
       })
       .then(() => {
-        return db.collection(config.collectionName).insertMany(categories)
+        return db.collection(collectionName).insertMany(categories)
       })
       .then(() => {
-        return db.collection(config.collectionName).insertMany(assets)
+        return db.collection(collectionName).insertMany(assets)
       })
       .then(() => {
-        return db.collection(config.collectionName).insertMany(content_types)
+        return db.collection(collectionName).insertMany(content_types)
       })
       .catch((error) => {
         expect(error).toBeNull()
       })
   })
   afterAll(() => {
-    return db.collection(config.collectionName).drop().then(() => {
+    return db.collection(collectionName).drop().then(() => {
       return Stack.close()
     })
   })

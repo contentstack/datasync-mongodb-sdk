@@ -116,7 +116,6 @@ class Stack {
             throw new Error('Kindly call \'.contentType()\' before \.descending()\'');
         }
         if (!(field) || typeof field !== 'string') {
-            // throw new Error('Kindly provide a valid field name for \'.descending()\'')
             if (this.internal.sort && typeof this.internal.sort === 'object') {
                 this.internal.sort.published_at = -1;
             }
@@ -1362,7 +1361,6 @@ class Stack {
         }
         throw new Error('Kindly pass a query object for \'.queryReferences()\'');
     }
-<<<<<<< HEAD
     queryReferencesBeta(query) {
         if (query && typeof query === 'object') {
             this.internal.queryReferencesBeta = query;
@@ -1370,22 +1368,6 @@ class Stack {
         }
         throw new Error('Kindly pass a query object for \'.queryReferences()\'');
     }
-    getQuery() {
-        return Object.assign({}, this.q);
-    }
-    include(fields) {
-        if (fields.length === 0) {
-            throw new Error('Kindly pass a valid reference field path to \'.include()\' ');
-        }
-        else if (typeof fields === 'string') {
-            this.internal.includeSpecificReferences = [fields];
-        }
-        else {
-            this.internal.includeSpecificReferences = fields;
-        }
-        return this;
-    }
-=======
     /**
      * @method getQuery
      * @description Returns the query build thusfar
@@ -1401,6 +1383,18 @@ class Stack {
      */
     getQuery() {
         return Object.assign({}, this.q);
+    }
+    include(fields) {
+        if (fields.length === 0) {
+            throw new Error('Kindly pass a valid reference field path to \'.include()\' ');
+        }
+        else if (typeof fields === 'string') {
+            this.internal.includeSpecificReferences = [fields];
+        }
+        else {
+            this.internal.includeSpecificReferences = fields;
+        }
+        return this;
     }
     /**
      * @method find
@@ -1424,37 +1418,30 @@ class Stack {
      *
      * @returns {object} - Returns a objects, that have been processed, filtered and referenced
      */
->>>>>>> develop
     find(query = {}) {
         return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
             let queryFilters = this.preProcess(query);
-            let formattedQuery;
-            if (this.internal.queryReferencesBeta) {
-                formattedQuery = yield this.queryBuilder(this.internal.queryReferencesBeta, this.q.locale, this.q.content_type_uid);
-                console.log('formatted query', JSON.stringify(formattedQuery));
+            if (this.internal.includeSpecificReferences) {
+                const projections = yield this.excludeSpecificReferences(this.internal.includeSpecificReferences, this.q.content_type_uid, this.internal.hasOwnProperty('only'));
+                console.log('projections', projections);
+                this.internal.projections = lodash_1.merge(this.internal.projections, projections);
+                console.log('this.internal.projections', this.internal.projections);
             }
-            queryFilters = lodash_1.merge(queryFilters, formattedQuery[0]);
-            console.log('queryfilters', JSON.stringify(queryFilters));
             if (this.internal.sort) {
                 this.collection = this.collection.find(queryFilters).sort(this.internal.sort);
             }
             else {
                 this.collection = this.collection.find(queryFilters);
             }
-            // process it in a different manner
             if (this.internal.queryReferences) {
-                return this.queryOnReferences()
-                    .then(resolve)
-                    .catch(reject);
+                this.collection = this.collection.project(this.internal.projections).toArray();
+            }
+            else {
+                this.collection = this.collection.project(this.internal.projections).limit(this.internal.limit).skip(this.internal.skip).toArray();
             }
             return this.collection
-                .project(this.internal.projections)
-                .limit(this.internal.limit)
-                .skip(this.internal.skip)
-                .toArray()
                 .then((result) => {
                 let contentType;
-<<<<<<< HEAD
                 if (this.internal.includeSchema && this.q.content_type_uid !== this.types.content_types && this.q.content_type_uid !==
                     this.types.assets) {
                     contentType = lodash_1.remove(result, { uid: this.q.content_type_uid });
@@ -1463,44 +1450,39 @@ class Stack {
                 }
                 if (this.internal.excludeReferences || this.q.content_type_uid === this.types.content_types || this.q.content_type_uid
                     === this.types.assets) {
-=======
-                if (this.internal.includeSchema && this.q.content_type_uid !== 'contentTypes' && this.q
-                    .content_type_uid !==
-                    '_assets') {
-                    contentType = lodash_1.remove(result, {
-                        uid: this.q.content_type_uid
-                    });
-                    contentType = (typeof contentType === 'object' && contentType instanceof Array && contentType
-                        .length) ?
-                        contentType[0] : null;
-                }
-                if (this.internal.excludeReferences || this.q.content_type_uid === 'contentTypes' || this.q
-                    .content_type_uid
-                    === '_assets') {
->>>>>>> develop
                     result = this.postProcess(result, contentType);
                     return resolve(result);
                 }
                 else if (this.internal.includeSpecificReferences) {
                     return this.includeSpecificReferences(result, this.q.locale, {}, undefined, this.internal.includeSpecificReferences)
                         .then(() => {
+                        if (this.internal.queryReferences) {
+                            result = sift_1.default(this.internal.queryReferences, result);
+                            if (this.internal.skip) {
+                                result = result.splice(this.internal.skip, this.internal.limit);
+                            }
+                            else if (this.internal.limit) {
+                                result = result.splice(0, this.internal.limit);
+                            }
+                        }
                         result = this.postProcess(result, contentType);
                         return resolve(result);
-                    })
-                        .catch((refError) => {
-                        this.cleanup();
-                        return reject(refError);
                     });
                 }
                 else {
                     return this.includeReferencesI(result, this.q.locale, {}, undefined)
                         .then(() => {
+                        if (this.internal.queryReferences) {
+                            result = sift_1.default(this.internal.queryReferences, result);
+                            if (this.internal.skip) {
+                                result = result.splice(this.internal.skip, this.internal.limit);
+                            }
+                            else if (this.internal.limit) {
+                                result = result.splice(0, this.internal.limit);
+                            }
+                        }
                         result = this.postProcess(result, contentType);
                         return resolve(result);
-                    })
-                        .catch((refError) => {
-                        this.cleanup();
-                        return reject(refError);
                     });
                 }
             })
@@ -1604,38 +1586,6 @@ class Stack {
                 .catch(reject);
         });
     }
-    queryOnReferences() {
-        return new Promise((resolve, reject) => {
-            return this.collection
-                // .find(query)
-                .project(this.internal.projections)
-                // .limit(this.internal.limit)
-                // .skip(this.internal.skip)
-                .toArray()
-                .then((result) => {
-                return this.includeReferencesI(result, this.q.locale, {}, undefined)
-                    .then(() => {
-                    result = sift_1.default(this.internal.queryReferences, result);
-                    if (this.internal.skip) {
-                        result = result.splice(this.internal.skip, this.internal.limit);
-                    }
-                    else if (this.internal.limit) {
-                        result = result.splice(0, this.internal.limit);
-                    }
-                    result = this.postProcess(result);
-                    return resolve(result);
-                })
-                    .catch((refError) => {
-                    this.cleanup();
-                    return reject(refError);
-                });
-            })
-                .catch((error) => {
-                this.cleanup();
-                return reject(error);
-            });
-        });
-    }
     /**
      * @private
      * @method preProcess
@@ -1706,10 +1656,6 @@ class Stack {
      */
     postProcess(result, contentType) {
         const count = (result === null) ? 0 : result.length;
-        // if (this.internal.only) {
-        //   result.forEach((item) => mask(item, this.internal.except))
-        // }
-        // result.forEach((item) => delete item._id)
         switch (this.q.content_type_uid) {
             case this.types.assets:
                 if (this.internal.single) {
@@ -1860,88 +1806,6 @@ class Stack {
                 .catch(reject);
         });
     }
-    includeReferencesBeta(entry, locale, references, parentUid) {
-        const self = this;
-        return new Promise((resolve, reject) => {
-            if (entry === null || typeof entry !== 'object') {
-                return resolve();
-            }
-            if (entry.uid) {
-                parentUid = entry.uid;
-            }
-            const referencesFound = [];
-            for (const prop in entry) {
-                if (entry[prop] !== null && typeof entry[prop] === 'object') {
-                    if (entry[prop] && entry[prop].reference_to) {
-                        if (entry[prop].values.length === 0) {
-                            entry[prop] = [];
-                        }
-                        else {
-                            let uids = entry[prop].values;
-                            if (typeof uids === 'string') {
-                                uids = [uids];
-                            }
-                            if (entry[prop].reference_to !== this.types.assets) {
-                                uids = lodash_1.filter(uids, (uid) => {
-                                    return !(util_1.checkCyclic(uid, references));
-                                });
-                            }
-                            if (uids.length) {
-                                const query = {
-                                    content_type_uid: entry[prop].reference_to,
-                                    locale,
-                                    uid: {
-                                        $in: uids,
-                                    },
-                                };
-                                referencesFound.push(new Promise((rs, rj) => {
-                                    return self.db.collection(this.contentStore.collectionName)
-                                        .find(query)
-                                        .project(self.config.contentStore.projections)
-                                        .toArray()
-                                        .then((result) => {
-                                        if (result.length === 0) {
-                                            entry[prop] = [];
-                                            return rs();
-                                        }
-                                        else if (parentUid) {
-                                            references[parentUid] = references[parentUid] || [];
-                                            references[parentUid] = lodash_1.uniq(references[parentUid].concat(lodash_1.map(result, 'uid')));
-                                        }
-                                        if (typeof entry[prop].values === 'string') {
-                                            entry[prop] = ((result === null) || result.length === 0) ? null : result[0];
-                                        }
-                                        else {
-                                            const referenceBucket = [];
-                                            query.uid.$in.forEach((entityUid) => {
-                                                const elem = lodash_1.find(result, (entity) => {
-                                                    return entity.uid === entityUid;
-                                                });
-                                                if (elem) {
-                                                    referenceBucket.push(elem);
-                                                }
-                                            });
-                                            entry[prop] = referenceBucket;
-                                        }
-                                        return self.includeReferencesBeta(entry[prop], locale, references, parentUid)
-                                            .then(rs)
-                                            .catch(rj);
-                                    })
-                                        .catch(rj);
-                                }));
-                            }
-                        }
-                    }
-                    else {
-                        referencesFound.push(self.includeReferencesBeta(entry[prop], locale, references, parentUid));
-                    }
-                }
-            }
-            return Promise.all(referencesFound)
-                .then(resolve)
-                .catch(reject);
-        });
-    }
     isPartOfInclude(pth, include) {
         for (let i = 0, j = include.length; i < j; i++) {
             if (include[i].indexOf(pth) !== -1) {
@@ -1950,16 +1814,27 @@ class Stack {
         }
         return false;
     }
+    /**
+     * @summary
+     *  Internal method, that iteratively calls itself and binds entries reference
+     * @param {Object} entry - An entry or a collection of entries, who's references are to be found
+     * @param {String} locale - Locale, in which the reference is to be found
+     * @param {Object} references - A map of uids tracked thusfar (used to detect cycle)
+     * @param {String} parentUid - Entry uid, which is the parent of the current `entry` object
+     * @returns {Object} - Returns `entry`, that has all of its reference binded
+     */
     includeSpecificReferences(entry, locale, references, parentUid, includePths = [], parentField = '') {
         const self = this;
         return new Promise((resolve, reject) => {
             if (entry === null || typeof entry !== 'object') {
                 return resolve();
             }
+            // current entry becomes the parent
             if (entry.uid) {
                 parentUid = entry.uid;
             }
             const referencesFound = [];
+            // iterate over each key in the object
             for (const prop in entry) {
                 if (entry[prop] !== null && typeof entry[prop] === 'object') {
                     let currentPth;
@@ -2013,6 +1888,7 @@ class Stack {
                                                 entry[prop] = ((result === null) || result.length === 0) ? null : result[0];
                                             }
                                             else {
+                                                // format the references in order
                                                 const referenceBucket = [];
                                                 query.uid.$in.forEach((entityUid) => {
                                                     const elem = lodash_1.find(result, (entity) => {
@@ -2044,94 +1920,13 @@ class Stack {
                 .catch(reject);
         });
     }
-    queryBuilder(query, locale, uid) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                if (query && Object.keys(query).length && uid) {
-                    return this.db.collection(this.contentStore.collectionName)
-                        .find({
-                        content_type_uid: this.types.content_types,
-                        uid
-                    })
-                        .project({
-                        references: 1
-                    })
-                        .limit(1)
-                        .toArray()
-                        .then((result) => {
-                        console.log('result', result);
-                        if (result === null || result.length === 0) {
-                            return resolve(query);
-                        }
-                        const references = result[0].references;
-                        if (references && Object.keys(references).length > 0) {
-                            const promises = [];
-                            for (const field in query) {
-                                if (query[field] === null) {
-                                    delete query[field];
-                                }
-                                else if (typeof query[field] === 'object' && query[field] instanceof Array && query[field].length) {
-                                    promises.push(this.queryBuilder(query[field], locale, uid));
-                                }
-                                else {
-                                    let filterField = field;
-                                    let refQuery, refContentType;
-                                    let refFieldM;
-                                    for (let refField in references) {
-                                        if (field.indexOf(refField) === 0) {
-                                            refFieldM = refField;
-                                            let newfilterField = filterField.replace(refField, '');
-                                            if (newfilterField.charAt(0) === '.') {
-                                                newfilterField = newfilterField.substr(1);
-                                            }
-                                            refQuery = refQuery || {};
-                                            refContentType = references[refField];
-                                            refQuery[newfilterField] = query[field];
-                                            refQuery.content_type_uid = refContentType;
-                                            refQuery.locale = locale;
-                                            delete query[field];
-                                        }
-                                    }
-                                    if (refQuery && Object.keys(refQuery).length) {
-                                        promises.push(this.db.collection(this.contentStore.collectionName)
-                                            .find(refQuery)
-                                            .project({ uid: 1 })
-                                            .toArray()
-                                            .then((result) => {
-                                            console.log('result', result);
-                                            console.log('refQuery', refQuery);
-                                            if (result === null || result.length === 0) {
-                                                query[`${refFieldM}.values`] = {
-                                                    $in: []
-                                                };
-                                            }
-                                            else {
-                                                console.log('filterfield> ', `${refFieldM}.values`);
-                                                query[`${refFieldM}.values`] = {
-                                                    $in: lodash_1.map(result, 'uid')
-                                                };
-                                            }
-                                            return query;
-                                        }));
-                                    }
-                                }
-                            }
-                            return Promise.all(promises)
-                                .then(resolve)
-                                .catch(reject);
-                        }
-                        else {
-                            return resolve({});
-                        }
-                    })
-                        .catch(reject);
-                }
-                else {
-                    return resolve(query);
-                }
-            });
-        });
-    }
+    /**
+     * [
+     *  'category.authors'
+     *  'category'
+     *  'authors.types'
+     * ]
+     */
     excludeSpecificReferences(includes, uid, isOnly) {
         return new Promise((resolve) => {
             return this.db.collection(this.contentStore.collectionName)
@@ -2140,7 +1935,7 @@ class Stack {
                 .limit(1)
                 .toArray()
                 .then((result) => {
-                if (result === null || result.length === 0) {
+                if (result === null) {
                     return resolve({});
                 }
                 const excludeQuery = {};
@@ -2154,7 +1949,10 @@ class Stack {
                         }
                     }
                     if (!flag) {
-                        excludeQuery[referenceField] = (isOnly) ? 1 : 0;
+                        const referenceFieldValues = `${referenceField}.values`;
+                        const referenceFieldRefTo = `${referenceField}.reference_to`;
+                        excludeQuery[referenceFieldValues] = (isOnly) ? 1 : 0;
+                        excludeQuery[referenceFieldRefTo] = (isOnly) ? 1 : 0;
                     }
                 }
                 return resolve(excludeQuery);
