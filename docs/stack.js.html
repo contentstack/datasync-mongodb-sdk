@@ -1,19 +1,39 @@
-"use strict";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: stack.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: stack.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
 /*!
  * Contentstack DataSync Mongodb SDK
  * Copyright (c) 2019 Contentstack LLC
  * MIT Licensed
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __importDefault = (this &amp;&amp; this.__importDefault) || function (mod) {
+    return (mod &amp;&amp; mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = require("lodash");
@@ -32,7 +52,6 @@ class Stack {
     constructor(stackConfig, existingDB) {
         this.config = lodash_1.merge(config_1.config, stackConfig);
         this.contentStore = this.config.contentStore;
-        this.types = this.contentStore.internalContentTypes;
         this.q = {};
         this.internal = {};
         this.db = existingDB;
@@ -66,7 +85,7 @@ class Stack {
         }
         if (!(field) || typeof field !== 'string') {
             // throw new Error('Kindly provide a valid field name for \'.ascending()\'')
-            if (this.internal.sort && typeof this.internal.sort === 'object') {
+            if (this.internal.sort &amp;&amp; typeof this.internal.sort === 'object') {
                 this.internal.sort.published_at = 1;
             }
             else {
@@ -76,7 +95,7 @@ class Stack {
             }
         }
         else {
-            if (this.internal.sort && typeof this.internal.sort === 'object') {
+            if (this.internal.sort &amp;&amp; typeof this.internal.sort === 'object') {
                 this.internal.sort[field] = 1;
             }
             else {
@@ -117,7 +136,7 @@ class Stack {
         }
         if (!(field) || typeof field !== 'string') {
             // throw new Error('Kindly provide a valid field name for \'.descending()\'')
-            if (this.internal.sort && typeof this.internal.sort === 'object') {
+            if (this.internal.sort &amp;&amp; typeof this.internal.sort === 'object') {
                 this.internal.sort.published_at = -1;
             }
             else {
@@ -127,7 +146,7 @@ class Stack {
             }
         }
         else {
-            if (this.internal.sort && typeof this.internal.sort === 'object') {
+            if (this.internal.sort &amp;&amp; typeof this.internal.sort === 'object') {
                 this.internal.sort[field] = -1;
             }
             else {
@@ -272,7 +291,7 @@ class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     and(queries) {
-        if (this.q.query && typeof this.q.query === 'object') {
+        if (this.q.query &amp;&amp; typeof this.q.query === 'object') {
             this.q.query = lodash_1.merge(this.q.query, {
                 $and: queries,
             });
@@ -313,7 +332,7 @@ class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     or(queries) {
-        if (this.q.query && typeof this.q.query === 'object') {
+        if (this.q.query &amp;&amp; typeof this.q.query === 'object') {
             this.q.query = lodash_1.merge(this.q.query, {
                 $or: queries,
             });
@@ -341,7 +360,7 @@ class Stack {
      *  .lessThan('age', 18)
      *  .find()
      *  .then((result) => {
-     *    // filtered entries, where { age < 18 }
+     *    // filtered entries, where { age &lt; 18 }
      *  })
      *  .catch((error) => {
      *    // handle query errors
@@ -353,7 +372,7 @@ class Stack {
         if (typeof key !== 'string' || typeof value === 'undefined') {
             throw new Error('Kindly pass valid key and value parameters for \'.lessThan()\'');
         }
-        else if (this.q.query && typeof this.q.query === 'object') {
+        else if (this.q.query &amp;&amp; typeof this.q.query === 'object') {
             this.q.query[key] = {
                 $lt: value,
             };
@@ -383,7 +402,7 @@ class Stack {
      *  .lessThanOrEqualTo('age', 18)
      *  .find()
      *  .then((result) => {
-     *    // filtered entries, where { age <= 18 }
+     *    // filtered entries, where { age &lt;= 18 }
      *  })
      *  .catch((error) => {
      *    // handle query errors
@@ -395,7 +414,7 @@ class Stack {
         if (typeof key !== 'string' || typeof value === 'undefined') {
             throw new Error('Kindly pass valid key and value parameters for \'.lessThanOrEqualTo()\'');
         }
-        else if (this.q.query && typeof this.q.query === 'object') {
+        else if (this.q.query &amp;&amp; typeof this.q.query === 'object') {
             this.q.query[key] = {
                 $lte: value,
             };
@@ -437,7 +456,7 @@ class Stack {
         if (typeof key !== 'string' || typeof value === 'undefined') {
             throw new Error('Kindly pass valid key and value parameters for \'.greaterThan()\'');
         }
-        else if (this.q.query && typeof this.q.query === 'object') {
+        else if (this.q.query &amp;&amp; typeof this.q.query === 'object') {
             this.q.query[key] = {
                 $gt: value,
             };
@@ -479,7 +498,7 @@ class Stack {
         if (typeof key !== 'string' || typeof value === 'undefined') {
             throw new Error('Kindly pass valid key and value parameters for \'.greaterThanOrEqualTo()\'');
         }
-        else if (this.q.query && typeof this.q.query === 'object') {
+        else if (this.q.query &amp;&amp; typeof this.q.query === 'object') {
             this.q.query[key] = {
                 $gte: value,
             };
@@ -526,7 +545,7 @@ class Stack {
         if (typeof key !== 'string' || typeof value === 'undefined') {
             throw new Error('Kindly pass valid key and value parameters for \'.notEqualTo()\'');
         }
-        else if (this.q.query && typeof this.q.query === 'object') {
+        else if (this.q.query &amp;&amp; typeof this.q.query === 'object') {
             this.q.query[key] = {
                 $ne: value,
             };
@@ -574,7 +593,7 @@ class Stack {
         if (typeof key !== 'string' || typeof value !== 'object' || !(value instanceof Array)) {
             throw new Error('Kindly pass valid key and value parameters for \'.containedIn()\'');
         }
-        else if (this.q.query && typeof this.q.query === 'object') {
+        else if (this.q.query &amp;&amp; typeof this.q.query === 'object') {
             this.q.query[key] = {
                 $in: value,
             };
@@ -622,7 +641,7 @@ class Stack {
         if (typeof key !== 'string' || typeof value !== 'object' || !(value instanceof Array)) {
             throw new Error('Kindly pass valid key and value parameters for \'.notContainedIn()\'');
         }
-        else if (this.q.query && typeof this.q.query === 'object') {
+        else if (this.q.query &amp;&amp; typeof this.q.query === 'object') {
             this.q.query[key] = {
                 $nin: value,
             };
@@ -670,7 +689,7 @@ class Stack {
         if (typeof key !== 'string') {
             throw new Error('Kindly pass valid key for \'.exists()\'');
         }
-        else if (this.q.query && typeof this.q.query === 'object') {
+        else if (this.q.query &amp;&amp; typeof this.q.query === 'object') {
             this.q.query[key] = {
                 $exists: true,
             };
@@ -718,7 +737,7 @@ class Stack {
         if (typeof key !== 'string') {
             throw new Error('Kindly pass valid key for \'.notExists()\'');
         }
-        else if (this.q.query && typeof this.q.query === 'object') {
+        else if (this.q.query &amp;&amp; typeof this.q.query === 'object') {
             this.q.query[key] = {
                 $exists: false,
             };
@@ -754,7 +773,7 @@ class Stack {
     contentType(uid) {
         // create new instances, instead of re-using the old one
         const stack = new Stack(this.config, this.db);
-        if (uid && typeof uid === 'string') {
+        if (uid &amp;&amp; typeof uid === 'string') {
             stack.q.content_type_uid = uid;
             stack.collection = stack.db.collection(stack.contentStore.collectionName);
             return stack;
@@ -786,7 +805,7 @@ class Stack {
         if (!(this.q.content_type_uid)) {
             throw new Error('Kindly call \'contentType()\' before \'entry()\'!');
         }
-        if (uid && typeof uid === 'string') {
+        if (uid &amp;&amp; typeof uid === 'string') {
             this.q.uid = uid;
         }
         this.internal.limit = 1;
@@ -813,7 +832,7 @@ class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     entries() {
-        if (this.q.content_type_uid && typeof this.q.content_type_uid === 'string') {
+        if (this.q.content_type_uid &amp;&amp; typeof this.q.content_type_uid === 'string') {
             return this;
         }
         throw new Error('Kindly call \'contentType()\' before \'entries()\'!');
@@ -840,10 +859,10 @@ class Stack {
      */
     asset(uid) {
         const stack = new Stack(this.config, this.db);
-        if (uid && typeof uid === 'string') {
+        if (uid &amp;&amp; typeof uid === 'string') {
             stack.q.uid = uid;
         }
-        stack.q.content_type_uid = this.types.assets;
+        stack.q.content_type_uid = '_assets';
         stack.collection = stack.db.collection(stack.contentStore.collectionName);
         stack.internal.limit = 1;
         stack.internal.single = true;
@@ -869,7 +888,7 @@ class Stack {
      */
     assets() {
         const stack = new Stack(this.config, this.db);
-        stack.q.content_type_uid = this.types.assets;
+        stack.q.content_type_uid = '_assets';
         stack.collection = stack.db.collection(stack.contentStore.collectionName);
         return stack;
     }
@@ -896,10 +915,10 @@ class Stack {
      */
     schema(uid) {
         const stack = new Stack(this.config, this.db);
-        if (uid && typeof uid === 'string') {
+        if (uid &amp;&amp; typeof uid === 'string') {
             stack.q.uid = uid;
         }
-        stack.q.content_type_uid = this.types.content_types;
+        stack.q.content_type_uid = 'contentTypes';
         stack.collection = stack.db.collection(stack.contentStore.collectionName);
         stack.internal.limit = 1;
         stack.internal.single = true;
@@ -925,7 +944,7 @@ class Stack {
      */
     schemas() {
         const stack = new Stack(this.config, this.db);
-        stack.q.content_type_uid = this.types.content_types;
+        stack.q.content_type_uid = 'contentTypes';
         stack.collection = stack.db.collection(stack.contentStore.collectionName);
         return stack;
     }
@@ -952,7 +971,7 @@ class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     limit(no) {
-        if (typeof no === 'number' && (no >= 0) && typeof this.q.content_type_uid === 'string') {
+        if (typeof no === 'number' &amp;&amp; (no >= 0) &amp;&amp; typeof this.q.content_type_uid === 'string') {
             this.internal.limit = no;
             return this;
         }
@@ -981,7 +1000,7 @@ class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     skip(no) {
-        if (typeof no === 'number' && (no >= 0) && typeof this.q.content_type_uid === 'string') {
+        if (typeof no === 'number' &amp;&amp; (no >= 0) &amp;&amp; typeof this.q.content_type_uid === 'string') {
             this.internal.skip = no;
             return this;
         }
@@ -1007,7 +1026,7 @@ class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     query(queryObject = {}) {
-        if (this.q.query && typeof this.q.query === 'object') {
+        if (this.q.query &amp;&amp; typeof this.q.query === 'object') {
             this.q.query = lodash_1.merge(this.q.query, queryObject);
         }
         else {
@@ -1105,7 +1124,7 @@ class Stack {
         if (!(field) || !(pattern) || typeof field !== 'string' || typeof pattern !== 'string') {
             throw new Error('Kindly provide a valid field and pattern value for \'.regex()\'');
         }
-        else if (this.q.query && typeof this.q.query === 'object') {
+        else if (this.q.query &amp;&amp; typeof this.q.query === 'object') {
             this.q.query = lodash_1.merge(this.q.query, {
                 [field]: {
                     $options: options,
@@ -1152,7 +1171,7 @@ class Stack {
         lodash_1.remove(values, (value) => {
             return typeof value !== 'string';
         });
-        if (this.q.query && typeof this.q.query === 'object') {
+        if (this.q.query &amp;&amp; typeof this.q.query === 'object') {
             this.q.query.tags = {
                 $in: values,
             };
@@ -1198,7 +1217,7 @@ class Stack {
         if (!(expr)) {
             throw new Error('Kindly provide a valid field and expr/fn value for \'.where()\'');
         }
-        else if (this.q.query && typeof this.q.query === 'object') {
+        else if (this.q.query &amp;&amp; typeof this.q.query === 'object') {
             if (typeof expr === 'function') {
                 expr = expr.toString();
             }
@@ -1356,36 +1375,12 @@ class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     queryReferences(query) {
-        if (query && typeof query === 'object') {
+        if (query &amp;&amp; typeof query === 'object') {
             this.internal.queryReferences = query;
             return this;
         }
         throw new Error('Kindly pass a query object for \'.queryReferences()\'');
     }
-<<<<<<< HEAD
-    queryReferencesBeta(query) {
-        if (query && typeof query === 'object') {
-            this.internal.queryReferencesBeta = query;
-            return this;
-        }
-        throw new Error('Kindly pass a query object for \'.queryReferences()\'');
-    }
-    getQuery() {
-        return Object.assign({}, this.q);
-    }
-    include(fields) {
-        if (fields.length === 0) {
-            throw new Error('Kindly pass a valid reference field path to \'.include()\' ');
-        }
-        else if (typeof fields === 'string') {
-            this.internal.includeSpecificReferences = [fields];
-        }
-        else {
-            this.internal.includeSpecificReferences = fields;
-        }
-        return this;
-    }
-=======
     /**
      * @method getQuery
      * @description Returns the query build thusfar
@@ -1424,17 +1419,9 @@ class Stack {
      *
      * @returns {object} - Returns a objects, that have been processed, filtered and referenced
      */
->>>>>>> develop
     find(query = {}) {
-        return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-            let queryFilters = this.preProcess(query);
-            let formattedQuery;
-            if (this.internal.queryReferencesBeta) {
-                formattedQuery = yield this.queryBuilder(this.internal.queryReferencesBeta, this.q.locale, this.q.content_type_uid);
-                console.log('formatted query', JSON.stringify(formattedQuery));
-            }
-            queryFilters = lodash_1.merge(queryFilters, formattedQuery[0]);
-            console.log('queryfilters', JSON.stringify(queryFilters));
+        return new Promise((resolve, reject) => {
+            const queryFilters = this.preProcess(query);
             if (this.internal.sort) {
                 this.collection = this.collection.find(queryFilters).sort(this.internal.sort);
             }
@@ -1454,43 +1441,21 @@ class Stack {
                 .toArray()
                 .then((result) => {
                 let contentType;
-<<<<<<< HEAD
-                if (this.internal.includeSchema && this.q.content_type_uid !== this.types.content_types && this.q.content_type_uid !==
-                    this.types.assets) {
-                    contentType = lodash_1.remove(result, { uid: this.q.content_type_uid });
-                    contentType = (typeof contentType === 'object' && contentType instanceof Array && contentType.length) ?
-                        contentType[0] : null;
-                }
-                if (this.internal.excludeReferences || this.q.content_type_uid === this.types.content_types || this.q.content_type_uid
-                    === this.types.assets) {
-=======
-                if (this.internal.includeSchema && this.q.content_type_uid !== 'contentTypes' && this.q
+                if (this.internal.includeSchema &amp;&amp; this.q.content_type_uid !== 'contentTypes' &amp;&amp; this.q
                     .content_type_uid !==
                     '_assets') {
                     contentType = lodash_1.remove(result, {
                         uid: this.q.content_type_uid
                     });
-                    contentType = (typeof contentType === 'object' && contentType instanceof Array && contentType
+                    contentType = (typeof contentType === 'object' &amp;&amp; contentType instanceof Array &amp;&amp; contentType
                         .length) ?
                         contentType[0] : null;
                 }
                 if (this.internal.excludeReferences || this.q.content_type_uid === 'contentTypes' || this.q
                     .content_type_uid
                     === '_assets') {
->>>>>>> develop
                     result = this.postProcess(result, contentType);
                     return resolve(result);
-                }
-                else if (this.internal.includeSpecificReferences) {
-                    return this.includeSpecificReferences(result, this.q.locale, {}, undefined, this.internal.includeSpecificReferences)
-                        .then(() => {
-                        result = this.postProcess(result, contentType);
-                        return resolve(result);
-                    })
-                        .catch((refError) => {
-                        this.cleanup();
-                        return reject(refError);
-                    });
                 }
                 else {
                     return this.includeReferencesI(result, this.q.locale, {}, undefined)
@@ -1508,7 +1473,7 @@ class Stack {
                 this.cleanup();
                 return reject(error);
             });
-        }));
+        });
     }
     /**
      * @method count
@@ -1645,7 +1610,7 @@ class Stack {
      */
     preProcess(query) {
         let queryFilters;
-        if (this.q.query && typeof this.q.query === 'object') {
+        if (this.q.query &amp;&amp; typeof this.q.query === 'object') {
             this.q.query = lodash_1.merge(this.q.query, query);
         }
         else {
@@ -1666,7 +1631,7 @@ class Stack {
         if (!(this.q.locale)) {
             this.q.locale = this.config.locales[0].code;
         }
-        if (this.q.content_type_uid === this.types.content_types) {
+        if (this.q.content_type_uid === 'contentTypes') {
             delete this.q.locale;
         }
         const filters = Object.assign({ content_type_uid: this.q.content_type_uid, locale: this.q.locale }, this.q.query);
@@ -1711,7 +1676,7 @@ class Stack {
         // }
         // result.forEach((item) => delete item._id)
         switch (this.q.content_type_uid) {
-            case this.types.assets:
+            case '_assets':
                 if (this.internal.single) {
                     result = {
                         asset: (result === null) ? result : result[0],
@@ -1725,7 +1690,7 @@ class Stack {
                 result.content_type_uid = 'assets';
                 result.locale = this.q.locale;
                 break;
-            case this.types.content_types:
+            case 'contentTypes':
                 if (this.internal.single) {
                     result = {
                         content_type: (result === null) ? result : result[0],
@@ -1785,10 +1750,10 @@ class Stack {
             const referencesFound = [];
             // iterate over each key in the object
             for (const prop in entry) {
-                if (entry[prop] !== null && typeof entry[prop] === 'object') {
-                    if (entry[prop] && entry[prop].reference_to) {
+                if (entry[prop] !== null &amp;&amp; typeof entry[prop] === 'object') {
+                    if (entry[prop] &amp;&amp; entry[prop].reference_to) {
                         if ((!(this.internal.includeReferences)
-                            && entry[prop].reference_to === this.types.assets) || this.internal.includeReferences) {
+                            &amp;&amp; entry[prop].reference_to === '_assets') || this.internal.includeReferences) {
                             if (entry[prop].values.length === 0) {
                                 entry[prop] = [];
                             }
@@ -1797,7 +1762,7 @@ class Stack {
                                 if (typeof uids === 'string') {
                                     uids = [uids];
                                 }
-                                if (entry[prop].reference_to !== this.types.assets) {
+                                if (entry[prop].reference_to !== '_assets') {
                                     uids = lodash_1.filter(uids, (uid) => {
                                         return !(util_1.checkCyclic(uid, references));
                                     });
@@ -1860,306 +1825,28 @@ class Stack {
                 .catch(reject);
         });
     }
-    includeReferencesBeta(entry, locale, references, parentUid) {
-        const self = this;
-        return new Promise((resolve, reject) => {
-            if (entry === null || typeof entry !== 'object') {
-                return resolve();
-            }
-            if (entry.uid) {
-                parentUid = entry.uid;
-            }
-            const referencesFound = [];
-            for (const prop in entry) {
-                if (entry[prop] !== null && typeof entry[prop] === 'object') {
-                    if (entry[prop] && entry[prop].reference_to) {
-                        if (entry[prop].values.length === 0) {
-                            entry[prop] = [];
-                        }
-                        else {
-                            let uids = entry[prop].values;
-                            if (typeof uids === 'string') {
-                                uids = [uids];
-                            }
-                            if (entry[prop].reference_to !== this.types.assets) {
-                                uids = lodash_1.filter(uids, (uid) => {
-                                    return !(util_1.checkCyclic(uid, references));
-                                });
-                            }
-                            if (uids.length) {
-                                const query = {
-                                    content_type_uid: entry[prop].reference_to,
-                                    locale,
-                                    uid: {
-                                        $in: uids,
-                                    },
-                                };
-                                referencesFound.push(new Promise((rs, rj) => {
-                                    return self.db.collection(this.contentStore.collectionName)
-                                        .find(query)
-                                        .project(self.config.contentStore.projections)
-                                        .toArray()
-                                        .then((result) => {
-                                        if (result.length === 0) {
-                                            entry[prop] = [];
-                                            return rs();
-                                        }
-                                        else if (parentUid) {
-                                            references[parentUid] = references[parentUid] || [];
-                                            references[parentUid] = lodash_1.uniq(references[parentUid].concat(lodash_1.map(result, 'uid')));
-                                        }
-                                        if (typeof entry[prop].values === 'string') {
-                                            entry[prop] = ((result === null) || result.length === 0) ? null : result[0];
-                                        }
-                                        else {
-                                            const referenceBucket = [];
-                                            query.uid.$in.forEach((entityUid) => {
-                                                const elem = lodash_1.find(result, (entity) => {
-                                                    return entity.uid === entityUid;
-                                                });
-                                                if (elem) {
-                                                    referenceBucket.push(elem);
-                                                }
-                                            });
-                                            entry[prop] = referenceBucket;
-                                        }
-                                        return self.includeReferencesBeta(entry[prop], locale, references, parentUid)
-                                            .then(rs)
-                                            .catch(rj);
-                                    })
-                                        .catch(rj);
-                                }));
-                            }
-                        }
-                    }
-                    else {
-                        referencesFound.push(self.includeReferencesBeta(entry[prop], locale, references, parentUid));
-                    }
-                }
-            }
-            return Promise.all(referencesFound)
-                .then(resolve)
-                .catch(reject);
-        });
-    }
-    isPartOfInclude(pth, include) {
-        for (let i = 0, j = include.length; i < j; i++) {
-            if (include[i].indexOf(pth) !== -1) {
-                return true;
-            }
-        }
-        return false;
-    }
-    includeSpecificReferences(entry, locale, references, parentUid, includePths = [], parentField = '') {
-        const self = this;
-        return new Promise((resolve, reject) => {
-            if (entry === null || typeof entry !== 'object') {
-                return resolve();
-            }
-            if (entry.uid) {
-                parentUid = entry.uid;
-            }
-            const referencesFound = [];
-            for (const prop in entry) {
-                if (entry[prop] !== null && typeof entry[prop] === 'object') {
-                    let currentPth;
-                    if (parentField === '' && isNaN(parseInt(prop))) {
-                        currentPth = prop;
-                    }
-                    else if (parentField === '' && !isNaN(parseInt(prop))) {
-                        currentPth = parentField;
-                    }
-                    else {
-                        currentPth = parentField.concat('.', prop);
-                    }
-                    if (entry[prop] && entry[prop].reference_to) {
-                        if (entry[prop].reference_to === this.types.assets || this.isPartOfInclude(currentPth, includePths)) {
-                            if (entry[prop].values.length === 0) {
-                                entry[prop] = [];
-                            }
-                            else {
-                                let uids = entry[prop].values;
-                                if (typeof uids === 'string') {
-                                    uids = [uids];
-                                }
-                                if (entry[prop].reference_to !== this.types.assets) {
-                                    uids = lodash_1.filter(uids, (uid) => {
-                                        return !(util_1.checkCyclic(uid, references));
-                                    });
-                                }
-                                if (uids.length) {
-                                    const query = {
-                                        content_type_uid: entry[prop].reference_to,
-                                        locale,
-                                        uid: {
-                                            $in: uids,
-                                        },
-                                    };
-                                    referencesFound.push(new Promise((rs, rj) => {
-                                        return self.db.collection(this.contentStore.collectionName)
-                                            .find(query)
-                                            .project(self.config.contentStore.projections)
-                                            .toArray()
-                                            .then((result) => {
-                                            if (result.length === 0) {
-                                                entry[prop] = [];
-                                                return rs();
-                                            }
-                                            else if (parentUid) {
-                                                references[parentUid] = references[parentUid] || [];
-                                                references[parentUid] = lodash_1.uniq(references[parentUid].concat(lodash_1.map(result, 'uid')));
-                                            }
-                                            if (typeof entry[prop].values === 'string') {
-                                                entry[prop] = ((result === null) || result.length === 0) ? null : result[0];
-                                            }
-                                            else {
-                                                const referenceBucket = [];
-                                                query.uid.$in.forEach((entityUid) => {
-                                                    const elem = lodash_1.find(result, (entity) => {
-                                                        return entity.uid === entityUid;
-                                                    });
-                                                    if (elem) {
-                                                        referenceBucket.push(elem);
-                                                    }
-                                                });
-                                                entry[prop] = referenceBucket;
-                                            }
-                                            return self.includeSpecificReferences(entry[prop], locale, references, parentUid, includePths, currentPth)
-                                                .then(rs)
-                                                .catch(rj);
-                                        })
-                                            .catch(rj);
-                                    }));
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        referencesFound.push(self.includeSpecificReferences(entry[prop], locale, references, parentUid, includePths, currentPth));
-                    }
-                }
-            }
-            return Promise.all(referencesFound)
-                .then(resolve)
-                .catch(reject);
-        });
-    }
-    queryBuilder(query, locale, uid) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                if (query && Object.keys(query).length && uid) {
-                    return this.db.collection(this.contentStore.collectionName)
-                        .find({
-                        content_type_uid: this.types.content_types,
-                        uid
-                    })
-                        .project({
-                        references: 1
-                    })
-                        .limit(1)
-                        .toArray()
-                        .then((result) => {
-                        console.log('result', result);
-                        if (result === null || result.length === 0) {
-                            return resolve(query);
-                        }
-                        const references = result[0].references;
-                        if (references && Object.keys(references).length > 0) {
-                            const promises = [];
-                            for (const field in query) {
-                                if (query[field] === null) {
-                                    delete query[field];
-                                }
-                                else if (typeof query[field] === 'object' && query[field] instanceof Array && query[field].length) {
-                                    promises.push(this.queryBuilder(query[field], locale, uid));
-                                }
-                                else {
-                                    let filterField = field;
-                                    let refQuery, refContentType;
-                                    let refFieldM;
-                                    for (let refField in references) {
-                                        if (field.indexOf(refField) === 0) {
-                                            refFieldM = refField;
-                                            let newfilterField = filterField.replace(refField, '');
-                                            if (newfilterField.charAt(0) === '.') {
-                                                newfilterField = newfilterField.substr(1);
-                                            }
-                                            refQuery = refQuery || {};
-                                            refContentType = references[refField];
-                                            refQuery[newfilterField] = query[field];
-                                            refQuery.content_type_uid = refContentType;
-                                            refQuery.locale = locale;
-                                            delete query[field];
-                                        }
-                                    }
-                                    if (refQuery && Object.keys(refQuery).length) {
-                                        promises.push(this.db.collection(this.contentStore.collectionName)
-                                            .find(refQuery)
-                                            .project({ uid: 1 })
-                                            .toArray()
-                                            .then((result) => {
-                                            console.log('result', result);
-                                            console.log('refQuery', refQuery);
-                                            if (result === null || result.length === 0) {
-                                                query[`${refFieldM}.values`] = {
-                                                    $in: []
-                                                };
-                                            }
-                                            else {
-                                                console.log('filterfield> ', `${refFieldM}.values`);
-                                                query[`${refFieldM}.values`] = {
-                                                    $in: lodash_1.map(result, 'uid')
-                                                };
-                                            }
-                                            return query;
-                                        }));
-                                    }
-                                }
-                            }
-                            return Promise.all(promises)
-                                .then(resolve)
-                                .catch(reject);
-                        }
-                        else {
-                            return resolve({});
-                        }
-                    })
-                        .catch(reject);
-                }
-                else {
-                    return resolve(query);
-                }
-            });
-        });
-    }
-    excludeSpecificReferences(includes, uid, isOnly) {
-        return new Promise((resolve) => {
-            return this.db.collection(this.contentStore.collectionName)
-                .find({ uid })
-                .project({ references: 1 })
-                .limit(1)
-                .toArray()
-                .then((result) => {
-                if (result === null || result.length === 0) {
-                    return resolve({});
-                }
-                const excludeQuery = {};
-                const references = result[0].references;
-                for (const referenceField in references) {
-                    let flag = false;
-                    for (let i = 0, j = includes.length; i < j; i++) {
-                        if (includes[i].includes(referenceField)) {
-                            flag = true;
-                            break;
-                        }
-                    }
-                    if (!flag) {
-                        excludeQuery[referenceField] = (isOnly) ? 1 : 0;
-                    }
-                }
-                return resolve(excludeQuery);
-            });
-        });
-    }
 }
 exports.Stack = Stack;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="global.html#Stack">Stack</a></li></ul><h3>Global</h3><ul><li><a href="global.html#and">and</a></li><li><a href="global.html#ascending">ascending</a></li><li><a href="global.html#asset">asset</a></li><li><a href="global.html#assets">assets</a></li><li><a href="global.html#close">close</a></li><li><a href="global.html#connect">connect</a></li><li><a href="global.html#containedIn">containedIn</a></li><li><a href="global.html#contentType">contentType</a></li><li><a href="global.html#count">count</a></li><li><a href="global.html#descending">descending</a></li><li><a href="global.html#entries">entries</a></li><li><a href="global.html#entry">entry</a></li><li><a href="global.html#excludeReferences">excludeReferences</a></li><li><a href="global.html#exists">exists</a></li><li><a href="global.html#find">find</a></li><li><a href="global.html#findOne">findOne</a></li><li><a href="global.html#getQuery">getQuery</a></li><li><a href="global.html#greaterThan">greaterThan</a></li><li><a href="global.html#greaterThanOrEqualTo">greaterThanOrEqualTo</a></li><li><a href="global.html#includeCount">includeCount</a></li><li><a href="global.html#language">language</a></li><li><a href="global.html#lessThan">lessThan</a></li><li><a href="global.html#lessThanOrEqualTo">lessThanOrEqualTo</a></li><li><a href="global.html#notContainedIn">notContainedIn</a></li><li><a href="global.html#notEqualTo">notEqualTo</a></li><li><a href="global.html#notExists">notExists</a></li><li><a href="global.html#or">or</a></li><li><a href="global.html#queryReferences">queryReferences</a></li><li><a href="global.html#schema">schema</a></li><li><a href="global.html#schemas">schemas</a></li><li><a href="global.html#tags">tags</a></li><li><a href="global.html#where">where</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Mar 28 2019 13:13:50 GMT+0530 (IST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

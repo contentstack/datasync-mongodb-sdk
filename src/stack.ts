@@ -1,5 +1,5 @@
 /*!
- * Contentstack Sync Mongodb SDK
+ * Contentstack DataSync Mongodb SDK
  * Copyright (c) 2019 Contentstack LLC
  * MIT Licensed
  */
@@ -11,12 +11,11 @@ import { config } from './config'
 import { checkCyclic, validateURI } from './util'
 
 /**
- * @summary
- *  Expose SDK query methods on Stack
- * @description
- *  Provides a range of connection/disconnect, filters and projections on mongodb
- * @returns
- *  'Stack' instance
+ * @class Stack
+ * @description Expose SDK query methods on Stack
+ * @constructor
+ * @description Provides a range of connection/disconnect, filters and projections on mongodb
+ * @returns {Stack} Returns an instance of `Stack`
  */
 export class Stack {
   private q: any
@@ -28,7 +27,7 @@ export class Stack {
   private internal: any
   private db: Db
 
-  constructor(stackConfig, existingDB?) {
+  constructor(stackConfig, existingDB ? ) {
     this.config = merge(config, stackConfig)
     this.contentStore = this.config.contentStore
     this.types = this.contentStore.internalContentTypes
@@ -38,14 +37,29 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Sorts the documents based on the 'sort' key
-   * @info
-   *  The sort function requires that the entire sort be able to complete within 32 megabytes.
-   *  When the sort option consumes more than 32 megabytes, MongoDB will return an error.
-   * @param field
+   * @public
+   * @method ascending
+   * @summary Sorts the documents based on the 'sort' key
+   * @description
+   * The sort function requires that the entire sort be able to complete within 32 megabytes.
+   * When the sort option consumes more than 32 megabytes, MongoDB will return an error.
+   * @param {string} field The field to sort in ascending order
+   * @example
+   * Stack
+   *  .contentType('')
+   *  .entries()
+   *  .ascending()
+   *  .find()
+   *  .then((result) => {
+   *    // result sorted in ascending manner with respect to 'published_at' field (by default)
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
-  public ascending(field?) {
+  public ascending(field ? ) {
     if (typeof this.q.content_type_uid !== 'string') {
       throw new Error('Kindly call \'.contentType()\' before \.ascending()\'')
     }
@@ -73,16 +87,30 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Sorts the documents based on the 'sort' key
-   * @info
-   *  The sort function requires that the entire sort be able to complete within 32 megabytes.
-   *  When the sort option consumes more than 32 megabytes, MongoDB will return an error.
-   * @link
-   *  https://docs.mongodb.com/manual/reference/operator/meta/orderby/
-   * @param field
+   * @public
+   * @method descending
+   * @summary Sorts the documents based on the 'sort' key
+   * @description
+   * The sort function requires that the entire sort be able to complete within 32 megabytes.
+   * When the sort option consumes more than 32 megabytes, MongoDB will return an error.
+   * 
+   * @param {string} field The field to sort in descending order
+   * @example
+   * Stack
+   *  .contentType('')
+   *  .entries()
+   *  .descending('title')
+   *  .find()
+   *  .then((result) => {
+   *    // result sorted in descending manner with respect to 'title' field
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
-  public descending(field?) {
+  public descending(field ? ) {
     if (typeof this.q.content_type_uid !== 'string') {
       throw new Error('Kindly call \'.contentType()\' before \.descending()\'')
     }
@@ -109,10 +137,24 @@ export class Stack {
   }
 
   /**
+   * @public
+   * @method connect
    * @summary
-   *  Establish connection to mongodb
-   * @param {Object} - Config overrides/mongodb specific config
-   * @returns {Object} - Mongodb 'db' instance
+   * Establish connection to mongodb
+   * 
+   * @param {object} overrides Config overrides/mongodb specific config
+   * @example
+   * Stack
+   *  .connect({overrides})
+   *  .then((result) => {
+   *    // mongodb connection object
+   *    // indexes will be created on the collection in the background if provided in config
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {object} Mongodb 'db' instance
    */
   public connect(overrides = {}) {
     return new Promise((resolve, reject) => {
@@ -142,7 +184,7 @@ export class Stack {
 
           Promise.all(bucket)
             .then(() => {
-              console.info(`Indexes created successfully in '${collectionName}' collection`)    
+              console.info(`Indexes created successfully in '${collectionName}' collection`)
             })
             .catch((error) => {
               console.error(`Failed while creating indexes in '${collectionName}' collection`)
@@ -156,7 +198,7 @@ export class Stack {
     })
   }
 
-  private createIndexes (collectionId, index, type) {
+  private createIndexes(collectionId, index, type) {
     return this.db.collection(collectionId)
       .createIndex({
         [index]: type
@@ -168,21 +210,40 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Closes connection with mongodb
+   * @public
+   * @method close
+   * @summary Closes connection with mongodb
    */
   public close() {
     this.client.close()
   }
 
   /**
-   * @summary
-   *  Locale on which to 'query'
-   * @param {String} code - Query locale's code
-   * @returns {this} - Returns `stack's` instance
+   * @method language
+   * @description
+   * Locale to query on
+   * 
+   * @param {string} code Query locale's code
+   * @example
+   * Stack
+   *  .contentType('')
+   *  .entries()
+   *  .language('es-es')
+   *  .find()
+   *  .then((result) => {
+   *    // results in entries fetched from 'es-es' locale
+   *    // if not provided, defaults to the 1st locale provided in the 'locales' key, provided in config
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public language(code) {
-    if (!(code) || typeof code !== 'string' || !(find(this.config.locales, {code}))) {
+    if (!(code) || typeof code !== 'string' || !(find(this.config.locales, {
+        code
+      }))) {
       throw new Error(`Language queried is invalid ${code}`)
     }
     this.q.locale = code
@@ -191,10 +252,32 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Logical AND query wrapper
-   * @param {Object} queries - Query filter
-   * @returns {this} - Returns `stack's` instance
+   * @public
+   * @method and
+   * @summary Logical AND query wrapper
+   * @description Accepts 2 queries and returns only those documents, that satisfy both the query conditions
+   * @param {object} queries Query filter
+   * @example
+   * Stack
+   *  .contentType('')
+   *  .entries()
+   *  .and([
+   *    {
+   *      title: 'John'
+   *    },
+   *    {
+   *      age: 30
+   *    }
+   *  ])
+   *  .find()
+   *  .then((result) => {
+   *    // filtered entries, where { title: 'John', age: 30 }
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public and(queries) {
     if (this.q.query && typeof this.q.query === 'object') {
@@ -211,10 +294,32 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Logical OR query wrapper
-   * @param {Object} queries - Query filter
-   * @returns {this} - Returns `stack's` instance
+   * @public
+   * @method or
+   * @summary Logical OR query wrapper
+   * @description Accepts 2 queries and returns only those documents, that satisfy either of the query conditions
+   * @param {object} queries Query filter
+   * @example
+   * Stack
+   *  .contentType('')
+   *  .entries()
+   *  .or([
+   *    {
+   *      title: 'John'
+   *    },
+   *    {
+   *      title: 'Jane'
+   *    }
+   *  ])
+   *  .find()
+   *  .then((result) => {
+   *    // filtered entries, where { title: 'John' } OR { title: 'Jane' }
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public or(queries) {
     if (this.q.query && typeof this.q.query === 'object') {
@@ -231,11 +336,28 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Comparison $lt query wrapper
-   * @param {String} key - Field to compare against
-   * @param {any} value - Value to compare with
-   * @returns {this} - Returns `stack's` instance
+   * @public
+   * @method lessThan
+   * @summary Comparison $lt query wrapper
+   * @description 
+   * Compares the field/key provided against the provided value. Only documents that have lower value than the one provided are returned.
+   * Check https://docs.mongodb.com/manual/reference/operator/query/lt/ and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
+   * @param {string} key Field to compare against
+   * @param {*} value Value to compare with
+   * @example
+   * Stack
+   *  .contentType('')
+   *  .entries()
+   *  .lessThan('age', 18)
+   *  .find()
+   *  .then((result) => {
+   *    // filtered entries, where { age < 18 }
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public lessThan(key, value) {
     if (typeof key !== 'string' || typeof value === 'undefined') {
@@ -256,11 +378,28 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Comparison $lte query wrapper
-   * @param {String} key - Field to compare against
-   * @param {any} value - Value to compare with
-   * @returns {this} - Returns `stack's` instance
+   * @public
+   * @method lessThanOrEqualTo
+   * @summary Comparison $lte query wrapper
+   * @description 
+   * Compares the field/key provided against the provided value. Only documents that have lower or equal value than the one provided are returned.
+   * Check https://docs.mongodb.com/manual/reference/operator/query/lte/ and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
+   * @param {string} key Field to compare against
+   * @param {*} value Value to compare with
+   * @example
+   * Stack
+   *  .contentType('')
+   *  .entries()
+   *  .lessThanOrEqualTo('age', 18)
+   *  .find()
+   *  .then((result) => {
+   *    // filtered entries, where { age <= 18 }
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public lessThanOrEqualTo(key, value) {
     if (typeof key !== 'string' || typeof value === 'undefined') {
@@ -281,11 +420,28 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Comparison $gt query wrapper
-   * @param {String} key - Field to compare against
-   * @param {any} value - Value to compare with
-   * @returns {this} - Returns `stack's` instance
+   * @public
+   * @method greaterThan
+   * @summary Comparison $gt query wrapper
+   * @description 
+   * Compares the field/key provided against the provided value. Only documents that have greater value than the one provided are returned.
+   * Check {@link https://docs.mongodb.com/manual/reference/operator/query/gt/ }and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
+   * @param {string} key Field to compare against
+   * @param {*} value Value to compare with
+   * @example
+   * Stack
+   *  .contentType('')
+   *  .entries()
+   *  .greaterThan('age', 60)
+   *  .find()
+   *  .then((result) => {
+   *    // filtered entries, where { age > 60 }
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public greaterThan(key, value) {
     if (typeof key !== 'string' || typeof value === 'undefined') {
@@ -306,11 +462,28 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Comparison $gte query wrapper
-   * @param {String} key - Field to compare against
-   * @param {any} value - Value to compare with
-   * @returns {this} - Returns `stack's` instance
+   * @public
+   * @method greaterThanOrEqualTo
+   * @summary Comparison $gte query wrapper
+   * @description 
+   * Compares the field/key provided against the provided value. Only documents that have greater than or equal value than the one provided are returned.
+   * Check https://docs.mongodb.com/manual/reference/operator/query/gte/ and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
+   * @param {string} key - Field to compare against
+   * @param {*} value - Value to compare with
+   * @example
+   * Stack
+   *  .contentType('')
+   *  .entries()
+   *  .greaterThanOrEqualTo('age', 60)
+   *  .find()
+   *  .then((result) => {
+   *    // filtered entries, where { age >= 60 }
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public greaterThanOrEqualTo(key, value) {
     if (typeof key !== 'string' || typeof value === 'undefined') {
@@ -331,11 +504,33 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Comparison $ne query wrapper
-   * @param {String} key - Field to compare against
-   * @param {any} value - Value to compare with
-   * @returns {this} - Returns `stack's` instance
+   * @public
+   * @method notEqualTo
+   * @summary Comparison $ne query wrapper
+   * @description 
+   * Compares the field/key provided against the provided value. Only documents that have value not equals than the one provided are returned.
+   * 
+   * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/ne/}.
+   * 
+   * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
+   * 
+   * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
+   * @param {string} key Field to compare against
+   * @param {*} value Value to compare with
+   * @example
+   * Stack
+   *  .contentType('')
+   *  .entries()
+   *  .notEqualTo('age', 25)
+   *  .find()
+   *  .then((result) => {
+   *    // filtered entries, where { age != 25 }
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public notEqualTo(key, value) {
     if (typeof key !== 'string' || typeof value === 'undefined') {
@@ -356,11 +551,34 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Comparison $in query wrapper
-   * @param {String} key - Field to compare against
-   * @param {any} value - Value to compare with
-   * @returns {this} - Returns `stack's` instance
+   * @public
+   * @method containedIn
+   * @summary Comparison $in query wrapper
+   * @description 
+   * Compares the field/key provided against the provided value. Only documents that have value contained in the field/key provided are returned.
+   * 
+   * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/in/}.
+   * 
+   * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
+   * 
+   * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
+   * @param {string} key Field to compare against
+   * @param {*} value Value to compare with
+   * 
+   * @example
+   * Stack
+   *  .contentType('')
+   *  .entries()
+   *  .containedIn('emails', 'john.doe@some.com')
+   *  .find()
+   *  .then((result) => {
+   *    // filtered entries, where 'john.doe@some.com' exists in 'emails' field (array)
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public containedIn(key, value) {
     if (typeof key !== 'string' || typeof value !== 'object' || !(value instanceof Array)) {
@@ -381,11 +599,34 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Comparison $nin query wrapper
-   * @param {String} key - Field to compare against
-   * @param {any} value - Value to compare with
-   * @returns {this} - Returns `stack's` instance
+   * @public
+   * @method notContainedIn
+   * @summary Comparison $nin query wrapper
+   * @description 
+   * Compares the field/key provided against the provided value. Only documents that have value not contained in the field/key provided are returned.
+   * 
+   * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/nin/}.
+   * 
+   * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
+   * 
+   * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
+   * @param {string} key Field to compare against
+   * @param {*} value Value to compare with
+   * 
+   * @example
+   * Stack
+   *  .contentType('')
+   *  .entries()
+   *  .notContainedIn('emails', 'john.doe@some.com')
+   *  .find()
+   *  .then((result) => {
+   *    // filtered entries, where 'john.doe@some.com' does not exist in 'emails' field (array)
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public notContainedIn(key, value) {
     if (typeof key !== 'string' || typeof value !== 'object' || !(value instanceof Array)) {
@@ -406,11 +647,34 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Element $exists query wrapper, checks if a field exists
-   * @param {String} key - Field to compare against
-   * @param {any} value - Value to compare with
-   * @returns {this} - Returns `stack's` instance
+   * @public
+   * @method exists
+   * @summary Element $exists query wrapper, checks if a field exists
+   * @description 
+   * Compares the field/key provided against the provided value. Only documents that have the field/key specified are returned.
+   * 
+   * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/exists/}.
+   * 
+   * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
+   * 
+   * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
+   * @param {string} key Field to compare against
+   * @param {*} value Value to compare with
+   * 
+   * @example
+   * Stack
+   *  .contentType('')
+   *  .entries()
+   *  .exists('emails')
+   *  .find()
+   *  .then((result) => {
+   *    // filtered entries, where 'emails' property exists
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public exists(key) {
     if (typeof key !== 'string') {
@@ -431,11 +695,34 @@ export class Stack {
   }
 
   /**
+   * @public
+   * @method notExists
    * @summary
-   *  Element $exists query wrapper, checks if a field does not exists
-   * @param {String} key - Field to compare against
-   * @param {any} value - Value to compare with
-   * @returns {this} - Returns `stack's` instance
+   * Property $exists query wrapper, checks if a field does not exists
+   * @description 
+   * Compares the field/key provided against the provided value. Only documents that do not have the key are returned.
+   * 
+   * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/exists/}.
+   * 
+   * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
+   * 
+   * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
+   * @param {string} key Field to compare against
+   * @param {*} value Value to compare with
+   * @example
+   * Stack
+   *  .contentType('')
+   *  .entries()
+   *  .notExists('emails')
+   *  .find()
+   *  .then((result) => {
+   *    // filtered entries, where 'emails' property does not exist
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public notExists(key) {
     if (typeof key !== 'string') {
@@ -456,10 +743,23 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Content type to query on
-   * @param {String} uid - Content type uid
-   * @returns {this} - Returns `stack's` instance
+   * @public
+   * @method contentType
+   * @summary Content type to query on
+   * @param {string} uid Content type uid
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .find()
+   *  .then((result) => {
+   *    // returns entries filtered based on 'blog' content type
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public contentType(uid) {
     // create new instances, instead of re-using the old one
@@ -474,12 +774,25 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Query for a single entry
-   * @param {String} uid - Entry uid to be found, if not provided,
+   * @public
+   * @method entry
+   * @summary Query for a single entry
+   * @param {string} uid Entry uid to be found, if not provided,
    *  by default returns the 1st element in the content type.
    *  Useful for `singleton` content types
-   * @returns {this} - Returns `stack's` instance
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entry()
+   *  .find()
+   *  .then((result) => {
+   *    // returns the entry based on its 'uid', if not provided, it would return the 1st entry found in 'blog' content type
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public entry(uid ? ) {
     if (!(this.q.content_type_uid)) {
@@ -495,9 +808,23 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Query for a set of entries on a content type
-   * @returns {this} - Returns `stack's` instance
+   * @method entries
+   * @description
+   * Query for a set of entries on a content type
+   * 
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .find()
+   *  .then((result) => {
+   *    // returns entries filtered based on 'blog' content type
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public entries() {
     if (this.q.content_type_uid && typeof this.q.content_type_uid === 'string') {
@@ -508,11 +835,24 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Query for a single asset
-   * @param {String} uid - Asset uid to be found, if not provided,
+   * @method asset
+   * @description
+   * Query for a single asset
+   * 
+   * @param {string} uid Asset uid to be found, if not provided,
    *  by default returns the 1st element from assets.
-   * @returns {this} - Returns `stack's` instance
+   * @example
+   * Stack
+   *  .asset()
+   *  .find()
+   *  .then((result) => {
+   *    // returns the asset based on its 'uid', if not provided, it would return the 1st asset found
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public asset(uid ? ) {
     const stack = new Stack(this.config, this.db)
@@ -528,9 +868,22 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Query for a set of assets
-   * @returns {this} - Returns `stack's` instance
+   * @method assets
+   * @description
+   * Query for a set of assets
+   * 
+   * @example
+   * Stack
+   *  .assets()
+   *  .find()
+   *  .then((result) => {
+   *    // returns assets filtered based on 'blog' content type
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public assets() {
     const stack = new Stack(this.config, this.db)
@@ -541,11 +894,25 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Query for a single content type's schema
-   * @param {String} uid - Content type uid to be found, if not provided,
+   * @method schema
+   * @description
+   * Query for a single content type's schema
+   * 
+   * @param {string} uid Content type uid to be found, if not provided,
    *  by default returns the 1st element from content types
-   * @returns {this} - Returns `stack's` instance
+   * 
+   * @example
+   * Stack
+   *  .schema('blog')
+   *  .find()
+   *  .then((result) => {
+   *    // returns content 'blog' content type's schema
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public schema(uid ? ) {
     const stack = new Stack(this.config, this.db)
@@ -561,9 +928,22 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Query for a set of content type schemas
-   * @returns {this} - Returns `stack's` instance
+   * @method schemas
+   * @description
+   * Query for a set of content type schemas
+   * @public
+   * @example
+   * Stack
+   *  .schemas()
+   *  .find()
+   *  .then((result) => {
+   *    // returns a set of content type schemas
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public schemas() {
     const stack = new Stack(this.config, this.db)
@@ -574,11 +954,26 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Parameter - used to limit the total no of items returned/scanned
-   *  Defaults to 100 (internally, which is overridden)
-   * @param {Number} no - Max count of the 'items' returned
-   * @returns {this} - Returns `stack's` instance
+   * Parameter - used to limit the total no of items returned/scanned
+   * Defaults to 100 (internally, which is overridden)
+   * 
+   * @param {number} no Max count of the 'items' returned
+   * 
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .limit(20)
+   *  .find()
+   *  .then((result) => {
+   *    // returns a maximum of 20 entries
+   *    // if not provided, by default - the limit specified in config is returned
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public limit(no) {
     if (typeof no === 'number' && (no >= 0) && typeof this.q.content_type_uid === 'string') {
@@ -590,11 +985,26 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Parameter - used to skip initial no of items scanned
-   *  Defaults to 0 (internally, which is overridden)
-   * @param {Number} no - Min count of the 'items' to be scanned
-   * @returns {this} - Returns `stack's` instance
+   * Parameter - used to skip initial no of items scanned
+   * Defaults to 0 (internally, which is overridden)
+   * 
+   * @param {number} no Min count of the 'items' to be scanned
+   * 
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .skip(10)
+   *  .find()
+   *  .then((result) => {
+   *    // returnes entries, after first skipping 20 entries of 'blog' content type
+   *    // if not provided, by default - the skip value provided in config is considered
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public skip(no) {
     if (typeof no === 'number' && (no >= 0) && typeof this.q.content_type_uid === 'string') {
@@ -606,10 +1016,23 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Raw query filter - wrapper
-   * @param {Object} queryObject - Query filter
-   * @returns {this} - Returns `stack's` instance
+   * Wrapper around a raw query wrapper
+   * @param {object} queryObject Query filter
+   * 
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .query({"group.heading": "Tab 1"})
+   *  .find()
+   *  .then((result) => {
+   *    // returns entries that have - {"group.heading": "Tab 1"}
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public query(queryObject = {}) {
     if (this.q.query && typeof this.q.query === 'object') {
@@ -622,10 +1045,24 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Projections - returns only the fields passed here
-   * @param {Array} fields - Array of 'fields', separated by dot ('.') notation for embedded document query
-   * @returns {this} - Returns `stack's` instance
+   * Projections - returns only the fields passed here
+   * 
+   * @param {array} fields Array of 'fields', separated by dot ('.') notation for embedded document query
+   * 
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .only(["title", "url", "links"])
+   *  .find()
+   *  .then((result) => {
+   *    // returns entries and projects only their - ["title", "url", "links"] properties
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public only(fields) {
     if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
@@ -644,10 +1081,23 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Projections - returns fields except the ones passed here
-   * @param {Array} fields - Array of 'fields', separated by dot ('.') notation for embedded document query
-   * @returns {this} - Returns `stack's` instance
+   * Projections - returns fields except the ones passed here
+   * 
+   * @param {array} fields Array of 'fields', separated by dot ('.') notation for embedded document query
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .except(["title", "url", "links"])
+   *  .find()
+   *  .then((result) => {
+   *    // returns entries and projects all of their properties, except - ["title", "url", "links"]
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public except(fields) {
     if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
@@ -666,12 +1116,25 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Raw regex to be applied on a field - wrapper
-   * @param {String} field - Field on which the regex is to be applied on
-   * @param {pattern} pattern - Regex pattern
-   * @param {options} options - Options to be applied while evaluating the regex
-   * @returns {this} - Returns `stack's` instance
+   * Raw regex to be applied on a field - wrapper
+   * 
+   * @param {string} field Field on which the regex is to be applied on
+   * @param {pattern} pattern Regex pattern
+   * @param {options} options Options to be applied while evaluating the regex
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .regex("name", "^J")
+   *  .find()
+   *  .then((result) => {
+   *    // returns entries who's name properties start with "J"
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public regex(field, pattern, options = 'i') {
     if (!(field) || !(pattern) || typeof field !== 'string' || typeof pattern !== 'string') {
@@ -696,10 +1159,25 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Match entries that match a specific tags
-   * @param {Array} values - Array of tag values
-   * @returns {this} - Returns `stack's` instance
+   * @public
+   * @method tags
+   * @summary Match entries that match a specific tags
+   * 
+   * @param {array} values Array of tag values
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .tags(["new", "fresh"])
+   *  .find()
+   *  .then((result) => {
+   *    // returns entries filtered based on their tag fields
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public tags(values) {
     if (!values || typeof values !== 'object' || !(values instanceof Array) || values.length === 0) {
@@ -726,22 +1204,32 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Pass JS expression or a full function to the query system
+   * @method where
+   * @summary Pass JS expression or a full function to the query system
    * @description
-   *  - Use the $where operator to pass either a string containing a JavaScript expression
-   *    or a full JavaScript function to the query system.
-   *  - The $where provides greater flexibility, but requires that the database processes
-   *    the JavaScript expression or function for each document in the collection.
-   *  - Reference the document in the JavaScript expression or function using either this or obj.
-   * @note
-   *  - Only apply the $where query operator to top-level documents.
-   *  - The $where query operator will not work inside a nested document, for instance,
-   *    in an $elemMatch query.
-   * @link
-   *  https://docs.mongodb.com/manual/reference/operator/query/where/index.html
-   * @param field
-   * @param value
+   * Use the $where operator to pass either a string containing a JavaScript expression or a full JavaScript function to the query system.
+   * The $where provides greater flexibility, but requires that the database processes the JavaScript expression or function for each document in the collection.
+   * Reference the document in the JavaScript expression or function using either this or obj.
+   * Only apply the $where query operator to top-level documents.
+   * The $where query operator will not work inside a nested document, for instance, in an $elemMatch query. 
+   * Ref. - https://docs.mongodb.com/manual/reference/operator/query/where/index.html
+   * @param {*} expr Pass either a string containing a JavaScript expression or a full JavaScript function to the query system.
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .where(function() { 
+   *    return (hex_md5(this.name) === "9b53e667f30cd329dca1ec9e6a83e994")
+   *  })
+   *  .find()
+   *  .then((result) => {
+   *    // returns entries filtered based on the $where condition provided
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public where(expr) {
     if (!(expr)) {
@@ -766,9 +1254,25 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Includes 'count' key in response, which is the total count of the items being returned
-   * @returns {this} - Returns `stack's` instance
+   * @public
+   * @method includeCount
+   * @description
+   * Includes 'count' key in response, which is the total count of the items being returned
+   * 
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .includeCount()
+   *  .find()
+   *  .then((result) => {
+   *    // returns entries, along with a 'count' property, with the total count of entries being returned
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public includeCount() {
     this.internal.includeCount = true
@@ -777,9 +1281,22 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Includes 'content_type' key in response, which is the content type schema of the entries filtered/scanned
-   * @returns {this} - Returns `stack's` instance
+   * @description
+   * Includes 'content_type' key in response, which is the content type schema of the entries filtered/scanned
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .includeSchema()
+   *  .find()
+   *  .then((result) => {
+   *    // returns entries, along with a 'content_type' property, which is 'blog' content type's schema
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public includeSchema() {
     this.internal.includeSchema = true
@@ -788,10 +1305,24 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Includes 'content_type' key in response, which is the content type schema of the entries filtered/scanned
-   * @returns {this} - Returns `stack's` instance
+   * @description
+   * Includes 'content_type' key in response, which is the content type schema of the entries filtered/scanned
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .includeContentType()
+   *  .find()
+   *  .then((result) => {
+   *    // returns entries, along with a 'content_type' property, which is 'blog' content type's schema
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
+
   public includeContentType() {
     this.internal.includeSchema = true
 
@@ -799,9 +1330,23 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Includes all references of the entries being scanned
-   * @returns {this} - Returns `stack's` instance
+   * @description
+   * Includes all references of the entries being returned.
+   * Note: This is a slow method, since it iteratively queries all the references and their references, binds them and returns
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .includeReferences()
+   *  .find()
+   *  .then((result) => {
+   *    // returns entries, along with all their references and their nested references
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public includeReferences() {
     this.internal.includeReferences = true
@@ -810,9 +1355,25 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Excludes all references of the entries being scanned
-   * @returns {this} - Returns `stack's` instance
+   * @method excludeReferences
+   * @description
+   * Excludes all references of the entries being scanned
+   * Note: On calling this, assets will not be binded in the result being returned.
+   * 
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .excludeReferences()
+   *  .find()
+   *  .then((result) => {
+   *    // returns entries, without any of its assets Or references
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public excludeReferences() {
     this.internal.excludeReferences = true
@@ -821,12 +1382,26 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Wrapper, that allows querying on the entry's references.
-   * @note
-   *  This is a slow method, since it scans all documents and fires the `reference` query on them
-   *  Use `.query()` filters to reduce the total no of documents being scanned
-   * @returns {this} - Returns `stack's` instance
+   * @method queryReferences
+   * @description
+   * Wrapper, that allows querying on the entry's references.
+   * Note: This is a slow method, since it scans all documents and fires the `reference` query on them. Once the references are binded, the query object passed is used for filtering
+   * Use `.query()` filters to reduce the total no of documents being scanned
+   * 
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .queryReferences({"authors.name": "John Doe"})
+   *  .find()
+   *  .then((result) => {
+   *    // returns entries, who's reference author's name equals "John Doe"
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public queryReferences(query) {
     if (query && typeof query === 'object') {
@@ -849,9 +1424,17 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Returns the query build thusfar
-   * @returns {this} - Returns `stack's` instance
+   * @method getQuery
+   * @description Returns the query build thusfar
+   * 
+   * @example
+   * const query = Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .getQuery()
+   * // exposes details of the queries formed inside the SDK
+   * 
+   * @returns {Stack} Returns an instance of 'stack'
    */
   public getQuery() {
     return {
@@ -872,12 +1455,26 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Queries the db using the query built/passed
+   * @method find
    * @description
-   *  Does all the processing, filtering, referencing after querying the DB
-   * @param {Object} query - Optional query object, that overrides all the previously build queries
-   * @returns {Object} - Returns a objects, that have been processed, filtered and referenced
+   * Queries the db using the query built/passed
+   * Does all the processing, filtering, referencing after querying the DB
+   * @param {object} query Optional query object, that overrides all the 
+   * previously build queries
+   * @public
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .find()
+   *  .then((result) => {
+   *    // returns blog content type's entries
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {object} - Returns a objects, that have been processed, filtered and referenced
    */
   public find(query = {}) {
     return new Promise(async (resolve, reject) => {
@@ -966,35 +1563,58 @@ export class Stack {
     })
   }
 
-  public count(query?) {
+  /**
+   * @method count
+   * @description Returns the count of the entries/assets that match the filter
+   * @param {object} query Optional query filter object
+   * @public
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .count()
+   *  .then((result) => {
+   *    // returns entries, without any of its assets Or references
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {object} Returns count of the entries/asset's matched
+   */
+  public count(query ? ) {
     return new Promise((resolve, reject) => {
       const queryFilters = this.preProcess(query)
       this.collection = this.collection.find(queryFilters)
       // process it in a different manner
       if (this.internal.queryReferences) {
         return this.collection
-        .project(this.internal.projections)
-        .toArray()
-        .then((result) => {
-          if (result === null || result.length === 0) {
-            return resolve({ count: 0})
-          }
-          this.internal.includeReferences = true
+          .project(this.internal.projections)
+          .toArray()
+          .then((result) => {
+            if (result === null || result.length === 0) {
+              return resolve({
+                count: 0
+              })
+            }
+            this.internal.includeReferences = true
 
-          return this.includeReferencesI(result, this.q.locale, {}, undefined)
-            .then(() => {
-              result = sift(this.internal.queryReferences, result)
-              result = result.length
-              this.cleanup()
+            return this.includeReferencesI(result, this.q.locale, {}, undefined)
+              .then(() => {
+                result = sift(this.internal.queryReferences, result)
+                result = result.length
+                this.cleanup()
 
-              return resolve({ count: result})
-            })
-        })
-        .catch((error) => {
-          this.cleanup()
+                return resolve({
+                  count: result
+                })
+              })
+          })
+          .catch((error) => {
+            this.cleanup()
 
-          return reject(error)
-        })
+            return reject(error)
+          })
       }
 
       return this.collection
@@ -1003,7 +1623,9 @@ export class Stack {
         .then((result) => {
           this.cleanup()
 
-          return resolve({ count: result })
+          return resolve({
+            count: result
+          })
         })
         .catch((error) => {
           this.cleanup()
@@ -1014,12 +1636,25 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Queries the db using the query built/passed. Returns a single entry/asset/content type object
+   * @method findOne
    * @description
-   *  Does all the processing, filtering, referencing after querying the DB
-   * @param {Object} query - Optional query object, that overrides all the previously build queries
-   * @returns {Object} - Returns an object, that has been processed, filtered and referenced
+   * Queries the db using the query built/passed. Returns a single entry/asset/content type object
+   * Does all the processing, filtering, referencing after querying the DB
+   * @param {object} query Optional query object, that overrides all the previously build queries
+   * 
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .findOne()
+   *  .then((result) => {
+   *    // returns an entry
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   * 
+   * @returns {object} - Returns an object, that has been processed, filtered and referenced
    */
   public findOne(query = {}) {
     return new Promise((resolve, reject) => {
@@ -1067,11 +1702,13 @@ export class Stack {
         })
     })
   }
+
   /**
-   * @summary
-   *  Internal method, that executes and formats the queries built/passed
-   * @param {Object} query - Query filter/process object
-   * @returns {Object} - Returns a query object, that has been processed to be queried in mongodb
+   * @private
+   * @method preProcess
+   * @summary Internal method, that executes and formats the queries built/passed
+   * @param {object} query Query filter/process object
+   * @returns {object} Returns a query object, that has been processed to be queried in mongodb
    */
   private preProcess(query) {
     let queryFilters
@@ -1128,8 +1765,9 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Does GC, so memory doesn't stackup
+   * @private
+   * @method cleanup
+   * @summary Does GC, so memory doesn't stackup
    */
   private cleanup() {
     this.collection = null
@@ -1138,12 +1776,13 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Internal method, that executes and formats the result, which the user and use
-   * @param {Object} result - Result, which's to be manipulated
-   * @returns {Object} - Returns the formatted version of the `result` object
+   * @private
+   * @method postProcess
+   * @summary Internal method, that executes and formats the result, which the user and use
+   * @param {object} result Result, which's to be manipulated
+   * @returns {object} Returns the formatted version of the `result` object
    */
-  private postProcess(result, contentType?) {
+  private postProcess(result, contentType ? ) {
     const count = (result === null) ? 0 : result.length
     // if (this.internal.only) {
     //   result.forEach((item) => mask(item, this.internal.except))
@@ -1204,15 +1843,16 @@ export class Stack {
   }
 
   /**
-   * @summary
-   *  Internal method, that iteratively calls itself and binds entries reference
-   * @param {Object} entry - An entry or a collection of entries, who's references are to be found
-   * @param {String} locale - Locale, in which the reference is to be found
-   * @param {Object} references - A map of uids tracked thusfar (used to detect cycle)
-   * @param {String} parentUid - Entry uid, which is the parent of the current `entry` object
-   * @returns {Object} - Returns `entry`, that has all of its reference binded
+   * @private
+   * @method includeReferencesI
+   * @summary Internal method, that iteratively calls itself and binds entries reference
+   * @param {object} entry An entry or a collection of entries, who's references are to be found
+   * @param {string} locale Locale, in which the reference is to be found
+   * @param {object} references A map of uids tracked thusfar (used to detect cycle)
+   * @param {string} parentUid Entry uid, which is the parent of the current `entry` object
+   * @returns {object} Returns `entry`, that has all of its reference binded
    */
-  private includeReferencesI(entry, locale, references, parentUid?) {
+  private includeReferencesI(entry, locale, references, parentUid ? ) {
     const self = this
 
     return new Promise((resolve, reject) => {
@@ -1615,48 +2255,6 @@ export class Stack {
       } else {
         return resolve(query);
       }
-    })
-  }
-
-  /**
-   * [
-   *  'category.authors'
-   *  'category'
-   *  'authors.types'
-   * ]
-   */
-
-  private excludeSpecificReferences (includes, uid, isOnly) {
-    return new Promise((resolve) => {
-      return this.db.collection(this.contentStore.collectionName)
-        .find({uid})
-        .project({references: 1})
-        .limit(1)
-        .toArray()
-        .then((result) => {
-          if (result === null || result.length === 0) {
-            return resolve({})
-          }
-          const excludeQuery = {}
-          const references = result[0].references
-
-          for (const referenceField in references) {
-            let flag = false
-
-            for (let i = 0, j = includes.length; i < j; i++) {
-              if (includes[i].includes(referenceField)) {
-                flag = true
-                break
-              }
-            }
-
-            if (!flag) {
-              excludeQuery[referenceField] = (isOnly) ? 1: 0
-            }
-          }
-
-          return resolve(excludeQuery)
-        })
     })
   }
 }
