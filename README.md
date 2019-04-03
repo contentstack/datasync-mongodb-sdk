@@ -1,14 +1,69 @@
 [![Contentstack](https://www.contentstack.com/docs/static/images/contentstack.png)](https://www.contentstack.com/)
-## Contentstack Sync Mongodb SDK
 
-Contentstack is a headless CMS with an API-first approach. It is a CMS that developers can use to build powerful cross-platform applications in their favorite languages. Build your application frontend, and Contentstack will take care of the rest. [Read More](https://www.contentstack.com/). 
+Contentstack is a headless CMS with an API-first approach. It is a CMS that developers can use to build powerful cross-platform applications in their favorite languages. Build your application frontend, and Contentstack will take care of the rest. [Read More](https://www.contentstack.com/).
 
-[Contentstack sync utility](https://www.contentstack.com/docs/tools-and-frameworks) provides Mongodb SDK to query applications that have locally strored contents in mongodb. Given below is the detailed guide and helpful resources to get started with Mongodb SDK.
+## Contentstack DataSync MongoDB SDK
+
+[Contentstack DataSync](https://www.contentstack.com/docs/guide/synchronization/contentstack-datasync) provides MongoDB SDK to query applications that have locally stored contents in mongodb. Given below is the detailed guide and helpful resources to get started.
 
 ### Prerequisite
 
-- nodejs, v6 or higher
-- mongodb, v3.6 or higher
+- nodejs, v8+
+- MongoDB, v3.6 or higher
+- You should have the data synced through [Contentstack DataSync](https://www.contentstack.com/docs/guide/synchronization/contentstack-datasync) 
+
+### Configuration
+
+|Property|Data Type|Default value|Description|
+|--|--|--|--|
+|dbName|string|contentstack-persistent-db|**Optional** The MongoDB database name|
+|collectionName|string|contents|**Optional** MongoDB database's collection name|
+|uri|string|mongodb://localhost:27017 |**Optional.** The MongoDB connection URI|
+|limit|number|100|**Optional.** Caps the total no of objects returned in a single call|
+|skip|number|0|**Optional.** Number of objects skipped before the result is returned|
+| indexes | object |**[see config below](https://github.com/contentstack/datasync-content-store-mongodb#detailed-configs)** |**Optional.** Option to create db indexes via configuration|
+|projections|object|**[see config below](https://github.com/contentstack/datasync-content-store-mongodb#detailed-configs)** |**Optional.** Mongodb projections. Keys provided here would be displayed/filtered out when fetching the result|
+|options|object|**[see config below](https://github.com/contentstack/datasync-content-store-mongodb#detailed-configs)** |**Optional.** MongoDB connection options [Ref.](http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html) for more info|
+
+### Detailed configs
+
+By default, this module uses the following internal configuration.
+
+```js
+{
+  dbName: 'contentstack-persistent-db',
+  collectionName: 'contents',
+  uri: 'mongodb://localhost:27017',
+  indexes: {
+    published_at: -1,
+    content_type_uid: 1,
+    locale: 1,
+    uid: 1
+  },
+  limit: 100,
+  locales: [
+  ],
+  options: {
+    autoReconnect: true,
+    connectTimeoutMS: 15000,
+    keepAlive: true,
+    noDelay: true,
+    reconnectInterval: 1000,
+    reconnectTries: 20,
+    useNewUrlParser: true,
+  },
+  projections: {
+    _id: 0,
+    _version: 0,
+    content_type_uid: 0,
+    created_at: 0,
+    sys_keys: 0,
+    updated_at: 0,
+    updated_by: 0,
+  },
+  skip: 0,
+}
+```
 
 ### Setup and Installation
 
@@ -102,4 +157,22 @@ Once you have initialized the SDK, you can start querying on the sync-utility's 
     })
     .catch(reject)
 ```
-For more details on queries supported/querying, [refer this](./mongodb-sdk-querying.md)!
+
+## Advanced Queries
+
+In order to learn more about advance queries please refer the API documentation, [here](https://contentstack.github.io/datasync-mongodb-sdk/).
+
+### Further Reading
+
+- [Getting started with Contentstack DataSync](https://www.contentstack.com/docs/guide/synchronization/contentstack-datasync)    
+- [Contentstack DataSync](https://www.contentstack.com/docs/guide/synchronization/contentstack-datasync/configuration-files-for-contentstack-datasync) doc lists the configuration for different modules
+
+### Support and Feature requests
+
+If you have any issues working with the library, please file an issue [here](https://github.com/contentstack/datasync-content-store-mongodb/issues) at Github.
+
+You can send us an e-mail at [support@contentstack.com](mailto:support@contentstack.com) if you have any support or feature requests. Our support team is available 24/7 on the intercom. You can always get in touch and give us an opportunity to serve you better!
+
+### License
+
+This repository is published under the [MIT license](LICENSE).

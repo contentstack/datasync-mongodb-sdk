@@ -1,5 +1,5 @@
 /*!
- * Contentstack Sync Mongodb SDK
+ * Contentstack DataSync Mongodb SDK
  * Copyright (c) 2019 Contentstack LLC
  * MIT Licensed
  */
@@ -7,10 +7,12 @@
 import { uniq } from 'lodash'
 
 /**
- * @summary
- *  Validates the mongodb 'uri' passed
- * @param {String} uri - Mongodb connection 'uri' string
- * @returns {String} - Returns the `uri` after validating it, else throws an error
+ * @private
+ * 
+ * @description
+ * Validates the mongodb 'uri' passed
+ * @param {string} uri - Mongodb connection 'uri' string
+ * @returns {string} - Returns the `uri` after validating it, else throws an error
  */
 export const validateURI = (uri) => {
   if (typeof uri !== 'string' || uri.length === 0) {
@@ -21,11 +23,12 @@ export const validateURI = (uri) => {
 }
 
 /**
- * @summary
- *  Checks for `cyclic` references
- * @param {String} uid - Uid to check if it exists on `map`
- * @param {Object} mapping - Map of the uids tracked thusfar
- * @returns {Boolean} - Returns `true` if the `uid` is part of the map (i.e. cyclic)
+ * @private
+ * @method checkCyclic
+ * @summary Checks for `cyclic` references
+ * @param {string} uid Uid to check if it exists on `map`
+ * @param {object} mapping Map of the uids tracked thusfar
+ * @returns {boolean} Returns `true` if the `uid` is part of the map (i.e. cyclic)
  */
 export const checkCyclic = (uid, mapping) => {
   let flag = false

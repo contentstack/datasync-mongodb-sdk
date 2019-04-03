@@ -1,5 +1,5 @@
 /*!
- * Contentstack Sync Mongodb SDK
+ * Contentstack DataSync Mongodb SDK
  * Copyright (c) 2019 Contentstack LLC
  * MIT Licensed
  */
@@ -8,6 +8,7 @@ export declare const config: {
         collectionName: string;
         dbName: string;
         indexes: {
+            published_at: number;
             content_type_uid: number;
             locale: number;
             uid: number;

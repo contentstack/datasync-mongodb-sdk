@@ -1,12 +1,14 @@
 {
-  "name": "contentstack-sync-mongodb-sdk",
-  "version": "1.0.0",
+  "name": "datasync-mongodb-sdk",
+  "version": "0.0.1",
   "description": "Contentstack sync utility's Mongodb SDK",
   "main": "dist/index.js",
   "scripts": {
     "clean": "rimraf dist typings coverage",
     "build-ts": "npm run clean && tsc",
     "watch-ts": "npm run clean && tsc -w",
+    "compile": "tsc",
+    "prepare": "npm run compile",
     "start": "dist/index.js",
     "tslint": "npx tslint -c tslint.json 'src/**/*.ts' --fix",
     "test": "jest"
@@ -14,10 +16,10 @@
   "author": "Contentstack Ecosystem",
   "license": "ISC",
   "dependencies": {
-    "debug": "^4.1.1",
-    "lodash": "^4.17.11",
-    "mongodb": "^3.1.12",
-    "sift": "^7.0.1"
+    "debug": "4.1.1",
+    "lodash": "4.17.11",
+    "mongodb": "3.1.12",
+    "sift": "7.0.1"
   },
   "devDependencies": {
     "@types/jest": "^23.3.11",

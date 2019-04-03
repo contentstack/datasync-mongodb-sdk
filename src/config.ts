@@ -1,5 +1,5 @@
 /*!
- * Contentstack Sync Mongodb SDK
+ * Contentstack DataSync Mongodb SDK
  * Copyright (c) 2019 Contentstack LLC
  * MIT Licensed
  */
@@ -9,7 +9,7 @@ export const config = {
     collectionName: 'contents',
     dbName: 'contentstack-persistent-db',
     indexes: {
-      // published_at: -1,
+      published_at: -1,
       content_type_uid: 1,
       locale: 1,
       uid: 1
