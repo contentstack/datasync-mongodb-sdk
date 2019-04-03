@@ -1,10 +1,6 @@
 const Contentstack = require('../dist').Contentstack
-// const Stack = require('../dist/contentstack').Stack
-// import * as Contentstack from '../dist'
 
 const Stack = Contentstack.Stack({
-  api_key: '',
-  access_token: '',
   locales: [
     {
       code: 'en-us',
@@ -15,11 +11,15 @@ const Stack = Contentstack.Stack({
       relative_url_prefix: '/es/'
     }
   ],
+  contentStore: {
+    dbName: 'mydb',
+    collectionName: 'dev'
+  }
 })
 
 function connect () {
   return new Promise((resolve, reject) => {
-    return Stack.connect({dbName: 'sync-test', collectionName: 'core'})
+    return Stack.connect()
       .then(resolve)
       .catch(reject)
   })
@@ -29,25 +29,18 @@ function close () {
   return Stack.close()
 }
 
-function find (contentType = 'blog') {
+function find (contentType = 'authors') {
   return new Promise((resolve, reject) => {
     Stack.contentType(contentType)
       .entries()
-      // .includeCount()
+      .includeCount()
       .includeReferences()
-      // .queryReferences({'authors.category': {}})
-      // .includeSchema()
-      // .language('es-es')
-      // .notEqualTo('title', 'Blog One')
-      // .query({tags: {$in: ['one', 'two']}})
-      .queryReferences({'authors.category.uid': 'c2'})
-      // .excludeReferences()
-      // .excludeAssets()
-      // .limit(1)
-      // .skip(1)
-      // .query({
-      //   uid: 'blt17559b99fee73d6f'
-      // })
+      .includeSchema()
+      .language('es-es')
+      .notEqualTo('title', 'Kolan')
+      .query({tags: {$in: ['one', 'two']}})
+      .limit(10)
+      .skip(1)
       .find()
       .then(resolve)
       .catch(reject)
@@ -68,20 +61,18 @@ return connect()
         //       age: null,
         //       summary: '',
         //       tags: [
-                
         //       ],
         //       locale: 'es-es',
         //       uid: 'blt17559b99fee73d6f'
         //     }
         //   ],
         //   content_type_uid: 'authors',
-        //   locale: 'es-es'
+        //   locale: 'es-es',
+        //   count: 10
         // }
         console.log(JSON.stringify(result, null, 1))
+        return
       })
   })
   .then(close)
-  .then(() => {
-    console.info('Data received successfully!')
-  })
   .catch(console.error)
