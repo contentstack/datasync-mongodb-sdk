@@ -1,6 +1,6 @@
 export const content_types = [
   {
-    content_type_uid: 'contentTypes',
+    content_type_uid: '_content_types',
     published_at: '2019-02-07T14:52:37.617Z',
     schema: [
       {
@@ -27,14 +27,14 @@ export const content_types = [
       },
     ],
     sys_keys: {
-      content_type_uid : 'contentTypes',
+      content_type_uid : '_content_types',
       uid: 'blog',
     },
     title: 'Blog',
     uid: 'blog',
   },
   {
-    content_type_uid: 'contentTypes',
+    content_type_uid: '_content_types',
     published_at: '2019-02-07T14:52:37.618Z',
     schema: [
       {
@@ -61,14 +61,14 @@ export const content_types = [
       },
     ],
     sys_keys: {
-      content_type_uid : 'contentTypes',
+      content_type_uid : '_content_types',
       uid: 'author',
     },
     title: 'Author',
     uid: 'author',
   },
   {
-    content_type_uid: 'contentTypes',
+    content_type_uid: '_content_types',
     published_at: '2019-02-07T14:52:37.616Z',
     schema: [
       {
@@ -95,7 +95,7 @@ export const content_types = [
       },
     ],
     sys_keys: {
-      content_type_uid : 'contentTypes',
+      content_type_uid : '_content_types',
       uid: 'category',
     },
     title: 'Category',

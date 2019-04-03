@@ -880,11 +880,7 @@ export declare class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     queryReferences(query: any): this;
-<<<<<<< HEAD
     queryReferencesBeta(query: any): this;
-    getQuery(): any;
-    include(fields: any): this;
-=======
     /**
      * @method getQuery
      * @description Returns the query build thusfar
@@ -899,6 +895,7 @@ export declare class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     getQuery(): any;
+    include(fields: any): this;
     /**
      * @method find
      * @description
@@ -921,7 +918,6 @@ export declare class Stack {
      *
      * @returns {object} - Returns a objects, that have been processed, filtered and referenced
      */
->>>>>>> develop
     find(query?: {}): Promise<{}>;
     /**
      * @method count
@@ -965,7 +961,6 @@ export declare class Stack {
      * @returns {object} - Returns an object, that has been processed, filtered and referenced
      */
     findOne(query?: {}): Promise<{}>;
-    private queryOnReferences;
     /**
      * @private
      * @method preProcess
@@ -999,9 +994,23 @@ export declare class Stack {
      * @returns {object} Returns `entry`, that has all of its reference binded
      */
     private includeReferencesI;
-    private includeReferencesBeta;
     private isPartOfInclude;
+    /**
+     * @summary
+     *  Internal method, that iteratively calls itself and binds entries reference
+     * @param {Object} entry - An entry or a collection of entries, who's references are to be found
+     * @param {String} locale - Locale, in which the reference is to be found
+     * @param {Object} references - A map of uids tracked thusfar (used to detect cycle)
+     * @param {String} parentUid - Entry uid, which is the parent of the current `entry` object
+     * @returns {Object} - Returns `entry`, that has all of its reference binded
+     */
     private includeSpecificReferences;
-    private queryBuilder;
+    /**
+     * [
+     *  'category.authors'
+     *  'category'
+     *  'authors.types'
+     * ]
+     */
     private excludeSpecificReferences;
 }

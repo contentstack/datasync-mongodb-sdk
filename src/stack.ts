@@ -1479,22 +1479,13 @@ export class Stack {
   public find(query = {}) {
     return new Promise(async (resolve, reject) => {
       let queryFilters = this.preProcess(query)
-      let formattedQuery
 
-      // if (this.internal.includeSpecificReferences) {
-      //   const projections = await this.excludeSpecificReferences(this.internal.includeSpecificReferences, this.q.content_type_uid, this.internal.hasOwnProperty('only'))
-      //   console.log('projections', projections)
-      //   this.internal.projections = merge(this.internal.projections, projections)
-      //   console.log('this.internal.projections', this.internal.projections)
-      // }
-
-      if (this.internal.queryReferencesBeta) {
-        formattedQuery = await this.queryBuilder(this.internal.queryReferencesBeta, this.q.locale, this.q.content_type_uid)
-        console.log('formatted query', JSON.stringify(formattedQuery))
+      if (this.internal.includeSpecificReferences) {
+        const projections = await this.excludeSpecificReferences(this.internal.includeSpecificReferences, this.q.content_type_uid, this.internal.hasOwnProperty('only'))
+        console.log('projections', projections)
+        this.internal.projections = merge(this.internal.projections, projections)
+        console.log('this.internal.projections', this.internal.projections)
       }
-
-      queryFilters = merge(queryFilters, formattedQuery[0])
-      console.log('queryfilters', JSON.stringify(queryFilters))
       
       if (this.internal.sort) {
         this.collection = this.collection.find(queryFilters).sort(this.internal.sort)
@@ -1502,18 +1493,13 @@ export class Stack {
         this.collection = this.collection.find(queryFilters)
       }
 
-      // process it in a different manner
       if (this.internal.queryReferences) {
-        return this.queryOnReferences()
-          .then(resolve)
-          .catch(reject)
+        this.collection = this.collection.project(this.internal.projections).toArray()
+      } else {
+        this.collection = this.collection.project(this.internal.projections).limit(this.internal.limit).skip(this.internal.skip).toArray()
       }
 
       return this.collection
-        .project(this.internal.projections)
-        .limit(this.internal.limit)
-        .skip(this.internal.skip)
-        .toArray()
         .then((result) => {
           let contentType
           if (this.internal.includeSchema && this.q.content_type_uid !== this.types.content_types && this.q.content_type_uid !==
@@ -1531,27 +1517,35 @@ export class Stack {
           } else if (this.internal.includeSpecificReferences) {
             return this.includeSpecificReferences(result, this.q.locale, {}, undefined, this.internal.includeSpecificReferences)
             .then(() => {
+              if (this.internal.queryReferences) {
+                result = sift(this.internal.queryReferences, result)
+
+                if (this.internal.skip) {
+                  result = result.splice(this.internal.skip, this.internal.limit)
+                } else if (this.internal.limit) {
+                  result = result.splice(0, this.internal.limit)
+                }
+              }
               result = this.postProcess(result, contentType)
 
               return resolve(result)
-            })
-            .catch((refError) => {
-              this.cleanup()
-
-              return reject(refError)
             })
           } else {
 
             return this.includeReferencesI(result, this.q.locale, {}, undefined)
               .then(() => {
+                if (this.internal.queryReferences) {
+                  result = sift(this.internal.queryReferences, result)
+  
+                  if (this.internal.skip) {
+                    result = result.splice(this.internal.skip, this.internal.limit)
+                  } else if (this.internal.limit) {
+                    result = result.splice(0, this.internal.limit)
+                  }
+                }
                 result = this.postProcess(result, contentType)
 
                 return resolve(result)
-              })
-              .catch((refError) => {
-                this.cleanup()
-
-                return reject(refError)
               })
           }
         })
@@ -1666,43 +1660,6 @@ export class Stack {
     })
   }
 
-  private queryOnReferences() {
-    return new Promise((resolve, reject) => {
-      return this.collection
-        // .find(query)
-        .project(this.internal.projections)
-        // .limit(this.internal.limit)
-        // .skip(this.internal.skip)
-        .toArray()
-        .then((result) => {
-          return this.includeReferencesI(result, this.q.locale, {}, undefined)
-            .then(() => {
-              result = sift(this.internal.queryReferences, result)
-
-              if (this.internal.skip) {
-                result = result.splice(this.internal.skip, this.internal.limit)
-              } else if (this.internal.limit) {
-                result = result.splice(0, this.internal.limit)
-              }
-
-              result = this.postProcess(result)
-
-              return resolve(result)
-            })
-            .catch((refError) => {
-              this.cleanup()
-
-              return reject(refError)
-            })
-        })
-        .catch((error) => {
-          this.cleanup()
-
-          return reject(error)
-        })
-    })
-  }
-
   /**
    * @private
    * @method preProcess
@@ -1784,10 +1741,6 @@ export class Stack {
    */
   private postProcess(result, contentType ? ) {
     const count = (result === null) ? 0 : result.length
-    // if (this.internal.only) {
-    //   result.forEach((item) => mask(item, this.internal.except))
-    // }
-    // result.forEach((item) => delete item._id)
     switch (this.q.content_type_uid) {
     case this.types.assets:
       if (this.internal.single) {
@@ -1946,104 +1899,8 @@ export class Stack {
     })
   }
 
-  private includeReferencesBeta(entry, locale, references, parentUid?) {
-    const self = this
-
-    return new Promise((resolve, reject) => {
-      if (entry === null || typeof entry !== 'object') {
-        return resolve()
-      }
-
-      // current entry becomes the parent
-      if (entry.uid) {
-        parentUid = entry.uid
-      }
-
-      const referencesFound = []
-
-      // iterate over each key in the object
-      for (const prop in entry) {
-        if (entry[prop] !== null && typeof entry[prop] === 'object') {
-          if (entry[prop] && entry[prop].reference_to) {
-            if (entry[prop].values.length === 0) {
-              entry[prop] = []
-            } else {
-              let uids = entry[prop].values
-              if (typeof uids === 'string') {
-                uids = [uids]
-              }
-              if (entry[prop].reference_to !== this.types.assets) {
-                uids = filter(uids, (uid) => {
-                  return !(checkCyclic(uid, references))
-                })
-              }
-              if (uids.length) {
-                const query = {
-                  content_type_uid: entry[prop].reference_to,
-                  locale,
-                  uid: {
-                    $in: uids,
-                  },
-                }
-
-                referencesFound.push(new Promise((rs, rj) => {
-                  return self.db.collection(this.contentStore.collectionName)
-                    .find(query)
-                    .project(self.config.contentStore.projections)
-                    .toArray()
-                    .then((result) => {
-                      if (result.length === 0) {
-                        entry[prop] = []
-
-                        return rs()
-                      } else if (parentUid) {
-                        references[parentUid] = references[parentUid] || []
-                        references[parentUid] = uniq(references[parentUid].concat(map(result, 'uid')))
-                      }
-
-                      if (typeof entry[prop].values === 'string') {
-                        entry[prop] = ((result === null) || result.length === 0) ? null : result[0]
-                      } else {
-                        // format the references in order
-                        const referenceBucket = []
-                        query.uid.$in.forEach((entityUid) => {
-                          const elem = find(result, (entity) => {
-                            return entity.uid === entityUid
-                          })
-                          if (elem) {
-                            referenceBucket.push(elem)
-                          }
-                        })
-                        entry[prop] = referenceBucket
-                      }
-
-                      return self.includeReferencesBeta(entry[prop], locale, references, parentUid)
-                        .then(rs)
-                        .catch(rj)
-                    })
-                    .catch(rj)
-                }))
-              }
-            }
-          } else {
-            referencesFound.push(self.includeReferencesBeta(entry[prop], locale, references, parentUid))
-          }
-        }
-      }
-
-      return Promise.all(referencesFound)
-        .then(resolve)
-        .catch(reject)
-    })
-  }
-
   private isPartOfInclude(pth, include) {
     for (let i = 0, j = include.length; i < j; i++) {
-      // const regexp = new RegExp(include[i])
-      // if (regexp.test(pth)) {
-      //   return true
-      // }
-
       if (include[i].indexOf(pth) !== -1) {
         return true
       }
@@ -2163,98 +2020,48 @@ export class Stack {
     })
   }
 
-  private async queryBuilder(query, locale, uid) {
-    return new Promise((resolve, reject) => {
-      if (query && Object.keys(query).length && uid) {
-        // find content type's schema
-        return this.db.collection(this.contentStore.collectionName)
-          .find({
-            content_type_uid: this.types.content_types,
-            uid
-          })
-          .project({
-            references: 1
-          })
-          .limit(1)
-          .toArray()
-          .then((result) => {
-            console.log('result', result)
-            if (result === null || result.length === 0) {
-              return resolve(query)
-            }
-            const references = result[0].references
+  /**
+   * [
+   *  'category.authors'
+   *  'category'
+   *  'authors.types'
+   * ]
+   */
 
-            if (references && Object.keys(references).length > 0) {
-              const promises = []
+  private excludeSpecificReferences (includes, uid, isOnly) {
+    return new Promise((resolve) => {
+      return this.db.collection(this.contentStore.collectionName)
+        .find({uid})
+        .project({references: 1})
+        .limit(1)
+        .toArray()
+        .then((result) => {
+          if (result === null) {
+            return resolve({})
+          }
+          const excludeQuery = {}
+          const references = result[0].references
 
-              for (const field in query) {
-                if (query[field] === null) {
-                  delete query[field]
-                } else if (typeof query[field] === 'object' && query[field] instanceof Array && query[field].length) {
-                  promises.push(this.queryBuilder(query[field], locale, uid))
-                } else {
-                  let filterField: any = field
-                  let refQuery, refContentType
-                  let refFieldM
-                  for (let refField in references) {
-                    // if the query's field matches the reference field exactly
-                    if (field.indexOf(refField) === 0) {
-                      refFieldM = refField
-                      let newfilterField = filterField.replace(refField, '')
-                      if (newfilterField.charAt(0) === '.') {
-                        newfilterField = newfilterField.substr(1)
-                      }
+          for (const referenceField in references) {
+            let flag = false
 
-                      refQuery = refQuery || {}
-                      refContentType = references[refField]
-                      // no idea
-                      refQuery[newfilterField] = query[field]
-                      refQuery.content_type_uid = refContentType
-                      refQuery.locale = locale
-                      delete query[field]
-                    }
-                  }
-
-                  if (refQuery && Object.keys(refQuery).length) {
-                    promises.push(
-                      this.db.collection(this.contentStore.collectionName)
-                        .find(refQuery)
-                        .project({uid: 1})
-                        .toArray()
-                        .then((result) => {
-                          console.log('result', result)
-                          console.log('refQuery', refQuery)
-                          if (result === null || result.length === 0) {
-                            query[`${refFieldM}.values`] = {
-                              $in: []
-                            }                        
-                          } else {
-                            console.log('filterfield> ', `${refFieldM}.values`)
-                            query[`${refFieldM}.values`] = {
-                              $in: map(result, 'uid')
-                            }
-                          }
-
-                          return query
-                        })
-                    )
-                  }
-                }
+            for (let i = 0, j = includes.length; i < j; i++) {
+              if (includes[i].includes(referenceField)) {
+                flag = true
+                break
               }
-
-              return Promise.all(promises)
-                .then(resolve)
-                .catch(reject)
-            } else {
-              // $and $or $nor $where
-              // setting this to an empty object - no references found on the content type!
-              return resolve({})
             }
-          })
-          .catch(reject)
-      } else {
-        return resolve(query);
-      }
+
+            if (!flag) {
+              const referenceFieldValues = `${referenceField}.values`
+              const referenceFieldRefTo = `${referenceField}.reference_to`
+              excludeQuery[referenceFieldValues] = (isOnly) ? 1: 0
+              excludeQuery[referenceFieldRefTo] = (isOnly) ? 1: 0
+            }
+          }
+
+          return resolve(excludeQuery)
+        })
     })
   }
 }
