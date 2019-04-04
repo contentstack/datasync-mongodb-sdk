@@ -140,6 +140,24 @@ describe('# References', () => {
           expect(error).toBeNull()
         })
     })
+
+    test('.include()', () => {
+      return Stack.contentType('blog')
+        .entries()
+        .include(['authors'])
+        .find()
+        .then((result) => {
+          (result as any).entries.forEach((entry) => {
+            itemPropertyChecks(result)
+            expect(result).toHaveProperty('entries')
+            expect((result as any).content_type_uid).toEqual('blog')
+            expect((result as any).entries).toHaveLength(5)
+            expect(entry).not.toHaveProperty('self_reference')
+          })
+        }).catch((error) => {
+          expect(error).toBeNull()
+        })
+    })
   })
 })
 

@@ -32,6 +32,10 @@ export const content_types = [
     },
     title: 'Blog',
     uid: 'blog',
+    reference: {
+      authors: 'author',
+      self_reference: 'blog'
+    }
   },
   {
     content_type_uid: '_content_types',
@@ -66,6 +70,10 @@ export const content_types = [
     },
     title: 'Author',
     uid: 'author',
+    reference: {
+      blogs: 'blog',
+      self_reference: 'author'
+    }
   },
   {
     content_type_uid: '_content_types',

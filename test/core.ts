@@ -17,40 +17,52 @@ const Stack = Contentstack.Stack(config)
 let db
 
 describe('# Core', () => {
+
   beforeAll(() => {
     return Stack.connect().then((dbInstance) => {
       db = dbInstance
     })
   })
+
   beforeAll(() => {
-    return db.collection(collectionName).insertMany(authors)
+    return db.collection(collectionName)
+        .insertMany(authors)
     .then(() => {
-      return db.collection(collectionName).insertMany(blogs)
+      return db.collection(collectionName)
+        .insertMany(blogs)
     })
     .then(() => {
-      return db.collection(collectionName).insertMany(products)
+      return db.collection(collectionName)
+        .insertMany(products)
     })
     .then(() => {
-      return db.collection(collectionName).insertMany(categories)
+      return db.collection(collectionName)
+        .insertMany(categories)
     })
     .then(() => {
-      return db.collection(collectionName).insertMany(assets)
+      return db.collection(collectionName)
+        .insertMany(assets)
     })
     .then(() => {
-      return db.collection(collectionName).insertMany(content_types)
+      return db.collection(collectionName)
+        .insertMany(content_types)
     })
     .catch((error) => {
       expect(error).toBeNull()
     })
   })
+
   afterAll(() => {
-    return db.collection(collectionName).drop().then(() => {
-      return Stack.close()
-    })
+    return db.collection(collectionName)
+      .drop()
+      .then(() => {
+        return Stack.close()
+      })
   })
 
   test('initialize stack', () => {
-    expect(Contentstack.Stack()).toHaveProperty('connect')
+    expect(Contentstack.Stack())
+      .toHaveProperty('connect')
   })
 
   describe('entries', () => {
