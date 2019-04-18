@@ -1,6 +1,6 @@
 {
   "name": "datasync-mongodb-sdk",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Contentstack sync utility's Mongodb SDK",
   "main": "dist/index.js",
   "scripts": {
@@ -14,7 +14,7 @@
     "test": "jest"
   },
   "author": "Contentstack Ecosystem",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "debug": "4.1.1",
     "lodash": "4.17.11",

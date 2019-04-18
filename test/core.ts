@@ -174,6 +174,7 @@ describe('# Core', () => {
       return Stack.assets()
         .findOne()
         .then((result) => {
+          console.error('@result', JSON.stringify(result))
           expect(result).toHaveProperty('asset')
           expect(result).toHaveProperty('content_type_uid')
           expect(result).toHaveProperty('locale')
@@ -186,6 +187,7 @@ describe('# Core', () => {
           expect((result as any).asset).not.toHaveProperty('created_at')
           expect((result as any).asset).not.toHaveProperty('updated_at')
         }).catch((error) => {
+          console.error(error)
           expect(error).toBeNull()
         })
     })

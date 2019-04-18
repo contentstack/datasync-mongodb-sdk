@@ -21,3 +21,4 @@ export declare const validateURI: (uri: any) => string;
  * @returns {boolean} Returns `true` if the `uid` is part of the map (i.e. cyclic)
  */
 export declare const checkCyclic: (uid: any, mapping: any) => boolean;
+export declare const validateConfig: (config: any) => void;

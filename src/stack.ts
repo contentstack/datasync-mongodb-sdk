@@ -8,7 +8,7 @@ import { filter, find, map, merge, remove, uniq } from 'lodash'
 import { Db, MongoClient } from 'mongodb'
 import sift from 'sift'
 import { config } from './config'
-import { checkCyclic, validateURI } from './util'
+import { checkCyclic, validateConfig, validateURI } from './util'
 
 /**
  * @class Stack
@@ -29,6 +29,8 @@ export class Stack {
 
   constructor(stackConfig, existingDB ? ) {
     this.config = merge(config, stackConfig)
+    // validates config.locales property
+    validateConfig(this.config)
     this.contentStore = this.config.contentStore
     this.types = this.contentStore.internalContentTypes
     this.q = {}
@@ -204,7 +206,6 @@ export class Stack {
         [index]: type
       })
       .then(() => {
-        console.info(`Index '${index}' created successfully!`)
         return
       })
   }
@@ -244,7 +245,7 @@ export class Stack {
     if (!(code) || typeof code !== 'string' || !(find(this.config.locales, {
         code
       }))) {
-      throw new Error(`Language queried is invalid ${code}`)
+      throw new Error(`Language ${code} is invalid!`)
     }
     this.q.locale = code
 
@@ -1482,9 +1483,7 @@ export class Stack {
 
       if (this.internal.includeSpecificReferences) {
         const projections = await this.excludeSpecificReferences(this.internal.includeSpecificReferences, this.q.content_type_uid, this.internal.hasOwnProperty('only'))
-        console.log('projections', projections)
         this.internal.projections = merge(this.internal.projections, projections)
-        console.log('this.internal.projections', this.internal.projections)
       }
       
       if (this.internal.sort) {
@@ -1681,21 +1680,26 @@ export class Stack {
       this.internal.projections = merge(this.contentStore.projections, this.internal.except)
     }
 
+    // set default limit, if .limit() hasn't been called
     if (!(this.internal.limit)) {
       this.internal.limit = this.contentStore.limit
     }
 
+    // set default skip, if .skip() hasn't been called
     if (!(this.internal.skip)) {
       this.internal.skip = this.contentStore.skip
     }
 
+    // set default locale, if no locale has been passed
     if (!(this.q.locale)) {
       this.q.locale = this.config.locales[0].code
     }
 
+    // if querying for content types, remove if any locale has been set
     if (this.q.content_type_uid === this.types.content_types) {
       delete this.q.locale
     }
+
 
     const filters = {
       content_type_uid: this.q.content_type_uid,
@@ -1711,6 +1715,18 @@ export class Stack {
           filters,
           {
             uid: this.q.content_type_uid,
+          },
+        ],
+      }
+    } else if (this.q.content_type_uid === this.types.assets) {
+      // since, content type will take up 1 item-space
+      queryFilters = {
+        $and: [
+          filters,
+          {
+            _version: {
+              $exists: true
+            }
           },
         ],
       }

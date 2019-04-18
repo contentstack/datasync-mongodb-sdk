@@ -31,6 +31,8 @@ const util_1 = require("./util");
 class Stack {
     constructor(stackConfig, existingDB) {
         this.config = lodash_1.merge(config_1.config, stackConfig);
+        // validates config.locales property
+        util_1.validateConfig(this.config);
         this.contentStore = this.config.contentStore;
         this.types = this.contentStore.internalContentTypes;
         this.q = {};
@@ -199,7 +201,6 @@ class Stack {
             [index]: type
         })
             .then(() => {
-            console.info(`Index '${index}' created successfully!`);
             return;
         });
     }
@@ -237,7 +238,7 @@ class Stack {
         if (!(code) || typeof code !== 'string' || !(lodash_1.find(this.config.locales, {
             code
         }))) {
-            throw new Error(`Language queried is invalid ${code}`);
+            throw new Error(`Language ${code} is invalid!`);
         }
         this.q.locale = code;
         return this;
@@ -1423,9 +1424,7 @@ class Stack {
             let queryFilters = this.preProcess(query);
             if (this.internal.includeSpecificReferences) {
                 const projections = yield this.excludeSpecificReferences(this.internal.includeSpecificReferences, this.q.content_type_uid, this.internal.hasOwnProperty('only'));
-                console.log('projections', projections);
                 this.internal.projections = lodash_1.merge(this.internal.projections, projections);
-                console.log('this.internal.projections', this.internal.projections);
             }
             if (this.internal.sort) {
                 this.collection = this.collection.find(queryFilters).sort(this.internal.sort);
@@ -1607,15 +1606,19 @@ class Stack {
         else {
             this.internal.projections = lodash_1.merge(this.contentStore.projections, this.internal.except);
         }
+        // set default limit, if .limit() hasn't been called
         if (!(this.internal.limit)) {
             this.internal.limit = this.contentStore.limit;
         }
+        // set default skip, if .skip() hasn't been called
         if (!(this.internal.skip)) {
             this.internal.skip = this.contentStore.skip;
         }
+        // set default locale, if no locale has been passed
         if (!(this.q.locale)) {
             this.q.locale = this.config.locales[0].code;
         }
+        // if querying for content types, remove if any locale has been set
         if (this.q.content_type_uid === this.types.content_types) {
             delete this.q.locale;
         }
@@ -1628,6 +1631,19 @@ class Stack {
                     filters,
                     {
                         uid: this.q.content_type_uid,
+                    },
+                ],
+            };
+        }
+        else if (this.q.content_type_uid === this.types.assets) {
+            // since, content type will take up 1 item-space
+            queryFilters = {
+                $and: [
+                    filters,
+                    {
+                        _version: {
+                            $exists: true
+                        }
                     },
                 ],
             };

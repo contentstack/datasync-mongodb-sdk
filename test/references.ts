@@ -152,7 +152,10 @@ describe('# References', () => {
             expect(result).toHaveProperty('entries')
             expect((result as any).content_type_uid).toEqual('blog')
             expect((result as any).entries).toHaveLength(5)
-            expect(entry).not.toHaveProperty('self_reference')
+            if (entry.hasOwnProperty('self_reference')) {
+              expect(entry).toHaveProperty('self_reference')
+              expect(entry.self_reference).toEqual({})
+            }
           })
         }).catch((error) => {
           expect(error).toBeNull()
