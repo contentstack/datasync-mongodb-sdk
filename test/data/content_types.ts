@@ -32,7 +32,7 @@ export const content_types = [
     },
     title: 'Blog',
     uid: 'blog',
-    reference: {
+    references: {
       authors: 'author',
       self_reference: 'blog'
     }
@@ -70,7 +70,7 @@ export const content_types = [
     },
     title: 'Author',
     uid: 'author',
-    reference: {
+    references: {
       blogs: 'blog',
       self_reference: 'author'
     }

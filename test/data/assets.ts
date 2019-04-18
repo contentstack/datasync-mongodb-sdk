@@ -1,5 +1,6 @@
 export const assets = [
   {
+    _version: 1,
     content_type_uid: '_assets',
     locale: 'en-us',
     sys_keys: {
@@ -14,6 +15,7 @@ export const assets = [
     'https://images.contentstack.io/v3/assets/blt44d99c34b040fa61/blt6788d40f2aaaab9a/5c5aae49005d89b20bb85c21/cnn.png',
   },
   {
+    _version: 1,
     content_type_uid: '_assets',
     locale: 'en-us',
     sys_keys: {
@@ -28,6 +30,7 @@ export const assets = [
     'https://images.contentstack.io/v3/assets/blt44d99c34b040fa61/blt6788d40f2aaaab9a/5c5aae49005d89b20bb85c21/cnn.png',
   },
   {
+    _version: 2,
     content_type_uid: '_assets',
     locale: 'en-us',    sys_keys: {
       content_type_uid : '_assets',
