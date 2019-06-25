@@ -22,3 +22,7 @@ export declare const validateURI: (uri: any) => string;
  */
 export declare const checkCyclic: (uid: any, mapping: any) => boolean;
 export declare const validateConfig: (config: any) => void;
+export declare const getCollectionName: ({ locale, content_type_uid }: {
+    locale: any;
+    content_type_uid: any;
+}, collection: any) => string;

@@ -12,9 +12,10 @@
  */
 export declare class Stack {
     private q;
+    private readonly collectionNames;
     private config;
     private contentStore;
-    private types;
+    private readonly types;
     private client;
     private collection;
     private internal;
@@ -89,8 +90,7 @@ export declare class Stack {
      *
      * @returns {object} Mongodb 'db' instance
      */
-    connect(overrides?: {}): Promise<{}>;
-    private createIndexes;
+    connect(overrides?: {}): Promise<any>;
     /**
      * @public
      * @method close
@@ -896,6 +896,7 @@ export declare class Stack {
      */
     getQuery(): any;
     include(fields: any): this;
+    private getContentTypeSchema;
     /**
      * @method find
      * @description
@@ -983,6 +984,21 @@ export declare class Stack {
      * @returns {object} Returns the formatted version of the `result` object
      */
     private postProcess;
+    private includeAssetsOnly;
+    /**
+     * @summary
+     * Internal method, that iteratively calls itself and binds entries reference
+     * @param {Object} entry - An entry or a collection of entries, who's references are to be found
+     * @param {String} contentTypeUid - Content type uid
+     * @param {String} locale - Locale, in which the reference is to be found
+     * @param {Object} include - Array of field paths, to be included
+     * @returns {Object} - Returns `entries`, that has all of its reference binded
+     */
+    private includeSpecificReferences;
+    private fetchPathDetails;
+    private includeReferenceIteration;
+    private getReferencePath;
+    private fetchEntries;
     /**
      * @private
      * @method includeReferencesI
@@ -994,23 +1010,4 @@ export declare class Stack {
      * @returns {object} Returns `entry`, that has all of its reference binded
      */
     private includeReferencesI;
-    private isPartOfInclude;
-    /**
-     * @summary
-     *  Internal method, that iteratively calls itself and binds entries reference
-     * @param {Object} entry - An entry or a collection of entries, who's references are to be found
-     * @param {String} locale - Locale, in which the reference is to be found
-     * @param {Object} references - A map of uids tracked thusfar (used to detect cycle)
-     * @param {String} parentUid - Entry uid, which is the parent of the current `entry` object
-     * @returns {Object} - Returns `entry`, that has all of its reference binded
-     */
-    private includeSpecificReferences;
-    /**
-     * [
-     *  'category.authors'
-     *  'category'
-     *  'authors.types'
-     * ]
-     */
-    private excludeSpecificReferences;
 }

@@ -56,35 +56,37 @@ const getParents = (child, mapping) => {
   return parents
 }
 
-const validateLocales = (config) => {
-  if (!(config.locales) || typeof config.locales !== 'object' || !(config.locales instanceof Array)) {
-    throw new Error(`Kindly provide 'config.locales: [ { code: '' }, ...]'`)
-  }
-
-  config.locales.forEach((locale) => {
-    if (!(locale) || typeof locale.code !== 'string' || locale.code.length === 0) {
-      throw new Error(`Locale ${locale} is invalid!`)
-    }
-  })
-
-  return
-}
-
 const validateContentStore = (contentStore) => {
   if (typeof contentStore.dbName !== 'string' || contentStore.dbName.length === 0) {
     throw new Error(`Contentstore dbName should be of type string and not empty!`)
   }
 
-  if (typeof contentStore.collectionName !== 'string' || contentStore.collectionName.length === 0) {
-    throw new Error(`Contentstore collectionName should be of type string and not empty!`)
+  if (typeof contentStore.collectionName === 'string') {
+    contentStore.collection = {
+      asset: contentStore.collectionName,
+      entry: contentStore.collectionName,
+      schema: contentStore.collectionName,
+    }
+
+    delete contentStore.collectionName
   }
 
   return
 }
 
 export const validateConfig = (config) => {
-  validateLocales(config)
   validateContentStore(config.contentStore)
 
   return
+}
+
+export const getCollectionName = ({locale, content_type_uid}, collection) => {
+  switch (content_type_uid) {
+    case '_assets':
+      return `${locale}.${collection.asset}`
+    case '_content_types':
+      return `${locale}.${collection.schema}`
+    default:
+      return `${locale}.${collection.entry}`
+  }
 }

@@ -7,11 +7,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.config = {
     contentStore: {
-        collectionName: 'contents',
-        dbName: 'contentstack-persistent-db',
+        collection: {
+            entry: 'contents',
+            asset: 'contents',
+            schema: 'content_types',
+        },
+        dbName: 'contentstack-db',
         indexes: {
-            published_at: -1,
-            content_type_uid: 1,
+            event_at: -1,
+            _content_type_uid: 1,
             locale: 1,
             uid: 1
         },
@@ -20,7 +24,7 @@ exports.config = {
             assets: '_assets'
         },
         limit: 100,
-        locales: [],
+        locale: 'en-us',
         // http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html
         options: {
             autoReconnect: true,
@@ -34,9 +38,10 @@ exports.config = {
         projections: {
             _id: 0,
             _version: 0,
-            content_type_uid: 0,
+            _content_type_uid: 0,
+            _synced_at: 0,
+            app_user_object_uid: 0,
             created_at: 0,
-            sys_keys: 0,
             updated_at: 0,
             updated_by: 0,
         },
