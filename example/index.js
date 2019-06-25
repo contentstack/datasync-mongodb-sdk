@@ -1,19 +1,14 @@
 const Contentstack = require('../dist').Contentstack
 
 const Stack = Contentstack.Stack({
-  locales: [
-    {
-      code: 'en-us',
-      relative_url_prefix: '/'
-    },
-    {
-      code: 'es-es',
-      relative_url_prefix: '/es/'
-    }
-  ],
+  // locale: 'en-us',
   contentStore: {
-    dbName: 'mydb',
-    collectionName: 'dev'
+    dbName: 'references',
+    collection: {
+      entry: 'contents',
+      asset: 'contents',
+      schema: 'content_types'
+    }
   }
 })
 
@@ -29,18 +24,26 @@ function close () {
   return Stack.close()
 }
 
-function find (contentType = 'authors') {
+function find (contentType = 'blog') {
   return new Promise((resolve, reject) => {
     Stack.contentType(contentType)
       .entries()
-      .includeCount()
-      .includeReferences()
-      .includeSchema()
-      .language('es-es')
-      .notEqualTo('title', 'Kolan')
-      .query({tags: {$in: ['one', 'two']}})
-      .limit(10)
-      .skip(1)
+      // .includeCount()
+      // .include(['reference_b'])
+      // .include([
+      //   'group.group.reference.reference_b.reference.reference',
+      // ])
+      // .include(['group.group.reference.reference_b.reference.reference', 'group.group.reference.reference_one',
+      //   'group.group.reference.reference_two', 'group.group.reference.self_reference',
+      //   'modular_blocks.block_one.reference', 'modular_blocks.block_two.group.reference.authors',
+      //   'modular_blocks.block_two.group.reference.categories'
+      // ])
+      // .includeSchema()
+      // .language('es-es')
+      // .notEqualTo('title', 'Kolan')
+      // .query({tags: {$in: ['one', 'two']}})
+      .limit(1)
+      // .skip(1)
       .find()
       .then(resolve)
       .catch(reject)
@@ -49,8 +52,10 @@ function find (contentType = 'authors') {
 
 return connect()
   .then(() => {
+    console.time('t')
     return find()
       .then((result) => {
+        console.timeEnd('t')
         const keys = Object.keys(result)
         // Sample output
         // {

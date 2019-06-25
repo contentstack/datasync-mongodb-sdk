@@ -5,11 +5,15 @@
  */
 export declare const config: {
     contentStore: {
-        collectionName: string;
+        collection: {
+            entry: string;
+            asset: string;
+            schema: string;
+        };
         dbName: string;
         indexes: {
-            published_at: number;
-            content_type_uid: number;
+            event_at: number;
+            _content_type_uid: number;
             locale: number;
             uid: number;
         };
@@ -18,7 +22,7 @@ export declare const config: {
             assets: string;
         };
         limit: number;
-        locales: any[];
+        locale: string;
         options: {
             autoReconnect: boolean;
             connectTimeoutMS: number;
@@ -31,9 +35,10 @@ export declare const config: {
         projections: {
             _id: number;
             _version: number;
-            content_type_uid: number;
+            _content_type_uid: number;
+            _synced_at: number;
+            app_user_object_uid: number;
             created_at: number;
-            sys_keys: number;
             updated_at: number;
             updated_by: number;
         };
