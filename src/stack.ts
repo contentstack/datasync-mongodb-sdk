@@ -10,41 +10,41 @@ import {
   map,
   merge,
   remove,
-  uniq
+  uniq,
 } from 'lodash'
 import {
   Db,
-  MongoClient
+  MongoClient,
 } from 'mongodb'
 import sift from 'sift'
 import {
-  config
+  config,
 } from './config'
 import {
   checkCyclic,
+  getCollectionName,
   validateConfig,
   validateURI,
-  getCollectionName
 } from './util'
 
 interface IShelf {
   path: string,
-    position: string,
-    uid: string,
+  position: string,
+  uid: string,
 }
 
 interface IQueryInterface {
-  $or: {
+  $or: Array<{
     _content_type_uid: string,
     uid: string,
     locale: string,
-  }[]
+  }>
 }
 
 interface ICollectionNames {
   asset: string,
-    entry: string,
-    schema: string,
+  entry: string,
+  schema: string,
 }
 
 /**
@@ -57,8 +57,8 @@ interface ICollectionNames {
 export class Stack {
   private q: any
   private readonly collectionNames: ICollectionNames
-  private config: any
-  private contentStore: any
+  private readonly config: any
+  private readonly contentStore: any
   private readonly types: any
   private client: any
   private collection: any
@@ -194,7 +194,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {object} Mongodb 'db' instance
    */
   public async connect (overrides = {}) {
@@ -209,6 +209,7 @@ export class Stack {
 
     await client.connect()
     this.db = client.db(dbName)
+
     return this.db
 
     // // Create indexes in the background
@@ -350,7 +351,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public or(queries) {
@@ -371,9 +372,11 @@ export class Stack {
    * @public
    * @method lessThan
    * @summary Comparison $lt query wrapper
-   * @description 
-   * Compares the field/key provided against the provided value. Only documents that have lower value than the one provided are returned.
-   * Check https://docs.mongodb.com/manual/reference/operator/query/lt/ and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
+   * @description
+   * Compares the field/key provided against the provided value.
+   * Only documents that have lower value than the one provided are returned.
+   * Check https://docs.mongodb.com/manual/reference/operator/query/lt/
+   * and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
    * @param {string} key Field to compare against
    * @param {*} value Value to compare with
    * @example
@@ -414,8 +417,10 @@ export class Stack {
    * @method lessThanOrEqualTo
    * @summary Comparison $lte query wrapper
    * @description 
-   * Compares the field/key provided against the provided value. Only documents that have lower or equal value than the one provided are returned.
-   * Check https://docs.mongodb.com/manual/reference/operator/query/lte/ and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
+   * Compares the field/key provided against the provided value.
+   * Only documents that have lower or equal value than the one provided are returned.
+   * Check https://docs.mongodb.com/manual/reference/operator/query/lte/
+   * and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
    * @param {string} key Field to compare against
    * @param {*} value Value to compare with
    * @example
@@ -455,9 +460,11 @@ export class Stack {
    * @public
    * @method greaterThan
    * @summary Comparison $gt query wrapper
-   * @description 
-   * Compares the field/key provided against the provided value. Only documents that have greater value than the one provided are returned.
-   * Check {@link https://docs.mongodb.com/manual/reference/operator/query/gt/ }and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
+   * @description
+   * Compares the field/key provided against the provided value.
+   * Only documents that have greater value than the one provided are returned.
+   * Check {@link https://docs.mongodb.com/manual/reference/operator/query/gt/ }
+   * and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
    * @param {string} key Field to compare against
    * @param {*} value Value to compare with
    * @example
@@ -498,8 +505,10 @@ export class Stack {
    * @method greaterThanOrEqualTo
    * @summary Comparison $gte query wrapper
    * @description 
-   * Compares the field/key provided against the provided value. Only documents that have greater than or equal value than the one provided are returned.
-   * Check https://docs.mongodb.com/manual/reference/operator/query/gte/ and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
+   * Compares the field/key provided against the provided value.
+   * Only documents that have greater than or equal value than the one provided are returned.
+   * Check https://docs.mongodb.com/manual/reference/operator/query/gte/ and
+   * https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
    * @param {string} key - Field to compare against
    * @param {*} value - Value to compare with
    * @example
@@ -540,13 +549,15 @@ export class Stack {
    * @method notEqualTo
    * @summary Comparison $ne query wrapper
    * @description 
-   * Compares the field/key provided against the provided value. Only documents that have value not equals than the one provided are returned.
-   * 
+   * Compares the field/key provided against the provided value.
+   * Only documents that have value not equals than the one provided are returned.
+   *
    * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/ne/}.
-   * 
+   *
    * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
-   * 
-   * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
+   *
+   * Comparison ordering
+   * {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
    * @param {string} key Field to compare against
    * @param {*} value Value to compare with
    * @example
@@ -586,17 +597,19 @@ export class Stack {
    * @public
    * @method containedIn
    * @summary Comparison $in query wrapper
-   * @description 
-   * Compares the field/key provided against the provided value. Only documents that have value contained in the field/key provided are returned.
-   * 
+   * @description
+   * Compares the field/key provided against the provided value.
+   * Only documents that have value contained in the field/key provided are returned.
+   *
    * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/in/}.
-   * 
+   *
    * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
-   * 
-   * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
+   *
+   * Comparison ordering 
+   * {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
    * @param {string} key Field to compare against
    * @param {*} value Value to compare with
-   * 
+   *
    * @example
    * Stack
    *  .contentType('')
@@ -635,13 +648,15 @@ export class Stack {
    * @method notContainedIn
    * @summary Comparison $nin query wrapper
    * @description 
-   * Compares the field/key provided against the provided value. Only documents that have value not contained in the field/key provided are returned.
-   * 
+   * Compares the field/key provided against the provided value.
+   * Only documents that have value not contained in the field/key provided are returned.
+   *
    * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/nin/}.
-   * 
+   *
    * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
-   * 
-   * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
+   *
+   * Comparison ordering 
+   * {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
    * @param {string} key Field to compare against
    * @param {*} value Value to compare with
    * 
@@ -683,13 +698,15 @@ export class Stack {
    * @method exists
    * @summary Element $exists query wrapper, checks if a field exists
    * @description 
-   * Compares the field/key provided against the provided value. Only documents that have the field/key specified are returned.
-   * 
+   * Compares the field / key provided against the provided value.Only documents that have the field /
+   *  key specified are returned.
+   *
    * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/exists/}.
-   * 
+   *
    * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
-   * 
-   * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
+   *
+   * Comparison ordering {
+     @link https: //docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
    * @param {string} key Field to compare against
    * @param {*} value Value to compare with
    * 
@@ -731,14 +748,15 @@ export class Stack {
    * @method notExists
    * @summary
    * Property $exists query wrapper, checks if a field does not exists
-   * @description 
+   * @description
    * Compares the field/key provided against the provided value. Only documents that do not have the key are returned.
-   * 
+   *
    * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/exists/}.
-   * 
+   *
    * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
-   * 
-   * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
+   *
+   * Comparison ordering {
+     @link https: //docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
    * @param {string} key Field to compare against
    * @param {*} value Value to compare with
    * @example
@@ -790,7 +808,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public contentType(uid) {
@@ -817,7 +835,8 @@ export class Stack {
    *  .entry()
    *  .find()
    *  .then((result) => {
-   *    // returns the entry based on its 'uid', if not provided, it would return the 1st entry found in 'blog' content type
+   *    // returns the entry based on its 'uid', 
+   *    // if not provided, it would return the 1st entry found in 'blog' content type
    *  })
    *  .catch((error) => {
    *    // handle query errors
@@ -842,7 +861,7 @@ export class Stack {
    * @method entries
    * @description
    * Query for a set of entries on a content type
-   * 
+   *
    * @example
    * Stack
    *  .contentType('blog')
@@ -854,7 +873,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public entries() {
@@ -869,7 +888,7 @@ export class Stack {
    * @method asset
    * @description
    * Query for a single asset
-   * 
+   *
    * @param {string} uid Asset uid to be found, if not provided,
    *  by default returns the 1st element from assets.
    * @example
@@ -882,7 +901,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public asset(uid ? ) {
@@ -902,7 +921,7 @@ export class Stack {
    * @method assets
    * @description
    * Query for a set of assets
-   * 
+   *
    * @example
    * Stack
    *  .assets()
@@ -913,7 +932,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public assets() {
@@ -928,10 +947,10 @@ export class Stack {
    * @method schema
    * @description
    * Query for a single content type's schema
-   * 
+   *
    * @param {string} uid Content type uid to be found, if not provided,
    *  by default returns the 1st element from content types
-   * 
+   *
    * @example
    * Stack
    *  .schema('blog')
@@ -942,7 +961,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public schema(uid ? ) {
@@ -973,7 +992,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public schemas() {
@@ -987,9 +1006,9 @@ export class Stack {
   /**
    * Parameter - used to limit the total no of items returned/scanned
    * Defaults to 100 (internally, which is overridden)
-   * 
+   *
    * @param {number} no Max count of the 'items' returned
-   * 
+   *
    * @example
    * Stack
    *  .contentType('blog')
@@ -1003,7 +1022,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public limit(no) {
@@ -1018,9 +1037,9 @@ export class Stack {
   /**
    * Parameter - used to skip initial no of items scanned
    * Defaults to 0 (internally, which is overridden)
-   * 
+   *
    * @param {number} no Min count of the 'items' to be scanned
-   * 
+   *
    * @example
    * Stack
    *  .contentType('blog')
@@ -1034,7 +1053,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public skip(no) {
@@ -1049,7 +1068,7 @@ export class Stack {
   /**
    * Wrapper around a raw query wrapper
    * @param {object} queryObject Query filter
-   * 
+   *
    * @example
    * Stack
    *  .contentType('blog')
@@ -1062,7 +1081,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public query(queryObject = {}) {
@@ -1092,7 +1111,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public only(fields) {
@@ -1127,7 +1146,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public except(fields) {
@@ -1238,13 +1257,16 @@ export class Stack {
    * @method where
    * @summary Pass JS expression or a full function to the query system
    * @description
-   * Use the $where operator to pass either a string containing a JavaScript expression or a full JavaScript function to the query system.
-   * The $where provides greater flexibility, but requires that the database processes the JavaScript expression or function for each document in the collection.
+   * Use the $where operator to pass either a string containing a JavaScript expression or a full JavaScript
+   * function to the query system.
+   * The $where provides greater flexibility, but requires that the database processes the JavaScript expression or
+   * function for each document in the collection.
    * Reference the document in the JavaScript expression or function using either this or obj.
    * Only apply the $where query operator to top-level documents.
    * The $where query operator will not work inside a nested document, for instance, in an $elemMatch query. 
    * Ref. - https://docs.mongodb.com/manual/reference/operator/query/where/index.html
-   * @param {*} expr Pass either a string containing a JavaScript expression or a full JavaScript function to the query system.
+   * @param { * } expr Pass either a string containing a JavaScript expression or a full JavaScript
+   * function to the query system.
    * @example
    * Stack
    *  .contentType('blog')
@@ -1363,7 +1385,8 @@ export class Stack {
   /**
    * @description
    * Includes all references of the entries being returned.
-   * Note: This is a slow method, since it iteratively queries all the references and their references, binds them and returns
+   * Note: This is a slow method, since it iteratively queries all the references and their references,
+   * binds them and returns
    * @example
    * Stack
    *  .contentType('blog')
@@ -1390,7 +1413,7 @@ export class Stack {
    * @description
    * Excludes all references of the entries being scanned
    * Note: On calling this, assets will not be binded in the result being returned.
-   * 
+   *
    * @example
    * Stack
    *  .contentType('blog')
@@ -1403,7 +1426,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public excludeReferences() {
@@ -1416,7 +1439,9 @@ export class Stack {
    * @method queryReferences
    * @description
    * Wrapper, that allows querying on the entry's references.
-   * Note: This is a slow method, since it scans all documents and fires the `reference` query on them. Once the references are binded, the query object passed is used for filtering
+   * Note: This is a slow method, since it scans all documents and fires the `reference`
+   * query on them.Once the references are binded, the query object passed is used
+   * for filtering
    * Use `.query()` filters to reduce the total no of documents being scanned
    * 
    * @example
@@ -1483,19 +1508,6 @@ export class Stack {
     }
 
     return this
-  }
-
-  private async getContentTypeSchema (locale, content_type_uid) {
-    return this.db.collection(getCollectionName({
-        locale,
-        content_type_uid: '_content_types'
-      }, this.collectionNames))
-      .findOne({
-        uid: content_type_uid
-      }, {
-        _synced_at: 0,
-        _id: 0,
-      })
   }
 
   /**
@@ -1638,7 +1650,7 @@ export class Stack {
                 this.cleanup()
 
                 return resolve({
-                  count: result
+                  count: result,
                 })
               })
           })
@@ -1689,13 +1701,22 @@ export class Stack {
    * @returns {object} - Returns an object, that has been processed, filtered and referenced
    */
   public findOne(query = {}) {
-    return new Promise((resolve, reject) => {
-      this.internal.single = true
+    this.internal.single = true
 
-      return this.find(query)
-        .then(resolve)
-        .catch(reject)
-    })
+    return this.find(query)
+  }
+
+  private async getContentTypeSchema (locale, contentTypeUid) {
+    return this.db.collection(getCollectionName({
+        content_type_uid: '_content_types',
+        locale,
+      }, this.collectionNames))
+      .findOne({
+        uid: contentTypeUid,
+      }, {
+        _id: 0,
+        _synced_at: 0,
+      })
   }
 
   /**
@@ -1747,8 +1768,8 @@ export class Stack {
           filters,
           {
             _version: {
-              $exists: true
-            }
+              $exists: true,
+            },
           },
         ],
       }
@@ -1757,8 +1778,8 @@ export class Stack {
     }
 
     this.collection = this.db.collection(getCollectionName({
+      content_type_uid: this.q.content_type_uid,
       locale: this.q.locale,
-      content_type_uid: this.q.content_type_uid
     }, this.collectionNames))
 
     return queryFilters
@@ -1838,13 +1859,16 @@ export class Stack {
     return result
   }
 
-  private async includeAssetsOnly(entries: any[], contentTypeUid: string, locale: string) {
-    const schema = await this.db.collection(getCollectionName({locale, content_type_uid: '_content_types'}, this.collectionNames))
+  private async includeAssetsOnly (entries: any[], contentTypeUid: string, locale: string) {
+    const schema = await this.db
+      .collection(getCollectionName({
+        content_type_uid: '_content_types',
+        locale,
+      }, this.collectionNames))
       .findOne({
         _content_type_uid: '_content_types',
-        uid: contentTypeUid
-      },
-      {
+        uid: contentTypeUid,
+      }, {
         _assets: 1,
         _id: 0,
       })
@@ -1857,7 +1881,7 @@ export class Stack {
     const paths = Object.keys(assetPaths)
     const shelf = []
     const queryBucket = {
-      $or: []
+      $or: [],
     }
 
     for (let i = 0, j = paths.length; i < j; i++) {
@@ -1868,13 +1892,16 @@ export class Stack {
       return
     }
 
-    const assets = await this.db.collection(getCollectionName({locale, content_type_uid: '_assets'}, this.collectionNames))
-      .find(queryBucket)
-      .project({
-        _id: 0,
-        _content_type_uid: 0,
-      })
-      .toArray()
+    const assets = await this.db.collection(getCollectionName({
+      content_type_uid: '_assets',
+      locale,
+    }, this.collectionNames))
+    .find(queryBucket)
+    .project({
+      _content_type_uid: 0,
+      _id: 0,
+    })
+    .toArray()
     // console.log('@assets', JSON.stringify(assets))
     // console.log('@shelf', JSON.stringify(shelf))
     for (let l = 0, m = shelf.length; l < m; l++) {
@@ -1898,7 +1925,7 @@ export class Stack {
    * @param {Object} include - Array of field paths, to be included
    * @returns {Object} - Returns `entries`, that has all of its reference binded
    */
-  private async includeSpecificReferences (entries: any[], contentTypeUid: string, locale: string, include: string[]) {
+  private async includeSpecificReferences(entries: any[], contentTypeUid: string, locale: string, include: string[]) {
     const ctQuery = {
       _content_type_uid: '_content_types',
       uid: contentTypeUid,
@@ -1914,7 +1941,9 @@ export class Stack {
     // console.log('pending paths: ' + pendingPath)
     // console.log('schema list: ' + JSON.stringify(schemaList))
 
-    const queries = { $or: [] } // reference field paths
+    const queries = {
+      $or: []
+    } // reference field paths
     const shelf = [] // a mapper object, that holds pointer to the original element
 
     // iterate over each path in the entries and fetch the references
@@ -1938,95 +1967,98 @@ export class Stack {
   }
 
   private fetchPathDetails(data: any, locale: string, pathArr: string[], queryBucket: IQueryInterface, shelf,
-    assetsOnly = false, parent, pos, counter = 0) {
-      if (counter === (pathArr.length)) {
-        // console.log('data', data)
-        // console.log('parent', parent)
-        if (data && typeof data === 'object') {
-          // console.log('data is object')
-          if (data instanceof Array && data.length) {
-            // console.log('data is array')
-            data.forEach((elem, idx) => {
-              // console.log('elem', elem)
-              if (typeof elem === 'string') {
-                queryBucket.$or.push({
-                  _content_type_uid: '_assets',
-                  uid: elem,
-                  locale,
-                })
-  
-                shelf.push({
-                  path: data,
-                  position: idx,
-                  uid: elem,
-                })
-              } else if (elem && typeof elem === 'object' && elem.hasOwnProperty('_content_type_uid')) {
-                queryBucket.$or.push({
-                  _content_type_uid: elem._content_type_uid,
-                  uid: elem.uid,
-                  locale,
-                })
-
-                shelf.push({
-                  path: data,
-                  position: idx,
-                  uid: elem.uid,
-                })
-              }
-            })
-          } else if (typeof data === 'object') {
-            // console.log('data is plain object')
-            if (data.hasOwnProperty('_content_type_uid')) {
+      assetsOnly = false, parent, pos, counter = 0) {
+    if (counter === (pathArr.length)) {
+      // console.log('data', data)
+      // console.log('parent', parent)
+      if (data && typeof data === 'object') {
+        // console.log('data is object')
+        if (data instanceof Array && data.length) {
+          // console.log('data is array')
+          data.forEach((elem, idx) => {
+            // console.log('elem', elem)
+            if (typeof elem === 'string') {
               queryBucket.$or.push({
-                _content_type_uid: data._content_type_uid,
-                uid: data.uid,
+                _content_type_uid: '_assets',
                 locale,
+                uid: elem,
               })
-  
+
               shelf.push({
-                path: parent,
-                position: pos,
-                uid: data.uid,
+                path: data,
+                position: idx,
+                uid: elem,
+              })
+            } else if (elem && typeof elem === 'object' && elem.hasOwnProperty('_content_type_uid')) {
+              queryBucket.$or.push({
+                _content_type_uid: elem._content_type_uid,
+                locale,
+                uid: elem.uid,
+              })
+
+              shelf.push({
+                path: data,
+                position: idx,
+                uid: elem.uid,
               })
             }
+          })
+        } else if (typeof data === 'object') {
+          // console.log('data is plain object')
+          if (data.hasOwnProperty('_content_type_uid')) {
+            queryBucket.$or.push({
+              _content_type_uid: data._content_type_uid,
+              locale,
+              uid: data.uid,
+            })
+
+            shelf.push({
+              path: parent,
+              position: pos,
+              uid: data.uid,
+            })
           }
-        } else if (typeof data === 'string') {
-          // console.log('data is string')
-          queryBucket.$or.push({
-            _content_type_uid: '_assets',
-            uid: data,
-            locale,
-          })
-  
-          // console.log('shelf for assets: ' + JSON.stringify(parent), pos)
-          shelf.push({
-            path: parent,
-            position: pos,
-            uid: data,
-          })
+        }
+      } else if (typeof data === 'string') {
+        // console.log('data is string')
+        queryBucket.$or.push({
+          _content_type_uid: '_assets',
+          locale,
+          uid: data,
+        })
+
+        // console.log('shelf for assets: ' + JSON.stringify(parent), pos)
+        shelf.push({
+          path: parent,
+          position: pos,
+          uid: data,
+        })
+      }
+    } else {
+      const currentField = pathArr[counter]
+      // console.log('path not over. current field is', currentField)
+      counter++
+      if (data instanceof Array) {
+        // tslint:disable-next-line: prefer-for-of
+        for (let i = 0; i < data.length; i++) {
+          if (data[i][currentField]) {
+            // console.log('data was array, lookin for field in data.current field')
+            this.fetchPathDetails(data[i][currentField], locale, pathArr, queryBucket, shelf, assetsOnly, data[i],
+              currentField, counter)
+          }
         }
       } else {
-        const currentField = pathArr[counter]
-        // console.log('path not over. current field is', currentField)
-        counter++
-        if (data instanceof Array) {
-          for (let i = 0; i < data.length; i++) {
-            if (data[i][currentField]) {
-              // console.log('data was array, lookin for field in data.current field')
-              this.fetchPathDetails(data[i][currentField], locale, pathArr, queryBucket, shelf, assetsOnly, data[i], currentField, counter)
-            }
-          }
-        } else {
-          if (data[currentField]) {
-            // console.log('data was object, lookin for field in data.current field')
-            this.fetchPathDetails(data[currentField], locale, pathArr, queryBucket, shelf, assetsOnly, data, currentField, counter)
-          }
+        if (data[currentField]) {
+          // console.log('data was object, lookin for field in data.current field')
+          this.fetchPathDetails(data[currentField], locale, pathArr, queryBucket, shelf, assetsOnly, data,
+            currentField, counter)
         }
+      }
     }
-  
+
     // since we've reached last of the paths, return!
     return
-    }
+  }
 
   private async includeReferenceIteration (eQuery: any, ctQuery: any, locale: string, include: string[], oldShelf:
     IShelf[]) {
@@ -2037,7 +2069,7 @@ export class Stack {
     const {
       paths,
       pendingPath,
-      schemaList
+      schemaList,
     } = await this.getReferencePath(ctQuery, locale, include)
 
     // console.log('@paths 2', JSON.stringify(paths))
@@ -2047,7 +2079,7 @@ export class Stack {
     const {
       result,
       queries,
-      shelf
+      shelf,
     } = await this.fetchEntries(eQuery, locale, paths, include)
     // GC to avoid mem leaks!
     // eQuery = null
@@ -2078,16 +2110,16 @@ export class Stack {
   private async getReferencePath (query, locale, currentInclude) {
     // console.log('@schemas::', JSON.stringify(query))
     const schemas = await this.db.collection(getCollectionName({
-        locale,
-        content_type_uid: '_content_types'
-      }, this.collectionNames))
-      .find(query)
-      .project({
-        _references: 1,
-        _assets: 1,
-        _id: 0,
-      })
-      .toArray()
+      content_type_uid: '_content_types',
+      locale,
+    }, this.collectionNames))
+    .find(query)
+    .project({
+      _assets: 1,
+      _id: 0,
+      _references: 1,
+    })
+    .toArray()
 
     const pendingPath = []
     const schemasReferred = []
@@ -2109,6 +2141,7 @@ export class Stack {
     schemas.forEach((schema) => {
       // Entry references
       entryReferences = merge(entryReferences, schema._references)
+      // tslint:disable-next-line: forin
       for (const path in schema._assets) {
         paths.push(path)
       }
@@ -2116,6 +2149,7 @@ export class Stack {
 
     for (let i = 0, j = currentInclude.length; i < j; i++) {
       const includePath = currentInclude[i]
+      // tslint:disable-next-line: forin
       for (const path in entryReferences) {
         const idx = includePath.indexOf(path)
         if (~idx) {
@@ -2165,28 +2199,28 @@ export class Stack {
   private async fetchEntries (query: any, locale: string, paths: string[], include: string[]) {
     // console.log('@fetch entries query', JSON.stringify(query))
     const result = await this.db.collection(getCollectionName({
-        locale,
-        content_type_uid: 'entries'
-      }, this.collectionNames))
-      .find(query)
-      .project({
-        _content_type_uid: 0,
-        _id: 0,
-        _synced_at: 0,
-        event_at: 0,
-      })
-      .toArray()
+      content_type_uid: 'entries',
+      locale,
+    }, this.collectionNames))
+    .find(query)
+    .project({
+      _content_type_uid: 0,
+      _id: 0,
+      _synced_at: 0,
+      event_at: 0,
+    })
+    .toArray()
 
     const queries = {
-      $or: []
+      $or: [],
     }
     const shelf = []
 
     if (result.length === 0) {
       return {
-        result,
         queries,
-        shelf
+        result,
+        shelf,
       }
     }
 
@@ -2203,9 +2237,9 @@ export class Stack {
     }
 
     return {
-      result,
       queries,
-      shelf
+      result,
+      shelf,
     }
   }
 
