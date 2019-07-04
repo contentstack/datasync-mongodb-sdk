@@ -1,7 +1,8 @@
 {
+  "author": "Contentstack Ecosystem <ecosystem@contentstack.com>",
   "name": "datasync-mongodb-sdk",
-  "version": "0.1.0",
-  "description": "Contentstack sync utility's Mongodb SDK",
+  "version": "1.0.0",
+  "description": "DataSync Mongodb SDK. Mongodb query wrapper around contents synced via @contentstack/content-store-mongodb",
   "main": "dist/index.js",
   "scripts": {
     "clean": "rimraf dist typings coverage",
@@ -13,23 +14,42 @@
     "tslint": "npx tslint -c tslint.json 'src/**/*.ts' --fix",
     "test": "jest"
   },
-  "author": "Contentstack Ecosystem",
   "license": "MIT",
   "dependencies": {
     "debug": "4.1.1",
     "lodash": "4.17.11",
     "mongodb": "3.1.12",
-    "sift": "7.0.1"
+    "sift": "8.5.0"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.11",
-    "@types/lodash": "4.14.119",
     "@types/node": "^10.12.18",
+    "@types/jest": "^24.0.15",
+    "@types/lodash": "^4.14.135",
     "@types/rimraf": "^2.0.2",
-    "jest": "^23.6.0",
-    "rimraf": "^2.6.3",
-    "ts-jest": "^23.10.5",
-    "tslint": "^5.12.1",
-    "typescript": "^3.2.4"
-  }
+    "jest": "24.8.0",
+    "rimraf": "2.6.3",
+    "ts-jest": "24.0.2",
+    "tslint": "5.18.0",
+    "typescript": "3.5.2"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "contentstack",
+    "utility",
+    "DataSync",
+    "mongodb-content-store"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/contentstack/datasync-mongodb-sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/contentstack/datasync-mongodb-sdk#readme/issues"
+  },
+  "homepage": "https://www.contentstack.com/docs/guide/synchronization/contentstack-datasync"
 }
