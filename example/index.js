@@ -25,29 +25,9 @@ function close () {
 }
 
 function find (contentType = 'blog') {
-  return new Promise((resolve, reject) => {
-    Stack.contentType(contentType)
+  return Stack.contentType(contentType)
       .entries()
-      // .includeCount()
-      // .include(['reference_b'])
-      // .include([
-      //   'group.group.reference.reference_b.reference.reference',
-      // ])
-      // .include(['group.group.reference.reference_b.reference.reference', 'group.group.reference.reference_one',
-      //   'group.group.reference.reference_two', 'group.group.reference.self_reference',
-      //   'modular_blocks.block_one.reference', 'modular_blocks.block_two.group.reference.authors',
-      //   'modular_blocks.block_two.group.reference.categories'
-      // ])
-      // .includeSchema()
-      // .language('es-es')
-      // .notEqualTo('title', 'Kolan')
-      // .query({tags: {$in: ['one', 'two']}})
-      .limit(1)
-      // .skip(1)
       .find()
-      .then(resolve)
-      .catch(reject)
-  })
 }
 
 return connect()

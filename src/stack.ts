@@ -5,12 +5,9 @@
  */
 
 import {
-  filter,
   find,
-  map,
   merge,
   remove,
-  uniq,
 } from 'lodash'
 import {
   Db,
@@ -21,7 +18,6 @@ import {
   config,
 } from './config'
 import {
-  checkCyclic,
   getCollectionName,
   validateConfig,
   validateURI,
@@ -29,29 +25,29 @@ import {
 
 interface IShelf {
   path: string,
-  position: string,
-  uid: string,
+    position: string,
+    uid: string,
 }
 
-interface IQueryInterface {
-  $or: Array<{
+interface IQuery {
+  $or: Array < {
     _content_type_uid: string,
     uid: string,
-    locale: string,
-  }>
+    locale?: string,
+  } >
 }
 
 interface ICollectionNames {
   asset: string,
-  entry: string,
-  schema: string,
+    entry: string,
+    schema: string,
 }
 
 /**
  * @class Stack
- * @description Expose SDK query methods on Stack
+ * @descriptionExpose SDK query methods on Stack
  * @constructor
- * @description Provides a range of connection/disconnect, filters and projections on mongodb
+ * @descriptionProvides a range of connection/disconnect, filters and projections on mongodb
  * @returns {Stack} Returns an instance of `Stack`
  */
 export class Stack {
@@ -97,7 +93,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public ascending(field ? ) {
@@ -134,7 +130,7 @@ export class Stack {
    * @description
    * The sort function requires that the entire sort be able to complete within 32 megabytes.
    * When the sort option consumes more than 32 megabytes, MongoDB will return an error.
-   * 
+   *
    * @param {string} field The field to sort in descending order
    * @example
    * Stack
@@ -148,7 +144,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public descending(field ? ) {
@@ -182,7 +178,7 @@ export class Stack {
    * @method connect
    * @summary
    * Establish connection to mongodb
-   * 
+   *
    * @param {object} overrides Config overrides/mongodb specific config
    * @example
    * Stack
@@ -197,7 +193,7 @@ export class Stack {
    *
    * @returns {object} Mongodb 'db' instance
    */
-  public async connect (overrides = {}) {
+  public async connect(overrides = {}) {
 
     const dbConfig = merge({}, this.config, overrides).contentStore
 
@@ -255,7 +251,7 @@ export class Stack {
    * @method language
    * @description
    * Locale to query on
-   * 
+   *
    * @param {string} code Query locale's code
    * @example
    * Stack
@@ -270,12 +266,12 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public language(code) {
     if (!(code) || typeof code !== 'string' || !(find(this.config.locales, {
-        code
+        code,
       }))) {
       throw new Error(`Language ${code} is invalid!`)
     }
@@ -288,7 +284,7 @@ export class Stack {
    * @public
    * @method and
    * @summary Logical AND query wrapper
-   * @description Accepts 2 queries and returns only those documents, that satisfy both the query conditions
+   * @descriptionAccepts 2 queries and returns only those documents, that satisfy both the query conditions
    * @param {object} queries Query filter
    * @example
    * Stack
@@ -309,7 +305,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public and(queries) {
@@ -330,7 +326,7 @@ export class Stack {
    * @public
    * @method or
    * @summary Logical OR query wrapper
-   * @description Accepts 2 queries and returns only those documents, that satisfy either of the query conditions
+   * @descriptionAccepts 2 queries and returns only those documents, that satisfy either of the query conditions
    * @param {object} queries Query filter
    * @example
    * Stack
@@ -391,7 +387,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public lessThan(key, value) {
@@ -416,7 +412,7 @@ export class Stack {
    * @public
    * @method lessThanOrEqualTo
    * @summary Comparison $lte query wrapper
-   * @description 
+   * @description
    * Compares the field/key provided against the provided value.
    * Only documents that have lower or equal value than the one provided are returned.
    * Check https://docs.mongodb.com/manual/reference/operator/query/lte/
@@ -435,7 +431,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public lessThanOrEqualTo(key, value) {
@@ -479,7 +475,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public greaterThan(key, value) {
@@ -504,7 +500,7 @@ export class Stack {
    * @public
    * @method greaterThanOrEqualTo
    * @summary Comparison $gte query wrapper
-   * @description 
+   * @description
    * Compares the field/key provided against the provided value.
    * Only documents that have greater than or equal value than the one provided are returned.
    * Check https://docs.mongodb.com/manual/reference/operator/query/gte/ and
@@ -523,7 +519,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public greaterThanOrEqualTo(key, value) {
@@ -548,7 +544,7 @@ export class Stack {
    * @public
    * @method notEqualTo
    * @summary Comparison $ne query wrapper
-   * @description 
+   * @description
    * Compares the field/key provided against the provided value.
    * Only documents that have value not equals than the one provided are returned.
    *
@@ -572,7 +568,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public notEqualTo(key, value) {
@@ -605,7 +601,7 @@ export class Stack {
    *
    * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
    *
-   * Comparison ordering 
+   * Comparison ordering
    * {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
    * @param {string} key Field to compare against
    * @param {*} value Value to compare with
@@ -622,7 +618,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public containedIn(key, value) {
@@ -647,7 +643,7 @@ export class Stack {
    * @public
    * @method notContainedIn
    * @summary Comparison $nin query wrapper
-   * @description 
+   * @description
    * Compares the field/key provided against the provided value.
    * Only documents that have value not contained in the field/key provided are returned.
    *
@@ -655,11 +651,11 @@ export class Stack {
    *
    * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
    *
-   * Comparison ordering 
+   * Comparison ordering
    * {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
    * @param {string} key Field to compare against
    * @param {*} value Value to compare with
-   * 
+   *
    * @example
    * Stack
    *  .contentType('')
@@ -672,7 +668,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public notContainedIn(key, value) {
@@ -697,7 +693,7 @@ export class Stack {
    * @public
    * @method exists
    * @summary Element $exists query wrapper, checks if a field exists
-   * @description 
+   * @description
    * Compares the field / key provided against the provided value.Only documents that have the field /
    *  key specified are returned.
    *
@@ -705,11 +701,11 @@ export class Stack {
    *
    * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
    *
-   * Comparison ordering {
-     @link https: //docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
+   * Comparison ordering{
+   * @link https: //docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
    * @param {string} key Field to compare against
    * @param {*} value Value to compare with
-   * 
+   *
    * @example
    * Stack
    *  .contentType('')
@@ -722,7 +718,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public exists(key) {
@@ -755,8 +751,8 @@ export class Stack {
    *
    * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
    *
-   * Comparison ordering {
-     @link https: //docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
+   * Comparison ordering{
+   * @link https: //docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
    * @param {string} key Field to compare against
    * @param {*} value Value to compare with
    * @example
@@ -771,7 +767,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public notExists(key) {
@@ -835,13 +831,13 @@ export class Stack {
    *  .entry()
    *  .find()
    *  .then((result) => {
-   *    // returns the entry based on its 'uid', 
+   *    // returns the entry based on its 'uid',
    *    // if not provided, it would return the 1st entry found in 'blog' content type
    *  })
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public entry(uid ? ) {
@@ -1096,9 +1092,9 @@ export class Stack {
 
   /**
    * Projections - returns only the fields passed here
-   * 
+   *
    * @param {array} fields Array of 'fields', separated by dot ('.') notation for embedded document query
-   * 
+   *
    * @example
    * Stack
    *  .contentType('blog')
@@ -1132,7 +1128,7 @@ export class Stack {
 
   /**
    * Projections - returns fields except the ones passed here
-   * 
+   *
    * @param {array} fields Array of 'fields', separated by dot ('.') notation for embedded document query
    * @example
    * Stack
@@ -1167,7 +1163,7 @@ export class Stack {
 
   /**
    * Raw regex to be applied on a field - wrapper
-   * 
+   *
    * @param {string} field Field on which the regex is to be applied on
    * @param {pattern} pattern Regex pattern
    * @param {options} options Options to be applied while evaluating the regex
@@ -1183,7 +1179,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public regex(field, pattern, options = 'i') {
@@ -1212,7 +1208,7 @@ export class Stack {
    * @public
    * @method tags
    * @summary Match entries that match a specific tags
-   * 
+   *
    * @param {array} values Array of tag values
    * @example
    * Stack
@@ -1226,7 +1222,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public tags(values) {
@@ -1263,7 +1259,7 @@ export class Stack {
    * function for each document in the collection.
    * Reference the document in the JavaScript expression or function using either this or obj.
    * Only apply the $where query operator to top-level documents.
-   * The $where query operator will not work inside a nested document, for instance, in an $elemMatch query. 
+   * The $where query operator will not work inside a nested document, for instance, in an $elemMatch query.
    * Ref. - https://docs.mongodb.com/manual/reference/operator/query/where/index.html
    * @param { * } expr Pass either a string containing a JavaScript expression or a full JavaScript
    * function to the query system.
@@ -1271,7 +1267,7 @@ export class Stack {
    * Stack
    *  .contentType('blog')
    *  .entries()
-   *  .where(function() { 
+   *  .where(function() {
    *    return (hex_md5(this.name) === "9b53e667f30cd329dca1ec9e6a83e994")
    *  })
    *  .find()
@@ -1281,7 +1277,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public where(expr) {
@@ -1311,7 +1307,7 @@ export class Stack {
    * @method includeCount
    * @description
    * Includes 'count' key in response, which is the total count of the items being returned
-   * 
+   *
    * @example
    * Stack
    *  .contentType('blog')
@@ -1324,7 +1320,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public includeCount() {
@@ -1348,7 +1344,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public includeSchema() {
@@ -1372,38 +1368,12 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
 
   public includeContentType() {
     this.internal.includeSchema = true
-
-    return this
-  }
-
-  /**
-   * @description
-   * Includes all references of the entries being returned.
-   * Note: This is a slow method, since it iteratively queries all the references and their references,
-   * binds them and returns
-   * @example
-   * Stack
-   *  .contentType('blog')
-   *  .entries()
-   *  .includeReferences()
-   *  .find()
-   *  .then((result) => {
-   *    // returns entries, along with all their references and their nested references
-   *  })
-   *  .catch((error) => {
-   *    // handle query errors
-   *  })
-   * 
-   * @returns {Stack} Returns an instance of 'stack'
-   */
-  public includeReferences() {
-    this.internal.includeReferences = true
 
     return this
   }
@@ -1443,7 +1413,7 @@ export class Stack {
    * query on them.Once the references are binded, the query object passed is used
    * for filtering
    * Use `.query()` filters to reduce the total no of documents being scanned
-   * 
+   *
    * @example
    * Stack
    *  .contentType('blog')
@@ -1456,7 +1426,7 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public queryReferences(query) {
@@ -1481,15 +1451,15 @@ export class Stack {
 
   /**
    * @method getQuery
-   * @description Returns the query build thusfar
-   * 
+   * @description
+   * Returns the query build thusfar
    * @example
    * const query = Stack
    *  .contentType('blog')
    *  .entries()
    *  .getQuery()
    * // exposes details of the queries formed inside the SDK
-   * 
+   *
    * @returns {Stack} Returns an instance of 'stack'
    */
   public getQuery() {
@@ -1498,6 +1468,37 @@ export class Stack {
     }
   }
 
+  /**
+   * @public
+   * @method includeAllReferences
+   * @description
+   * This method would return all the references of your queried entries (until depth 4)
+   * Note: If you wish to increase the depth of the references fetched, call .referenceDepth()
+   * @example
+   * Stack.contentType('blog')
+   *  .entries()
+   *  .includeAllReferences()
+   * @returns {Stack} Returns 'this' instance (of Stack)
+   */
+  public includeReferences() {
+    this.internal.includeAllReferences = true
+
+    return this
+  }
+
+  /**
+   * @public
+   * @method include
+   * @description
+   * Pass in reference field uids, that you want included in your result.
+   * If you want all the references, use .includeAllReferences()
+   * @example
+   * Stack.contentType('blog')
+   *  .entries()
+   *  .include(['related_blogs', 'authors.blogs']) // here related_blogs and authors.blogs are reference field uids
+   * @param {object} fields An array of reference field uids
+   * @returns {Stack} Returns 'this' instance (of Stack)
+   */
   public include(fields) {
     if (fields.length === 0) {
       throw new Error('Kindly pass a valid reference field path to \'.include()\' ')
@@ -1515,7 +1516,7 @@ export class Stack {
    * @description
    * Queries the db using the query built/passed
    * Does all the processing, filtering, referencing after querying the DB
-   * @param {object} query Optional query object, that overrides all the 
+   * @param {object} query Optional query object, that overrides all the
    * previously build queries
    * @public
    * @example
@@ -1529,13 +1530,12 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {object} - Returns a objects, that have been processed, filtered and referenced
    */
   public find(query = {}) {
     return new Promise(async (resolve, reject) => {
       const queryFilters = this.preProcess(query)
-      // console.log('@query filters', JSON.stringify(queryFilters))
 
       if (this.internal.sort) {
         this.collection = this.collection
@@ -1560,44 +1560,31 @@ export class Stack {
 
       return this.collection
         .then(async (result) => {
-          let contentType
-          if (this.internal.includeSchema) {
-            contentType = await this.getContentTypeSchema(this.q.locale, this.q.content_type_uid)
-          }
-
           // Ignore references include, for empty list, exclude call, content type & assets
           if (result.length === 0 || this.internal.excludeReferences || this.q.content_type_uid === this
             .types.content_types || this.q.content_type_uid
             === this.types.assets) {
-            result = this.postProcess(result, contentType)
-
-            return resolve(result)
+            // Do nothing
           } else if (this.internal.includeSpecificReferences) {
-            return this.includeSpecificReferences(result, this.q.content_type_uid, this.q.locale, this
-                .internal.includeSpecificReferences)
-              .then(() => {
-                if (this.internal.queryReferences) {
-                  result = sift(this.internal.queryReferences, result)
-
-                  if (this.internal.skip) {
-                    result = result.splice(this.internal.skip, this.internal.limit)
-                  } else if (this.internal.limit) {
-                    result = result.splice(0, this.internal.limit)
-                  }
-                }
-                result = this.postProcess(result, contentType)
-
-                return resolve(result)
-              })
+            await this.includeSpecificReferences(result, this.q.content_type_uid, this.q.locale, this
+              .internal.includeSpecificReferences)
+          } else if (this.internal.includeAllReferences) {
+            await this.bindReferences(result, this.q.content_type_uid, this.q.locale)
           } else {
-
-            return this.includeAssetsOnly(result, this.q.content_type_uid, this.q.locale)
-              .then(() => {
-                result = this.postProcess(result, contentType)
-
-                return resolve(result)
-              })
+            await this.includeAssetsOnly(result, this.q.content_type_uid, this.q.locale)
           }
+          if (this.internal.queryReferences) {
+            result = sift(this.internal.queryReferences, result)
+
+            if (this.internal.skip) {
+              result = result.splice(this.internal.skip, this.internal.limit)
+            } else if (this.internal.limit) {
+              result = result.splice(0, this.internal.limit)
+            }
+          }
+          result = await this.postProcess(result)
+
+          return resolve(result)
         })
         .catch((error) => {
           this.cleanup()
@@ -1609,7 +1596,7 @@ export class Stack {
 
   /**
    * @method count
-   * @description Returns the count of the entries/assets that match the filter
+   * @descriptionReturns the count of the entries/assets that match the filter
    * @param {object} query Optional query filter object
    * @public
    * @example
@@ -1623,52 +1610,21 @@ export class Stack {
    *  .catch((error) => {
    *    // handle query errors
    *  })
-   * 
+   *
    * @returns {object} Returns count of the entries/asset's matched
    */
   public count(query ? ) {
     return new Promise((resolve, reject) => {
       const queryFilters = this.preProcess(query)
       this.collection = this.collection.find(queryFilters)
-      // process it in a different manner
-      if (this.internal.queryReferences) {
-        return this.collection
-          .project(this.internal.projections)
-          .toArray()
-          .then((result) => {
-            if (result === null || result.length === 0) {
-              return resolve({
-                count: 0
-              })
-            }
-            this.internal.includeReferences = true
-
-            return this.includeReferencesI(result, this.q.locale, {}, undefined)
-              .then(() => {
-                result = sift(this.internal.queryReferences, result)
-                result = result.length
-                this.cleanup()
-
-                return resolve({
-                  count: result,
-                })
-              })
-          })
-          .catch((error) => {
-            this.cleanup()
-
-            return reject(error)
-          })
-      }
 
       return this.collection
-        .project(this.internal.projections)
         .count()
         .then((result) => {
           this.cleanup()
 
           return resolve({
-            count: result
+            count: result,
           })
         })
         .catch((error) => {
@@ -1685,38 +1641,19 @@ export class Stack {
    * Queries the db using the query built/passed. Returns a single entry/asset/content type object
    * Does all the processing, filtering, referencing after querying the DB
    * @param {object} query Optional query object, that overrides all the previously build queries
-   * 
+   *
    * @example
    * Stack
    *  .contentType('blog')
    *  .entries()
    *  .findOne()
-   *  .then((result) => {
-   *    // returns an entry
-   *  })
-   *  .catch((error) => {
-   *    // handle query errors
-   *  })
-   * 
+   *
    * @returns {object} - Returns an object, that has been processed, filtered and referenced
    */
   public findOne(query = {}) {
     this.internal.single = true
 
     return this.find(query)
-  }
-
-  private async getContentTypeSchema (locale, contentTypeUid) {
-    return this.db.collection(getCollectionName({
-        content_type_uid: '_content_types',
-        locale,
-      }, this.collectionNames))
-      .findOne({
-        uid: contentTypeUid,
-      }, {
-        _id: 0,
-        _synced_at: 0,
-      })
   }
 
   /**
@@ -1733,6 +1670,8 @@ export class Stack {
     } else {
       this.q.query = {}
     }
+
+    this.q.referenceDepth = this.q.referenceDepth || this.contentStore.referenceDepth
 
     if (this.internal.only) {
       this.internal.projections = this.internal.only
@@ -1803,43 +1742,32 @@ export class Stack {
    * @param {object} result Result, which's to be manipulated
    * @returns {object} Returns the formatted version of the `result` object
    */
-  private postProcess(result, contentType ? ) {
+  private async postProcess(result) {
     const count = (result === null) ? 0 : result.length
+    const output: any = {}
     switch (this.q.content_type_uid) {
     case this.types.assets:
       if (this.internal.single) {
-        result = {
-          asset: (result === null) ? result : result[0],
-        }
+        output.asset = (result === null) ? result : result[0]
       } else {
-        result = {
-          assets: result,
-        }
+        output.assets = result
       }
       result.content_type_uid = 'assets'
       result.locale = this.q.locale
       break
     case this.types.content_types:
       if (this.internal.single) {
-        result = {
-          content_type: (result === null) ? result : result[0],
-        }
+        output.content_type = (result === null) ? result : result[0]
       } else {
-        result = {
-          content_types: result,
-        }
+        output.content_types = result
       }
       result.content_type_uid = 'content_types'
       break
     default:
       if (this.internal.single) {
-        result = {
-          entry: (result === null) ? result : result[0],
-        }
+        output.entry = (result === null) ? result : result[0]
       } else {
-        result = {
-          entries: result,
-        }
+        output.entries = result
       }
       result.content_type_uid = this.q.content_type_uid
       result.locale = this.q.locale
@@ -1851,7 +1779,18 @@ export class Stack {
     }
 
     if (this.internal.includeSchema) {
-      result.content_type = contentType
+      result.content_type = await this.db.collection({
+          content_type_uid: '_content_types',
+          locale: this.q.locale,
+        }, this.collectionNames)
+        .findOne({
+          uid: this.q.content_type_uid,
+        }, {
+          _assets: 0,
+          _content_type_uid: 0,
+          _id: 0,
+          _references: 0,
+        })
     }
 
     this.cleanup()
@@ -1859,7 +1798,7 @@ export class Stack {
     return result
   }
 
-  private async includeAssetsOnly (entries: any[], contentTypeUid: string, locale: string) {
+  private async includeAssetsOnly(entries: any[], contentTypeUid: string, locale: string) {
     const schema = await this.db
       .collection(getCollectionName({
         content_type_uid: '_content_types',
@@ -1893,17 +1832,16 @@ export class Stack {
     }
 
     const assets = await this.db.collection(getCollectionName({
-      content_type_uid: '_assets',
-      locale,
-    }, this.collectionNames))
-    .find(queryBucket)
-    .project({
-      _content_type_uid: 0,
-      _id: 0,
-    })
-    .toArray()
-    // console.log('@assets', JSON.stringify(assets))
-    // console.log('@shelf', JSON.stringify(shelf))
+        content_type_uid: '_assets',
+        locale,
+      }, this.collectionNames))
+      .find(queryBucket)
+      .project({
+        _content_type_uid: 0,
+        _id: 0,
+      })
+      .toArray()
+
     for (let l = 0, m = shelf.length; l < m; l++) {
       for (let n = 0, o = assets.length; n < o; n++) {
         if (shelf[l].uid === assets[n].uid) {
@@ -1930,6 +1868,22 @@ export class Stack {
       _content_type_uid: '_content_types',
       uid: contentTypeUid,
     }
+    /**
+     * key: {
+     *  $in_query: {
+     *    $or: [
+     *      {
+     *        range: { $in: [10, 100] }
+     *      },
+     *      {
+     *        key2: {
+     *          $in_query: ...
+     *        }
+     *      }
+     *    ]
+     *  }
+     * }
+     */
 
     const {
       paths, // ref. fields in the current content types
@@ -1942,7 +1896,7 @@ export class Stack {
     // console.log('schema list: ' + JSON.stringify(schemaList))
 
     const queries = {
-      $or: []
+      $or: [],
     } // reference field paths
     const shelf = [] // a mapper object, that holds pointer to the original element
 
@@ -1963,11 +1917,12 @@ export class Stack {
     // else, self-recursively iterate and fetch references
     // Note: Shelf is the one holding `pointers` to the actual entry
     // Once the pointer has been used, for GC, point the object to null
+
     return this.includeReferenceIteration(queries, schemaList, locale, pendingPath, shelf)
   }
 
-  private fetchPathDetails(data: any, locale: string, pathArr: string[], queryBucket: IQueryInterface, shelf,
-      assetsOnly = false, parent, pos, counter = 0) {
+  private fetchPathDetails(data: any, locale: string, pathArr: string[], queryBucket: IQuery, shelf,
+    assetsOnly = false, parent, pos, counter = 0) {
     if (counter === (pathArr.length)) {
       // console.log('data', data)
       // console.log('parent', parent)
@@ -2103,29 +2058,28 @@ export class Stack {
 
     // Iterative loops, that traverses paths and binds them onto entries
     await this.includeReferenceIteration(queries, schemaList, locale, pendingPath, shelf)
-    // console.log('m out again..')
+
     return
   }
 
-  private async getReferencePath (query, locale, currentInclude) {
-    // console.log('@schemas::', JSON.stringify(query))
+  private async getReferencePath(query, locale, currentInclude) {
     const schemas = await this.db.collection(getCollectionName({
-      content_type_uid: '_content_types',
-      locale,
-    }, this.collectionNames))
-    .find(query)
-    .project({
-      _assets: 1,
-      _id: 0,
-      _references: 1,
-    })
-    .toArray()
+        content_type_uid: '_content_types',
+        locale,
+      }, this.collectionNames))
+      .find(query)
+      .project({
+        _assets: 1,
+        _id: 0,
+        _references: 1,
+      })
+      .toArray()
 
     const pendingPath = []
     const schemasReferred = []
     const paths = []
     const schemaList = {
-      $or: []
+      $or: [],
     }
 
     if (schemas.length === 0) {
@@ -2196,20 +2150,21 @@ export class Stack {
     }
   }
 
-  private async fetchEntries (query: any, locale: string, paths: string[], include: string[]) {
+  private async fetchEntries (query: IQuery, locale: string, paths: string[], include: string[], includeAll:
+    boolean = false) {
     // console.log('@fetch entries query', JSON.stringify(query))
     const result = await this.db.collection(getCollectionName({
-      content_type_uid: 'entries',
-      locale,
-    }, this.collectionNames))
-    .find(query)
-    .project({
-      _content_type_uid: 0,
-      _id: 0,
-      _synced_at: 0,
-      event_at: 0,
-    })
-    .toArray()
+        content_type_uid: 'entries',
+        locale,
+      }, this.collectionNames))
+      .find(query)
+      .project({
+        _content_type_uid: 0,
+        _id: 0,
+        _synced_at: 0,
+        event_at: 0,
+      })
+      .toArray()
 
     const queries = {
       $or: [],
@@ -2224,13 +2179,12 @@ export class Stack {
       }
     }
 
-    if (include.length) {
+    if (include.length || includeAll) {
       paths.forEach((path) => {
-        // console.log('path:', path)
         this.fetchPathDetails(result, locale, path.split('.'), queries, shelf, false, result, 0)
       })
     } else {
-      // if there are no includes, only fetch assets
+      // if there are no includes, only fetch assets)
       paths.forEach((path) => {
         this.fetchPathDetails(result, locale, path.split('.'), queries, shelf, true, result, 0)
       })
@@ -2243,109 +2197,147 @@ export class Stack {
     }
   }
 
-  /**
-   * @private
-   * @method includeReferencesI
-   * @summary Internal method, that iteratively calls itself and binds entries reference
-   * @param {object} entry An entry or a collection of entries, who's references are to be found
-   * @param {string} locale Locale, in which the reference is to be found
-   * @param {object} references A map of uids tracked thusfar (used to detect cycle)
-   * @param {string} parentUid Entry uid, which is the parent of the current `entry` object
-   * @returns {object} Returns `entry`, that has all of its reference binded
-   */
-  private includeReferencesI(entry, locale, references, parentUid ? ) {
+  private async bindReferences (entries: any[], contentTypeUid: string, locale: string) {
+    const ctQuery = {
+      $or: [{
+        _content_type_uid: '_content_types',
+        uid: contentTypeUid,
+      }],
+    }
 
-    return new Promise((resolve, reject) => {
-      if (entry === null || typeof entry !== 'object') {
-        return resolve()
+    const {
+      paths, // ref. fields in the current content types
+      ctQueries, // list of content type uids, the current content types refer to
+    } = await this.getAllReferencePaths(ctQuery, locale)
+
+    // console.log('paths: ' + paths)
+    // console.log('schema list: ' + JSON.stringify(schemaList))
+
+    const queries = {
+      $or: [],
+    } // reference field paths
+    const objectPointerList = [] // a mapper object, that holds pointer to the original element
+
+    // iterate over each path in the entries and fetch the references
+    // while fetching, keep track of their location
+    for (let i = 0, j = paths.length; i < j; i++) {
+      this.fetchPathDetails(entries, locale, paths[i].split('.'), queries, objectPointerList, true, entries, 0)
+    }
+
+    // console.log('@sub queries', queries)
+    // console.log('@objectPointerList', JSON.stringify(objectPointerList))
+
+    // even after traversing, if no references were found, simply return the entries found thusfar
+    if (objectPointerList.length === 0) {
+      return entries
+    }
+    // console.log('@shelf-1', JSON.stringify(shelf))
+    // else, self-recursively iterate and fetch references
+    // Note: Shelf is the one holding `pointers` to the actual entry
+    // Once the pointer has been used, for GC, point the object to null
+
+    return this.includeAllReferencesIteration(queries, ctQueries, locale, objectPointerList)
+  }
+
+  private async includeAllReferencesIteration (oldEntryQueries: IQuery, oldCtQueries: IQuery, locale:
+    string, oldObjectPointerList: IShelf[], depth = 0) {
+    if (depth > this.q.referenceDepth || oldObjectPointerList.length === 0 || oldCtQueries.$or.length === 0) {
+      return
+    }
+    const {
+      ctQueries,
+      paths,
+    } = await this.getAllReferencePaths(oldCtQueries, locale)
+    // console.log('@paths', paths)
+    // GC to aviod mem leaks
+    oldCtQueries = null
+    const {
+      result,
+      queries,
+      shelf,
+    } = await this.fetchEntries(oldEntryQueries, locale, paths, [], true)
+    // GC to avoid mem leaks!
+    oldEntryQueries = null
+
+    for (let i = 0, j = oldObjectPointerList.length; i < j; i++) {
+      const element: IShelf = oldObjectPointerList[i]
+      for (let k = 0, l = result.length; k < l; k++) {
+        if (result[k].uid === element.uid) {
+          element.path[element.position] = result[k]
+          break
+        }
       }
+    }
+    // GC to avoid mem leaks!
+    oldObjectPointerList = null
 
-      // current entry becomes the parent
-      if (entry.uid) {
-        parentUid = entry.uid
+      ++depth
+    // Iterative loops, that traverses paths and binds them onto entries
+    await this.includeAllReferencesIteration(queries, ctQueries, locale, shelf, depth)
+
+    return
+  }
+
+  private async getAllReferencePaths (contentTypeQueries: IQuery, locale: string) {
+    const contents: any[] = await this.db
+      .collection(getCollectionName({
+          content_type_uid: '_content_types',
+          locale,
+        },
+        this.collectionNames,
+      ))
+      .find(contentTypeQueries)
+      .project({
+        _assets: 1,
+        _references: 1,
+      })
+      .toArray()
+    const ctQueries: IQuery = {
+      $or: [],
+    }
+    let paths: string[] = []
+
+    for (let i = 0, j = contents.length; i < j; i++) {
+      // console.log('_assets', contents[i]._assets)
+      // console.log('references', contents[i]._references)
+      let assetFieldPaths: string[]
+      let entryReferencePaths: string[]
+      if (contents[i].hasOwnProperty('_assets')) {
+        assetFieldPaths = Object.keys(contents[i]._assets)
+        paths = paths.concat(assetFieldPaths)
       }
+      if (contents[i].hasOwnProperty('_references')) {
+        entryReferencePaths = Object.keys(contents[i]._references)
+        paths = paths.concat(entryReferencePaths)
 
-      const referencesFound = []
-
-      // iterate over each key in the object
-      for (const prop in entry) {
-        if (entry[prop] !== null && typeof entry[prop] === 'object') {
-          if (entry[prop] && entry[prop].reference_to) {
-            if ((!(this.internal.includeReferences)
-                && entry[prop].reference_to === this.types.assets) || this.internal.includeReferences) {
-              if (entry[prop].values.length === 0) {
-                entry[prop] = []
-              } else {
-                let uids = entry[prop].values
-                if (typeof uids === 'string') {
-                  uids = [uids]
-                }
-                if (entry[prop].reference_to !== this.types.assets) {
-                  uids = filter(uids, (uid) => {
-                    return !(checkCyclic(uid, references))
-                  })
-                }
-                if (uids.length) {
-                  const query = {
-                    content_type_uid: entry[prop].reference_to,
-                    locale,
-                    uid: {
-                      $in: uids,
-                    },
-                  }
-
-                  referencesFound.push(new Promise((rs, rj) => {
-                    return this.db.collection(getCollectionName({
-                        locale: this.q.locale,
-                        content_type_uid: 'entries'
-                      }, this.collectionNames))
-                      .find(query)
-                      .project(this.config.contentStore.projections)
-                      .toArray()
-                      .then((result) => {
-                        if (result.length === 0) {
-                          entry[prop] = []
-
-                          return rs()
-                        } else if (parentUid) {
-                          references[parentUid] = references[parentUid] || []
-                          references[parentUid] = uniq(references[parentUid].concat(map(result, 'uid')))
-                        }
-
-                        if (typeof entry[prop].values === 'string') {
-                          entry[prop] = ((result === null) || result.length === 0) ? null : result[0]
-                        } else {
-                          // format the references in order
-                          const referenceBucket = []
-                          query.uid.$in.forEach((entityUid) => {
-                            const elem = find(result, (entity) => {
-                              return entity.uid === entityUid
-                            })
-                            if (elem) {
-                              referenceBucket.push(elem)
-                            }
-                          })
-                          entry[prop] = referenceBucket
-                        }
-
-                        return this.includeReferencesI(entry[prop], locale, references, parentUid)
-                          .then(rs)
-                          .catch(rj)
-                      })
-                      .catch(rj)
-                  }))
-                }
-              }
-            }
-          } else {
-            referencesFound.push(this.includeReferencesI(entry[prop], locale, references, parentUid))
+        for (let k = 0, l = entryReferencePaths.length; k < l; k++) {
+          if (typeof contents[i]._references[entryReferencePaths[k]] === 'string') {
+            ctQueries.$or.push({
+              _content_type_uid: '_content_types',
+              // this would probably make it slow in FS, avoid this there?
+              // locale,
+              uid: contents[i]._references[entryReferencePaths[k]],
+            })
+          } else if (contents[i]._references[entryReferencePaths[k]].length) {
+            contents[i]._references[entryReferencePaths[k]].forEach((uid) => {
+              ctQueries.$or.push({
+                _content_type_uid: '_content_types',
+                // avoiding locale here, not sure if its required
+                // locale,
+                uid,
+              })
+            })
           }
         }
       }
+    }
 
-      return Promise.all(referencesFound)
-        .then(resolve)
-        .catch(reject)
-    })
+    // console.log('@paths later..', JSON.stringify(paths))
+    // console.log('@ctQueries later..', JSON.stringify(ctQueries))
+    return {
+      ctQueries,
+      paths,
+    }
   }
+  // tslint:disable-next-line: max-file-line-count
 }

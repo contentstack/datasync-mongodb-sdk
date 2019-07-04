@@ -6,20 +6,14 @@
 export declare const config: {
     contentStore: {
         collection: {
-            entry: string;
             asset: string;
+            entry: string;
             schema: string;
         };
         dbName: string;
-        indexes: {
-            event_at: number;
-            _content_type_uid: number;
-            locale: number;
-            uid: number;
-        };
         internalContentTypes: {
-            content_types: string;
             assets: string;
+            content_types: string;
         };
         limit: number;
         locale: string;
@@ -33,15 +27,15 @@ export declare const config: {
             useNewUrlParser: boolean;
         };
         projections: {
-            _id: number;
-            _version: number;
             _content_type_uid: number;
+            _id: number;
             _synced_at: number;
-            app_user_object_uid: number;
+            _version: number;
             created_at: number;
             updated_at: number;
             updated_by: number;
         };
+        referenceDepth: number;
         skip: number;
         uri: string;
     };

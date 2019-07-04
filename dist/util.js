@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = require("lodash");
 /**
  * @private
- *
+ * @method validateURI
  * @description
  * Validates the mongodb 'uri' passed
  * @param {string} uri - Mongodb connection 'uri' string
@@ -31,6 +31,7 @@ exports.validateURI = (uri) => {
 exports.checkCyclic = (uid, mapping) => {
     let flag = false;
     let list = [uid];
+    // tslint:disable-next-line: prefer-for-of
     for (let i = 0; i < list.length; i++) {
         const parent = getParents(list[i], mapping);
         if (parent.indexOf(uid) !== -1) {
@@ -52,7 +53,7 @@ const getParents = (child, mapping) => {
 };
 const validateContentStore = (contentStore) => {
     if (typeof contentStore.dbName !== 'string' || contentStore.dbName.length === 0) {
-        throw new Error(`Contentstore dbName should be of type string and not empty!`);
+        throw new Error('Contentstore dbName should be of type string and not empty!');
     }
     if (typeof contentStore.collectionName === 'string') {
         contentStore.collection = {

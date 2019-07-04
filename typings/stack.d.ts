@@ -5,16 +5,16 @@
  */
 /**
  * @class Stack
- * @description Expose SDK query methods on Stack
+ * @descriptionExpose SDK query methods on Stack
  * @constructor
- * @description Provides a range of connection/disconnect, filters and projections on mongodb
+ * @descriptionProvides a range of connection/disconnect, filters and projections on mongodb
  * @returns {Stack} Returns an instance of `Stack`
  */
 export declare class Stack {
     private q;
     private readonly collectionNames;
-    private config;
-    private contentStore;
+    private readonly config;
+    private readonly contentStore;
     private readonly types;
     private client;
     private collection;
@@ -124,7 +124,7 @@ export declare class Stack {
      * @public
      * @method and
      * @summary Logical AND query wrapper
-     * @description Accepts 2 queries and returns only those documents, that satisfy both the query conditions
+     * @descriptionAccepts 2 queries and returns only those documents, that satisfy both the query conditions
      * @param {object} queries Query filter
      * @example
      * Stack
@@ -153,7 +153,7 @@ export declare class Stack {
      * @public
      * @method or
      * @summary Logical OR query wrapper
-     * @description Accepts 2 queries and returns only those documents, that satisfy either of the query conditions
+     * @descriptionAccepts 2 queries and returns only those documents, that satisfy either of the query conditions
      * @param {object} queries Query filter
      * @example
      * Stack
@@ -183,8 +183,10 @@ export declare class Stack {
      * @method lessThan
      * @summary Comparison $lt query wrapper
      * @description
-     * Compares the field/key provided against the provided value. Only documents that have lower value than the one provided are returned.
-     * Check https://docs.mongodb.com/manual/reference/operator/query/lt/ and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
+     * Compares the field/key provided against the provided value.
+     * Only documents that have lower value than the one provided are returned.
+     * Check https://docs.mongodb.com/manual/reference/operator/query/lt/
+     * and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
      * @param {string} key Field to compare against
      * @param {*} value Value to compare with
      * @example
@@ -208,8 +210,10 @@ export declare class Stack {
      * @method lessThanOrEqualTo
      * @summary Comparison $lte query wrapper
      * @description
-     * Compares the field/key provided against the provided value. Only documents that have lower or equal value than the one provided are returned.
-     * Check https://docs.mongodb.com/manual/reference/operator/query/lte/ and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
+     * Compares the field/key provided against the provided value.
+     * Only documents that have lower or equal value than the one provided are returned.
+     * Check https://docs.mongodb.com/manual/reference/operator/query/lte/
+     * and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
      * @param {string} key Field to compare against
      * @param {*} value Value to compare with
      * @example
@@ -233,8 +237,10 @@ export declare class Stack {
      * @method greaterThan
      * @summary Comparison $gt query wrapper
      * @description
-     * Compares the field/key provided against the provided value. Only documents that have greater value than the one provided are returned.
-     * Check {@link https://docs.mongodb.com/manual/reference/operator/query/gt/ }and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
+     * Compares the field/key provided against the provided value.
+     * Only documents that have greater value than the one provided are returned.
+     * Check {@link https://docs.mongodb.com/manual/reference/operator/query/gt/ }
+     * and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
      * @param {string} key Field to compare against
      * @param {*} value Value to compare with
      * @example
@@ -258,8 +264,10 @@ export declare class Stack {
      * @method greaterThanOrEqualTo
      * @summary Comparison $gte query wrapper
      * @description
-     * Compares the field/key provided against the provided value. Only documents that have greater than or equal value than the one provided are returned.
-     * Check https://docs.mongodb.com/manual/reference/operator/query/gte/ and https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
+     * Compares the field/key provided against the provided value.
+     * Only documents that have greater than or equal value than the one provided are returned.
+     * Check https://docs.mongodb.com/manual/reference/operator/query/gte/ and
+     * https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing for more info
      * @param {string} key - Field to compare against
      * @param {*} value - Value to compare with
      * @example
@@ -283,13 +291,15 @@ export declare class Stack {
      * @method notEqualTo
      * @summary Comparison $ne query wrapper
      * @description
-     * Compares the field/key provided against the provided value. Only documents that have value not equals than the one provided are returned.
+     * Compares the field/key provided against the provided value.
+     * Only documents that have value not equals than the one provided are returned.
      *
      * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/ne/}.
      *
      * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
      *
-     * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
+     * Comparison ordering
+     * {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
      * @param {string} key Field to compare against
      * @param {*} value Value to compare with
      * @example
@@ -313,13 +323,15 @@ export declare class Stack {
      * @method containedIn
      * @summary Comparison $in query wrapper
      * @description
-     * Compares the field/key provided against the provided value. Only documents that have value contained in the field/key provided are returned.
+     * Compares the field/key provided against the provided value.
+     * Only documents that have value contained in the field/key provided are returned.
      *
      * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/in/}.
      *
      * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
      *
-     * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
+     * Comparison ordering
+     * {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
      * @param {string} key Field to compare against
      * @param {*} value Value to compare with
      *
@@ -344,13 +356,15 @@ export declare class Stack {
      * @method notContainedIn
      * @summary Comparison $nin query wrapper
      * @description
-     * Compares the field/key provided against the provided value. Only documents that have value not contained in the field/key provided are returned.
+     * Compares the field/key provided against the provided value.
+     * Only documents that have value not contained in the field/key provided are returned.
      *
      * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/nin/}.
      *
      * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
      *
-     * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
+     * Comparison ordering
+     * {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
      * @param {string} key Field to compare against
      * @param {*} value Value to compare with
      *
@@ -375,13 +389,15 @@ export declare class Stack {
      * @method exists
      * @summary Element $exists query wrapper, checks if a field exists
      * @description
-     * Compares the field/key provided against the provided value. Only documents that have the field/key specified are returned.
+     * Compares the field / key provided against the provided value.Only documents that have the field /
+     *  key specified are returned.
      *
      * Check mongodb query here: {@link https://docs.mongodb.com/manual/reference/operator/query/exists/}.
      *
      * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
      *
-     * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
+     * Comparison ordering{
+     * @link https: //docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
      * @param {string} key Field to compare against
      * @param {*} value Value to compare with
      *
@@ -413,7 +429,8 @@ export declare class Stack {
      *
      * Res: {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/#type-bracketing}.
      *
-     * Comparison ordering {@link https://docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
+     * Comparison ordering{
+     * @link https: //docs.mongodb.com/manual/reference/bson-type-comparison-order/#bson-types-comparison-order}
      * @param {string} key Field to compare against
      * @param {*} value Value to compare with
      * @example
@@ -465,7 +482,8 @@ export declare class Stack {
      *  .entry()
      *  .find()
      *  .then((result) => {
-     *    // returns the entry based on its 'uid', if not provided, it would return the 1st entry found in 'blog' content type
+     *    // returns the entry based on its 'uid',
+     *    // if not provided, it would return the 1st entry found in 'blog' content type
      *  })
      *  .catch((error) => {
      *    // handle query errors
@@ -730,13 +748,16 @@ export declare class Stack {
      * @method where
      * @summary Pass JS expression or a full function to the query system
      * @description
-     * Use the $where operator to pass either a string containing a JavaScript expression or a full JavaScript function to the query system.
-     * The $where provides greater flexibility, but requires that the database processes the JavaScript expression or function for each document in the collection.
+     * Use the $where operator to pass either a string containing a JavaScript expression or a full JavaScript
+     * function to the query system.
+     * The $where provides greater flexibility, but requires that the database processes the JavaScript expression or
+     * function for each document in the collection.
      * Reference the document in the JavaScript expression or function using either this or obj.
      * Only apply the $where query operator to top-level documents.
      * The $where query operator will not work inside a nested document, for instance, in an $elemMatch query.
      * Ref. - https://docs.mongodb.com/manual/reference/operator/query/where/index.html
-     * @param {*} expr Pass either a string containing a JavaScript expression or a full JavaScript function to the query system.
+     * @param { * } expr Pass either a string containing a JavaScript expression or a full JavaScript
+     * function to the query system.
      * @example
      * Stack
      *  .contentType('blog')
@@ -816,26 +837,6 @@ export declare class Stack {
      */
     includeContentType(): this;
     /**
-     * @description
-     * Includes all references of the entries being returned.
-     * Note: This is a slow method, since it iteratively queries all the references and their references, binds them and returns
-     * @example
-     * Stack
-     *  .contentType('blog')
-     *  .entries()
-     *  .includeReferences()
-     *  .find()
-     *  .then((result) => {
-     *    // returns entries, along with all their references and their nested references
-     *  })
-     *  .catch((error) => {
-     *    // handle query errors
-     *  })
-     *
-     * @returns {Stack} Returns an instance of 'stack'
-     */
-    includeReferences(): this;
-    /**
      * @method excludeReferences
      * @description
      * Excludes all references of the entries being scanned
@@ -861,7 +862,9 @@ export declare class Stack {
      * @method queryReferences
      * @description
      * Wrapper, that allows querying on the entry's references.
-     * Note: This is a slow method, since it scans all documents and fires the `reference` query on them. Once the references are binded, the query object passed is used for filtering
+     * Note: This is a slow method, since it scans all documents and fires the `reference`
+     * query on them.Once the references are binded, the query object passed is used
+     * for filtering
      * Use `.query()` filters to reduce the total no of documents being scanned
      *
      * @example
@@ -883,8 +886,8 @@ export declare class Stack {
     queryReferencesBeta(query: any): this;
     /**
      * @method getQuery
-     * @description Returns the query build thusfar
-     *
+     * @description
+     * Returns the query build thusfar
      * @example
      * const query = Stack
      *  .contentType('blog')
@@ -895,8 +898,33 @@ export declare class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     getQuery(): any;
+    /**
+     * @public
+     * @method includeAllReferences
+     * @description
+     * This method would return all the references of your queried entries (until depth 4)
+     * Note: If you wish to increase the depth of the references fetched, call .referenceDepth()
+     * @example
+     * Stack.contentType('blog')
+     *  .entries()
+     *  .includeAllReferences()
+     * @returns {Stack} Returns 'this' instance (of Stack)
+     */
+    includeReferences(): this;
+    /**
+     * @public
+     * @method include
+     * @description
+     * Pass in reference field uids, that you want included in your result.
+     * If you want all the references, use .includeAllReferences()
+     * @example
+     * Stack.contentType('blog')
+     *  .entries()
+     *  .include(['related_blogs', 'authors.blogs']) // here related_blogs and authors.blogs are reference field uids
+     * @param {object} fields An array of reference field uids
+     * @returns {Stack} Returns 'this' instance (of Stack)
+     */
     include(fields: any): this;
-    private getContentTypeSchema;
     /**
      * @method find
      * @description
@@ -919,10 +947,10 @@ export declare class Stack {
      *
      * @returns {object} - Returns a objects, that have been processed, filtered and referenced
      */
-    find(query?: {}): Promise<{}>;
+    find(query?: {}): Promise<unknown>;
     /**
      * @method count
-     * @description Returns the count of the entries/assets that match the filter
+     * @descriptionReturns the count of the entries/assets that match the filter
      * @param {object} query Optional query filter object
      * @public
      * @example
@@ -939,7 +967,7 @@ export declare class Stack {
      *
      * @returns {object} Returns count of the entries/asset's matched
      */
-    count(query?: any): Promise<{}>;
+    count(query?: any): Promise<unknown>;
     /**
      * @method findOne
      * @description
@@ -952,16 +980,10 @@ export declare class Stack {
      *  .contentType('blog')
      *  .entries()
      *  .findOne()
-     *  .then((result) => {
-     *    // returns an entry
-     *  })
-     *  .catch((error) => {
-     *    // handle query errors
-     *  })
      *
      * @returns {object} - Returns an object, that has been processed, filtered and referenced
      */
-    findOne(query?: {}): Promise<{}>;
+    findOne(query?: {}): Promise<unknown>;
     /**
      * @private
      * @method preProcess
@@ -999,15 +1021,7 @@ export declare class Stack {
     private includeReferenceIteration;
     private getReferencePath;
     private fetchEntries;
-    /**
-     * @private
-     * @method includeReferencesI
-     * @summary Internal method, that iteratively calls itself and binds entries reference
-     * @param {object} entry An entry or a collection of entries, who's references are to be found
-     * @param {string} locale Locale, in which the reference is to be found
-     * @param {object} references A map of uids tracked thusfar (used to detect cycle)
-     * @param {string} parentUid Entry uid, which is the parent of the current `entry` object
-     * @returns {object} Returns `entry`, that has all of its reference binded
-     */
-    private includeReferencesI;
+    private bindReferences;
+    private includeAllReferencesIteration;
+    private getAllReferencePaths;
 }
