@@ -5,7 +5,7 @@
  */
 /**
  * @private
- *
+ * @method validateURI
  * @description
  * Validates the mongodb 'uri' passed
  * @param {string} uri - Mongodb connection 'uri' string
