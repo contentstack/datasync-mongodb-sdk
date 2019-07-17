@@ -25,13 +25,16 @@ import {
 
 interface IShelf {
   path: string,
-    position: string,
-    uid: string,
+  position: string,
+  uid: string,
 }
 
 interface IQuery {
   $or: Array < {
     _content_type_uid: string,
+    _version?: {
+      $exists: boolean,
+    },
     uid: string,
     locale?: string,
   } >
@@ -39,8 +42,8 @@ interface IQuery {
 
 interface ICollectionNames {
   asset: string,
-    entry: string,
-    schema: string,
+  entry: string,
+  schema: string,
 }
 
 /**
@@ -1563,7 +1566,7 @@ export class Stack {
           // Ignore references include, for empty list, exclude call, content type & assets
           if (result.length === 0 || this.internal.excludeReferences || this.q.content_type_uid === this
             .types.content_types || this.q.content_type_uid
-            === this.types.assets) {
+            === this.types.assets || this.internal.onlyCount) {
             // Do nothing
           } else if (this.internal.includeSpecificReferences) {
             await this.includeSpecificReferences(result, this.q.content_type_uid, this.q.locale, this
@@ -1574,8 +1577,7 @@ export class Stack {
             await this.includeAssetsOnly(result, this.q.content_type_uid, this.q.locale)
           }
           if (this.internal.queryReferences) {
-            result = sift(this.internal.queryReferences, result)
-
+            result = result.filter(sift(this.internal.queryReferences))
             if (this.internal.skip) {
               result = result.splice(this.internal.skip, this.internal.limit)
             } else if (this.internal.limit) {
@@ -1613,26 +1615,10 @@ export class Stack {
    *
    * @returns {object} Returns count of the entries/asset's matched
    */
-  public count(query ? ) {
-    return new Promise((resolve, reject) => {
-      const queryFilters = this.preProcess(query)
-      this.collection = this.collection.find(queryFilters)
+  public async count(query ? ) {
+    this.internal.onlyCount = true
 
-      return this.collection
-        .count()
-        .then((result) => {
-          this.cleanup()
-
-          return resolve({
-            count: result,
-          })
-        })
-        .catch((error) => {
-          this.cleanup()
-
-          return reject(error)
-        })
-    })
+    return this.find(query)
   }
 
   /**
@@ -1744,7 +1730,15 @@ export class Stack {
    */
   private async postProcess(result) {
     const count = (result === null) ? 0 : result.length
-    const output: any = {}
+    const output: any = {
+      locale: this.q.locale,
+    }
+    if (this.internal.onlyCount) {
+      output.count = count
+
+      return output
+    }
+
     switch (this.q.content_type_uid) {
     case this.types.assets:
       if (this.internal.single) {
@@ -1752,8 +1746,7 @@ export class Stack {
       } else {
         output.assets = result
       }
-      result.content_type_uid = 'assets'
-      result.locale = this.q.locale
+      output.content_type_uid = 'assets'
       break
     case this.types.content_types:
       if (this.internal.single) {
@@ -1761,7 +1754,7 @@ export class Stack {
       } else {
         output.content_types = result
       }
-      result.content_type_uid = 'content_types'
+      output.content_type_uid = 'content_types'
       break
     default:
       if (this.internal.single) {
@@ -1769,20 +1762,20 @@ export class Stack {
       } else {
         output.entries = result
       }
-      result.content_type_uid = this.q.content_type_uid
-      result.locale = this.q.locale
+      output.content_type_uid = this.q.content_type_uid
       break
     }
 
     if (this.internal.includeCount) {
-      result.count = count
+      output.count = count
     }
 
+    // console.log('this.internal.includeSchema', this.internal.includeSchema)
     if (this.internal.includeSchema) {
-      result.content_type = await this.db.collection({
+      output.content_type = await this.db.collection(getCollectionName({
           content_type_uid: '_content_types',
           locale: this.q.locale,
-        }, this.collectionNames)
+        }, this.collectionNames))
         .findOne({
           uid: this.q.content_type_uid,
         }, {
@@ -1795,7 +1788,7 @@ export class Stack {
 
     this.cleanup()
 
-    return result
+    return output
   }
 
   private async includeAssetsOnly(entries: any[], contentTypeUid: string, locale: string) {
@@ -1891,10 +1884,6 @@ export class Stack {
       schemaList, // list of content type uids, the current content types refer to
     } = await this.getReferencePath(ctQuery, locale, include)
 
-    // console.log('paths: ' + paths)
-    // console.log('pending paths: ' + pendingPath)
-    // console.log('schema list: ' + JSON.stringify(schemaList))
-
     const queries = {
       $or: [],
     } // reference field paths
@@ -1906,14 +1895,10 @@ export class Stack {
       this.fetchPathDetails(entries, locale, paths[i].split('.'), queries, shelf, true, entries, 0)
     }
 
-    // console.log('@sub queries', queries)
-    // console.log('@shelf', JSON.stringify(shelf))
-
     // even after traversing, if no references were found, simply return the entries found thusfar
     if (shelf.length === 0) {
       return entries
     }
-    // console.log('@shelf-1', JSON.stringify(shelf))
     // else, self-recursively iterate and fetch references
     // Note: Shelf is the one holding `pointers` to the actual entry
     // Once the pointer has been used, for GC, point the object to null
@@ -1922,19 +1907,15 @@ export class Stack {
   }
 
   private fetchPathDetails(data: any, locale: string, pathArr: string[], queryBucket: IQuery, shelf,
-    assetsOnly = false, parent, pos, counter = 0) {
+                           assetsOnly = false, parent, pos, counter = 0) {
     if (counter === (pathArr.length)) {
-      // console.log('data', data)
-      // console.log('parent', parent)
       if (data && typeof data === 'object') {
-        // console.log('data is object')
         if (data instanceof Array && data.length) {
-          // console.log('data is array')
           data.forEach((elem, idx) => {
-            // console.log('elem', elem)
             if (typeof elem === 'string') {
               queryBucket.$or.push({
                 _content_type_uid: '_assets',
+                _version: { $exists: true},
                 locale,
                 uid: elem,
               })
@@ -1959,7 +1940,6 @@ export class Stack {
             }
           })
         } else if (typeof data === 'object') {
-          // console.log('data is plain object')
           if (data.hasOwnProperty('_content_type_uid')) {
             queryBucket.$or.push({
               _content_type_uid: data._content_type_uid,
@@ -1975,14 +1955,13 @@ export class Stack {
           }
         }
       } else if (typeof data === 'string') {
-        // console.log('data is string')
         queryBucket.$or.push({
           _content_type_uid: '_assets',
+          _version: { $exists: true},
           locale,
           uid: data,
         })
 
-        // console.log('shelf for assets: ' + JSON.stringify(parent), pos)
         shelf.push({
           path: parent,
           position: pos,
@@ -1991,20 +1970,17 @@ export class Stack {
       }
     } else {
       const currentField = pathArr[counter]
-      // console.log('path not over. current field is', currentField)
       counter++
       if (data instanceof Array) {
         // tslint:disable-next-line: prefer-for-of
         for (let i = 0; i < data.length; i++) {
           if (data[i][currentField]) {
-            // console.log('data was array, lookin for field in data.current field')
             this.fetchPathDetails(data[i][currentField], locale, pathArr, queryBucket, shelf, assetsOnly, data[i],
               currentField, counter)
           }
         }
       } else {
         if (data[currentField]) {
-          // console.log('data was object, lookin for field in data.current field')
           this.fetchPathDetails(data[currentField], locale, pathArr, queryBucket, shelf, assetsOnly, data,
             currentField, counter)
         }
@@ -2015,7 +1991,7 @@ export class Stack {
     return
   }
 
-  private async includeReferenceIteration (eQuery: any, ctQuery: any, locale: string, include: string[], oldShelf:
+  private async includeReferenceIteration(eQuery: any, ctQuery: any, locale: string, include: string[], oldShelf:
     IShelf[]) {
     if (oldShelf.length === 0 || ctQuery.$or.length === 0) {
       return
@@ -2027,21 +2003,13 @@ export class Stack {
       schemaList,
     } = await this.getReferencePath(ctQuery, locale, include)
 
-    // console.log('@paths 2', JSON.stringify(paths))
-    // console.log('@pending path', pendingPath)
-    // console.log('@schema list 2', JSON.stringify(schemaList))
-
     const {
       result,
       queries,
       shelf,
     } = await this.fetchEntries(eQuery, locale, paths, include)
     // GC to avoid mem leaks!
-    // eQuery = null
-
-    // console.log('@entries 2', JSON.stringify(result))
-    // console.log('@queries 2', queries)
-    // console.log('@shelf-2', JSON.stringify(shelf))
+    eQuery = null
 
     for (let i = 0, j = oldShelf.length; i < j; i++) {
       const element: IShelf = oldShelf[i]
@@ -2106,9 +2074,9 @@ export class Stack {
       // tslint:disable-next-line: forin
       for (const path in entryReferences) {
         const idx = includePath.indexOf(path)
+        // tslint:disable-next-line: no-bitwise
         if (~idx) {
           let subPath
-          // console.log('path vs includePath', path, includePath)
           // Its the complete path!! Hurrah!
           if (path.length !== includePath.length) {
             subPath = includePath.slice(0, path.length)
@@ -2150,9 +2118,8 @@ export class Stack {
     }
   }
 
-  private async fetchEntries (query: IQuery, locale: string, paths: string[], include: string[], includeAll:
+  private async fetchEntries(query: IQuery, locale: string, paths: string[], include: string[], includeAll:
     boolean = false) {
-    // console.log('@fetch entries query', JSON.stringify(query))
     const result = await this.db.collection(getCollectionName({
         content_type_uid: 'entries',
         locale,
@@ -2197,7 +2164,7 @@ export class Stack {
     }
   }
 
-  private async bindReferences (entries: any[], contentTypeUid: string, locale: string) {
+  private async bindReferences(entries: any[], contentTypeUid: string, locale: string) {
     const ctQuery = {
       $or: [{
         _content_type_uid: '_content_types',
@@ -2210,9 +2177,6 @@ export class Stack {
       ctQueries, // list of content type uids, the current content types refer to
     } = await this.getAllReferencePaths(ctQuery, locale)
 
-    // console.log('paths: ' + paths)
-    // console.log('schema list: ' + JSON.stringify(schemaList))
-
     const queries = {
       $or: [],
     } // reference field paths
@@ -2224,14 +2188,10 @@ export class Stack {
       this.fetchPathDetails(entries, locale, paths[i].split('.'), queries, objectPointerList, true, entries, 0)
     }
 
-    // console.log('@sub queries', queries)
-    // console.log('@objectPointerList', JSON.stringify(objectPointerList))
-
     // even after traversing, if no references were found, simply return the entries found thusfar
     if (objectPointerList.length === 0) {
       return entries
     }
-    // console.log('@shelf-1', JSON.stringify(shelf))
     // else, self-recursively iterate and fetch references
     // Note: Shelf is the one holding `pointers` to the actual entry
     // Once the pointer has been used, for GC, point the object to null
@@ -2239,8 +2199,8 @@ export class Stack {
     return this.includeAllReferencesIteration(queries, ctQueries, locale, objectPointerList)
   }
 
-  private async includeAllReferencesIteration (oldEntryQueries: IQuery, oldCtQueries: IQuery, locale:
-    string, oldObjectPointerList: IShelf[], depth = 0) {
+  private async includeAllReferencesIteration(oldEntryQueries: IQuery, oldCtQueries: IQuery, locale:
+    string,                                   oldObjectPointerList: IShelf[], depth = 0) {
     if (depth > this.q.referenceDepth || oldObjectPointerList.length === 0 || oldCtQueries.$or.length === 0) {
       return
     }
@@ -2248,7 +2208,6 @@ export class Stack {
       ctQueries,
       paths,
     } = await this.getAllReferencePaths(oldCtQueries, locale)
-    // console.log('@paths', paths)
     // GC to aviod mem leaks
     oldCtQueries = null
     const {
@@ -2271,14 +2230,14 @@ export class Stack {
     // GC to avoid mem leaks!
     oldObjectPointerList = null
 
-      ++depth
+    ++depth
     // Iterative loops, that traverses paths and binds them onto entries
     await this.includeAllReferencesIteration(queries, ctQueries, locale, shelf, depth)
 
     return
   }
 
-  private async getAllReferencePaths (contentTypeQueries: IQuery, locale: string) {
+  private async getAllReferencePaths(contentTypeQueries: IQuery, locale: string) {
     const contents: any[] = await this.db
       .collection(getCollectionName({
           content_type_uid: '_content_types',
@@ -2298,8 +2257,6 @@ export class Stack {
     let paths: string[] = []
 
     for (let i = 0, j = contents.length; i < j; i++) {
-      // console.log('_assets', contents[i]._assets)
-      // console.log('references', contents[i]._references)
       let assetFieldPaths: string[]
       let entryReferencePaths: string[]
       if (contents[i].hasOwnProperty('_assets')) {
@@ -2332,8 +2289,6 @@ export class Stack {
       }
     }
 
-    // console.log('@paths later..', JSON.stringify(paths))
-    // console.log('@ctQueries later..', JSON.stringify(ctQueries))
     return {
       ctQueries,
       paths,

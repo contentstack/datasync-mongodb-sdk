@@ -2,6 +2,7 @@
  * @description Test contentstack-mongodb-sdk basic methods
  */
 
+import { cloneDeep } from 'lodash'
 import { Contentstack } from '../src'
 import { config } from './config'
 import { assets } from './data/assets'
@@ -10,54 +11,61 @@ import { entries as blogs } from './data/blog'
 import { entries as categories } from './data/category'
 import { content_types } from './data/content_types'
 
-config.contentStore.collectionName = 'comparison'
-const collectionName = config.contentStore.collectionName
-const Stack = Contentstack.Stack(config)
+const scriptConfig = cloneDeep(config)
+const collNameConfig: any = scriptConfig.contentStore.collection
+collNameConfig.asset = 'contents.comparison_operators'
+collNameConfig.entry = 'contents.comparison_operators'
+collNameConfig.schema = 'content_types.comparison_operators'
+
+const Stack = Contentstack.Stack(scriptConfig)
+const collection = cloneDeep(collNameConfig)
+
+collection.asset = `en-us.${collNameConfig.asset}`
+collection.entry = `en-us.${collNameConfig.entry}`
+collection.schema = `en-us.${collNameConfig.schema}`
+
 let db
 
-const itemPropertyChecks = (result) => {
-  if (result instanceof Array) {
-    result.forEach((item) => {
-      expect(item).not.toHaveProperty('sys_keys')
-      expect(item).not.toHaveProperty('_version')
-      expect(item).not.toHaveProperty('content_type_uid')
-      expect(item).not.toHaveProperty('created_at')
-      expect(item).not.toHaveProperty('updated_at')
-    })
-    expect(result).toHaveProperty('content_type_uid')
-    expect(result).toHaveProperty('locale')
-    expect((result as any).locale).toEqual('en-us')
-  }
+const checkEntries = (result: any) => {
+  expect(result).toHaveProperty('entries')
+  expect(result).toHaveProperty('locale')
+  expect(result).toHaveProperty('content_type_uid')
+  expect(result.locale).toEqual('en-us')
+  expect(result.entries instanceof Array).toBeTruthy()
+  result.entries.forEach((item) => {
+    expect(item).not.toHaveProperty('_version')
+    expect(item).not.toHaveProperty('_content_type_uid')
+    expect(item).not.toHaveProperty('created_at')
+    expect(item).not.toHaveProperty('updated_at')
+  })
 }
 
 describe('# Comparison Operator Querying', () => {
+
   beforeAll(() => {
     return Stack.connect().then((dbInstance) => {
       db = dbInstance
+
+      return
     })
   })
-  beforeAll(() => {
-    return db.collection(collectionName).insertMany(authors)
-      .then(() => {
-        return db.collection(collectionName).insertMany(blogs)
-      })
-      .then(() => {
-        return db.collection(collectionName).insertMany(categories)
-      })
-      .then(() => {
-        return db.collection(collectionName).insertMany(assets)
-      })
-      .then(() => {
-        return db.collection(collectionName).insertMany(content_types)
-      })
-      .catch((error) => {
-        expect(error).toBeNull()
-      })
+
+  beforeAll(async () => {
+    await db.collection(collection.entry).insertMany(authors)
+    await db.collection(collection.entry).insertMany(blogs)
+    await db.collection(collection.entry).insertMany(categories)
+    await db.collection(collection.asset).insertMany(assets)
+    await db.collection(collection.schema).insertMany(content_types)
+
+    return
   })
-  afterAll(() => {
-    return db.collection(collectionName).drop().then(() => {
-      return Stack.close()
-    })
+
+  afterAll(async () => {
+    await db.collection(collection.entry).drop()
+    // await db.collection(collection.asset).drop()
+    await db.collection(collection.schema).drop()
+
+    return Stack.close()
   })
 
   describe('on: non pre-existing operator', () => {
@@ -66,12 +74,11 @@ describe('# Comparison Operator Querying', () => {
         .entries()
         .lessThan('no', 1)
         .find()
-        .then((result) => {
-          (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(1)
+        .then((result: any) => {
+          checkEntries(result)
+          expect(result.content_type_uid).toEqual('blog')
+          expect(result.entries).toHaveLength(1)
+          result.entries.forEach((entry) => {
             expect(entry).toHaveProperty('no')
             expect(entry.no).toEqual(0)
           })
@@ -85,12 +92,11 @@ describe('# Comparison Operator Querying', () => {
         .entries()
         .lessThanOrEqualTo('no', 0)
         .find()
-        .then((result) => {
-          (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(1)
+        .then((result: any) => {
+          checkEntries(result)
+          expect(result.content_type_uid).toEqual('blog')
+          expect(result.entries).toHaveLength(1)
+          result.entries.forEach((entry) => {
             expect(entry).toHaveProperty('no')
             expect(entry.no).toEqual(0)
           })
@@ -104,12 +110,11 @@ describe('# Comparison Operator Querying', () => {
         .entries()
         .notEqualTo('no', 0)
         .find()
-        .then((result) => {
-          (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(4)
+        .then((result: any) => {
+          checkEntries(result)
+          expect(result.content_type_uid).toEqual('blog')
+          expect(result.entries).toHaveLength(4)
+          result.entries.forEach((entry) => {
             expect(entry).toHaveProperty('no')
             expect(entry.no).not.toEqual(0)
           })
@@ -123,12 +128,11 @@ describe('# Comparison Operator Querying', () => {
         .entries()
         .greaterThan('no', 5)
         .find()
-        .then((result) => {
-          (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(1)
+        .then((result: any) => {
+          checkEntries(result)
+          expect(result.content_type_uid).toEqual('blog')
+          expect(result.entries).toHaveLength(1)
+          result.entries.forEach((entry) => {
             expect(entry).toHaveProperty('no')
             expect(entry.no).toBeGreaterThan(5)
           })
@@ -142,12 +146,11 @@ describe('# Comparison Operator Querying', () => {
         .entries()
         .greaterThanOrEqualTo('no', 6)
         .find()
-        .then((result) => {
-          (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(1)
+        .then((result: any) => {
+          checkEntries(result)
+          expect(result.content_type_uid).toEqual('blog')
+          expect(result.entries).toHaveLength(1)
+          result.entries.forEach((entry) => {
             expect(entry).toHaveProperty('no')
             expect(entry.no).toBeGreaterThanOrEqual(6)
           })
@@ -161,12 +164,11 @@ describe('# Comparison Operator Querying', () => {
         .entries()
         .containedIn('tags', ['last'])
         .find()
-        .then((result) => {
-          (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(1)
+        .then((result: any) => {
+          checkEntries(result)
+          expect(result.content_type_uid).toEqual('blog')
+          expect(result.entries).toHaveLength(1)
+          result.entries.forEach((entry) => {
             expect(entry).toHaveProperty('tags')
             expect(entry.tags).toContain('last')
           })
@@ -180,12 +182,11 @@ describe('# Comparison Operator Querying', () => {
         .entries()
         .notContainedIn('tags', ['last'])
         .find()
-        .then((result) => {
-          (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(4)
+        .then((result: any) => {
+          checkEntries(result)
+          expect(result.content_type_uid).toEqual('blog')
+          expect(result.entries).toHaveLength(4)
+          result.entries.forEach((entry) => {
             if (entry.tags) {
               expect(entry.tags).not.toContain('last')
             }
@@ -202,12 +203,11 @@ describe('# Comparison Operator Querying', () => {
         .entries()
         .lessThanOrEqualTo('no', 0)
         .find()
-        .then((result) => {
-          (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(1)
+        .then((result: any) => {
+          checkEntries(result)
+          expect(result.content_type_uid).toEqual('blog')
+          expect(result.entries).toHaveLength(1)
+          result.entries.forEach((entry) => {
             expect(entry).toHaveProperty('no')
             expect(entry.no).toEqual(0)
           })
@@ -223,12 +223,11 @@ describe('# Comparison Operator Querying', () => {
         .greaterThan('no', 5)
         .greaterThanOrEqualTo('no', 6)
         .find()
-        .then((result) => {
-          (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(1)
+        .then((result: any) => {
+          checkEntries(result)
+          expect(result.content_type_uid).toEqual('blog')
+          expect(result.entries).toHaveLength(1)
+          result.entries.forEach((entry) => {
             expect(entry).toHaveProperty('no')
             expect(entry.no).toBeGreaterThanOrEqual(6)
           })
@@ -243,12 +242,11 @@ describe('# Comparison Operator Querying', () => {
         .containedIn('tags', ['last'])
         .notContainedIn('tags', ['first'])
         .find()
-        .then((result) => {
-          (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(4)
+        .then((result: any) => {
+          checkEntries(result)
+          expect(result.content_type_uid).toEqual('blog')
+          expect(result.entries).toHaveLength(4)
+          result.entries.forEach((entry) => {
             if (entry.tags) {
               expect(entry.tags).not.toContain('first')
             }

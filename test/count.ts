@@ -2,6 +2,7 @@
  * @description Test contentstack-mongodb-sdk basic methods
  */
 
+import { cloneDeep } from 'lodash'
 import { Contentstack } from '../src'
 import { config } from './config'
 import { assets } from './data/assets'
@@ -10,41 +11,48 @@ import { entries as blogs } from './data/blog'
 import { entries as categories } from './data/category'
 import { content_types } from './data/content_types'
 
-config.contentStore.collectionName = 'count'
-const collectionName = config.contentStore.collectionName
-const Stack = Contentstack.Stack(config)
-const blogsCount = blogs.length
+const scriptConfig = cloneDeep(config)
+const collNameConfig: any = scriptConfig.contentStore.collection
+collNameConfig.asset = 'contents.count'
+collNameConfig.entry = 'contents.count'
+collNameConfig.schema = 'content_types.count'
+
+const Stack = Contentstack.Stack(scriptConfig)
+const collection = cloneDeep(collNameConfig)
+const blogCount = blogs.length
+
+collection.asset = `en-us.${collNameConfig.asset}`
+collection.entry = `en-us.${collNameConfig.entry}`
+collection.schema = `en-us.${collNameConfig.schema}`
+
 let db
 
 describe('# Count', () => {
+
   beforeAll(() => {
     return Stack.connect().then((dbInstance) => {
       db = dbInstance
+
+      return
     })
-  })
-  beforeAll(() => {
-    return db.collection(collectionName).insertMany(authors)
-      .then(() => {
-        return db.collection(collectionName).insertMany(blogs)
-      })
-      .then(() => {
-        return db.collection(collectionName).insertMany(categories)
-      })
-      .then(() => {
-        return db.collection(collectionName).insertMany(assets)
-      })
-      .then(() => {
-        return db.collection(collectionName).insertMany(content_types)
-      })
-      .catch((error) => {
-        expect(error).toBeNull()
-      })
   })
 
-  afterAll(() => {
-    return db.collection(collectionName).drop().then(() => {
-      return Stack.close()
-    })
+  beforeAll(async () => {
+    await db.collection(collection.entry).insertMany(authors)
+    await db.collection(collection.entry).insertMany(blogs)
+    await db.collection(collection.entry).insertMany(categories)
+    await db.collection(collection.asset).insertMany(assets)
+    await db.collection(collection.schema).insertMany(content_types)
+
+    return
+  })
+
+  afterAll(async () => {
+    await db.collection(collection.entry).drop()
+    // await db.collection(collection.asset).drop()
+    await db.collection(collection.schema).drop()
+
+    return Stack.close()
   })
 
   describe('basic', () => {
@@ -52,10 +60,11 @@ describe('# Count', () => {
       return Stack.contentType('blog')
         .entries()
         .count()
-        .then((result) => {
+        .then((result: any) => {
           expect(result).toHaveProperty('count')
-          expect((result as any).count).toEqual(blogsCount)
-          expect(Object.keys(result)).toHaveLength(1)
+          expect(result).toHaveProperty('locale')
+          expect(result.count).toEqual(blogCount)
+          expect(Object.keys(result)).toHaveLength(2)
         }).catch((error) => {
           expect(error).toBeNull()
         })
@@ -68,10 +77,11 @@ describe('# Count', () => {
         .entries()
         .queryReferences({'authors.uid': 'a10'})
         .count()
-        .then((result) => {
+        .then((result: any) => {
           expect(result).toHaveProperty('count')
-          expect((result as any).count).toEqual(1)
-          expect(Object.keys(result)).toHaveLength(1)
+          expect(result).toHaveProperty('locale')
+          expect(result.count).toEqual(1)
+          expect(Object.keys(result)).toHaveLength(2)
         }).catch((error) => {
           expect(error).toBeNull()
         })

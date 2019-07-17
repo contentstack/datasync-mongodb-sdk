@@ -1,112 +1,164 @@
+// tslint:disable-next-line: variable-name
 export const content_types = [
   {
-    content_type_uid: '_content_types',
+    _content_type_uid: '_content_types',
+    locale: 'en-us',
     published_at: '2019-02-07T14:52:37.617Z',
     schema: [
       {
-        'display_name' : 'Title',
-        'uid' : 'title',
-        'data_type' : 'text',
-        'mandatory' : true,
-        'unique' : true,
-        'field_metadata' : {
-          '_default' : true,
+        display_name : 'Title',
+        uid : 'title',
+        // tslint:disable-next-line: object-literal-sort-keys
+        data_type: 'text',
+        mandatory : true,
+        unique : true,
+        field_metadata : {
+          _default : true,
         },
-        'multiple' : false,
+        multiple : false,
       },
       {
-        'display_name' : 'URL',
-        'uid' : 'url',
-        'data_type' : 'text',
-        'mandatory' : false,
-        'field_metadata' : {
-          '_default' : true,
+        display_name : 'URL',
+        uid : 'url',
+        // tslint:disable-next-line: object-literal-sort-keys
+        data_type: 'text',
+        mandatory : false,
+        field_metadata : {
+          _default : true,
         },
-        'multiple' : false,
-        'unique' : false,
+        multiple : false,
+        unique : false,
       },
     ],
-    sys_keys: {
-      content_type_uid : '_content_types',
-      uid: 'blog',
-    },
     title: 'Blog',
     uid: 'blog',
-    references: {
+    // tslint:disable-next-line: object-literal-sort-keys
+    _references: {
       authors: 'author',
-      self_reference: 'blog'
-    }
+      self_reference: 'blog',
+    },
+    _assets: {
+      single_file: '_assets',
+    },
   },
   {
-    content_type_uid: '_content_types',
+    _content_type_uid: '_content_types',
+    locale: 'en-us',
     published_at: '2019-02-07T14:52:37.618Z',
     schema: [
       {
-        'display_name' : 'Title',
-        'uid' : 'title',
-        'data_type' : 'text',
-        'mandatory' : true,
-        'unique' : true,
-        'field_metadata' : {
-          '_default' : true,
+        display_name : 'Title',
+        uid : 'title',
+        // tslint:disable-next-line: object-literal-sort-keys
+        data_type: 'text',
+        mandatory : true,
+        unique : true,
+        field_metadata : {
+          _default : true,
         },
-        'multiple' : false,
+        multiple : false,
       },
       {
-        'display_name' : 'URL',
-        'uid' : 'url',
-        'data_type' : 'text',
-        'mandatory' : false,
-        'field_metadata' : {
-          '_default' : true,
+        display_name : 'URL',
+        uid : 'url',
+        // tslint:disable-next-line: object-literal-sort-keys
+        data_type: 'text',
+        mandatory : false,
+        field_metadata : {
+          _default : true,
         },
-        'multiple' : false,
-        'unique' : false,
+        multiple : false,
+        unique : false,
       },
     ],
-    sys_keys: {
-      content_type_uid : '_content_types',
-      uid: 'author',
-    },
     title: 'Author',
     uid: 'author',
+    // tslint:disable-next-line: object-literal-sort-keys
     references: {
       blogs: 'blog',
-      self_reference: 'author'
-    }
+      category: 'category',
+      self_reference: 'author',
+    },
+    _assets: {
+
+    },
   },
   {
-    content_type_uid: '_content_types',
+    _content_type_uid: '_content_types',
+    locale: 'en-us',
     published_at: '2019-02-07T14:52:37.616Z',
     schema: [
       {
-        'display_name' : 'Title',
-        'uid' : 'title',
-        'data_type' : 'text',
-        'mandatory' : true,
-        'unique' : true,
-        'field_metadata' : {
-          '_default' : true,
+        display_name : 'Title',
+        uid : 'title',
+        // tslint:disable-next-line: object-literal-sort-keys
+        data_type: 'text',
+        mandatory : true,
+        unique : true,
+        field_metadata : {
+          _default : true,
         },
-        'multiple' : false,
+        multiple : false,
       },
       {
-        'display_name' : 'URL',
-        'uid' : 'url',
-        'data_type' : 'text',
-        'mandatory' : false,
-        'field_metadata' : {
-          '_default' : true,
+        display_name : 'URL',
+        uid : 'url',
+        // tslint:disable-next-line: object-literal-sort-keys
+        data_type: 'text',
+        mandatory : false,
+        field_metadata : {
+          _default : true,
         },
-        'multiple' : false,
-        'unique' : false,
+        multiple : false,
+        unique : false,
       },
     ],
-    sys_keys: {
-      content_type_uid : '_content_types',
-      uid: 'category',
-    },
     title: 'Category',
     uid: 'category',
+    // tslint:disable-next-line: object-literal-sort-keys
+    _references: {},
+    _assets: {},
+  },
+  {
+    _content_type_uid: '_content_types',
+    locale: 'en-us',
+    published_at: '2019-02-07T14:52:37.616Z',
+    schema: [
+      {
+        display_name : 'Title',
+        uid : 'title',
+        // tslint:disable-next-line: object-literal-sort-keys
+        data_type: 'text',
+        mandatory : true,
+        unique : true,
+        field_metadata : {
+          _default : true,
+        },
+        multiple : false,
+      },
+      {
+        display_name : 'URL',
+        uid : 'url',
+        // tslint:disable-next-line: object-literal-sort-keys
+        data_type: 'text',
+        mandatory : false,
+        field_metadata : {
+          _default : true,
+        },
+        multiple : false,
+        unique : false,
+      },
+    ],
+    title: 'Products',
+    uid: 'products',
+    // tslint:disable-next-line: object-literal-sort-keys
+    _references: {
+      authors: 'author',
+      self_reference: 'blog',
+    },
+    _assets: {
+      files: '_assets',
+      single_file: '_assets',
+    },
   },
 ]
