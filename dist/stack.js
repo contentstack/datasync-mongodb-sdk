@@ -1471,7 +1471,7 @@ class Stack {
                 // Ignore references include, for empty list, exclude call, content type & assets
                 if (result.length === 0 || this.internal.excludeReferences || this.q.content_type_uid === this
                     .types.content_types || this.q.content_type_uid
-                    === this.types.assets) {
+                    === this.types.assets || this.internal.onlyCount) {
                     // Do nothing
                 }
                 else if (this.internal.includeSpecificReferences) {
@@ -1485,7 +1485,7 @@ class Stack {
                     yield this.includeAssetsOnly(result, this.q.content_type_uid, this.q.locale);
                 }
                 if (this.internal.queryReferences) {
-                    result = sift_1.default(this.internal.queryReferences, result);
+                    result = result.filter(sift_1.default(this.internal.queryReferences));
                     if (this.internal.skip) {
                         result = result.splice(this.internal.skip, this.internal.limit);
                     }
@@ -1522,21 +1522,9 @@ class Stack {
      * @returns {object} Returns count of the entries/asset's matched
      */
     count(query) {
-        return new Promise((resolve, reject) => {
-            const queryFilters = this.preProcess(query);
-            this.collection = this.collection.find(queryFilters);
-            return this.collection
-                .count()
-                .then((result) => {
-                this.cleanup();
-                return resolve({
-                    count: result,
-                });
-            })
-                .catch((error) => {
-                this.cleanup();
-                return reject(error);
-            });
+        return __awaiter(this, void 0, void 0, function* () {
+            this.internal.onlyCount = true;
+            return this.find(query);
         });
     }
     /**
@@ -1635,7 +1623,13 @@ class Stack {
     postProcess(result) {
         return __awaiter(this, void 0, void 0, function* () {
             const count = (result === null) ? 0 : result.length;
-            const output = {};
+            const output = {
+                locale: this.q.locale,
+            };
+            if (this.internal.onlyCount) {
+                output.count = count;
+                return output;
+            }
             switch (this.q.content_type_uid) {
                 case this.types.assets:
                     if (this.internal.single) {
@@ -1644,8 +1638,7 @@ class Stack {
                     else {
                         output.assets = result;
                     }
-                    result.content_type_uid = 'assets';
-                    result.locale = this.q.locale;
+                    output.content_type_uid = 'assets';
                     break;
                 case this.types.content_types:
                     if (this.internal.single) {
@@ -1654,7 +1647,7 @@ class Stack {
                     else {
                         output.content_types = result;
                     }
-                    result.content_type_uid = 'content_types';
+                    output.content_type_uid = 'content_types';
                     break;
                 default:
                     if (this.internal.single) {
@@ -1663,18 +1656,18 @@ class Stack {
                     else {
                         output.entries = result;
                     }
-                    result.content_type_uid = this.q.content_type_uid;
-                    result.locale = this.q.locale;
+                    output.content_type_uid = this.q.content_type_uid;
                     break;
             }
             if (this.internal.includeCount) {
-                result.count = count;
+                output.count = count;
             }
+            // console.log('this.internal.includeSchema', this.internal.includeSchema)
             if (this.internal.includeSchema) {
-                result.content_type = yield this.db.collection({
+                output.content_type = yield this.db.collection(util_1.getCollectionName({
                     content_type_uid: '_content_types',
                     locale: this.q.locale,
-                }, this.collectionNames)
+                }, this.collectionNames))
                     .findOne({
                     uid: this.q.content_type_uid,
                 }, {
@@ -1685,7 +1678,7 @@ class Stack {
                 });
             }
             this.cleanup();
-            return result;
+            return output;
         });
     }
     includeAssetsOnly(entries, contentTypeUid, locale) {
@@ -1772,9 +1765,6 @@ class Stack {
             const { paths, // ref. fields in the current content types
             pendingPath, // left over of *paths*
             schemaList, } = yield this.getReferencePath(ctQuery, locale, include);
-            // console.log('paths: ' + paths)
-            // console.log('pending paths: ' + pendingPath)
-            // console.log('schema list: ' + JSON.stringify(schemaList))
             const queries = {
                 $or: [],
             }; // reference field paths
@@ -1784,13 +1774,10 @@ class Stack {
             for (let i = 0, j = paths.length; i < j; i++) {
                 this.fetchPathDetails(entries, locale, paths[i].split('.'), queries, shelf, true, entries, 0);
             }
-            // console.log('@sub queries', queries)
-            // console.log('@shelf', JSON.stringify(shelf))
             // even after traversing, if no references were found, simply return the entries found thusfar
             if (shelf.length === 0) {
                 return entries;
             }
-            // console.log('@shelf-1', JSON.stringify(shelf))
             // else, self-recursively iterate and fetch references
             // Note: Shelf is the one holding `pointers` to the actual entry
             // Once the pointer has been used, for GC, point the object to null
@@ -1799,17 +1786,13 @@ class Stack {
     }
     fetchPathDetails(data, locale, pathArr, queryBucket, shelf, assetsOnly = false, parent, pos, counter = 0) {
         if (counter === (pathArr.length)) {
-            // console.log('data', data)
-            // console.log('parent', parent)
             if (data && typeof data === 'object') {
-                // console.log('data is object')
                 if (data instanceof Array && data.length) {
-                    // console.log('data is array')
                     data.forEach((elem, idx) => {
-                        // console.log('elem', elem)
                         if (typeof elem === 'string') {
                             queryBucket.$or.push({
                                 _content_type_uid: '_assets',
+                                _version: { $exists: true },
                                 locale,
                                 uid: elem,
                             });
@@ -1834,7 +1817,6 @@ class Stack {
                     });
                 }
                 else if (typeof data === 'object') {
-                    // console.log('data is plain object')
                     if (data.hasOwnProperty('_content_type_uid')) {
                         queryBucket.$or.push({
                             _content_type_uid: data._content_type_uid,
@@ -1850,13 +1832,12 @@ class Stack {
                 }
             }
             else if (typeof data === 'string') {
-                // console.log('data is string')
                 queryBucket.$or.push({
                     _content_type_uid: '_assets',
+                    _version: { $exists: true },
                     locale,
                     uid: data,
                 });
-                // console.log('shelf for assets: ' + JSON.stringify(parent), pos)
                 shelf.push({
                     path: parent,
                     position: pos,
@@ -1866,20 +1847,17 @@ class Stack {
         }
         else {
             const currentField = pathArr[counter];
-            // console.log('path not over. current field is', currentField)
             counter++;
             if (data instanceof Array) {
                 // tslint:disable-next-line: prefer-for-of
                 for (let i = 0; i < data.length; i++) {
                     if (data[i][currentField]) {
-                        // console.log('data was array, lookin for field in data.current field')
                         this.fetchPathDetails(data[i][currentField], locale, pathArr, queryBucket, shelf, assetsOnly, data[i], currentField, counter);
                     }
                 }
             }
             else {
                 if (data[currentField]) {
-                    // console.log('data was object, lookin for field in data.current field')
                     this.fetchPathDetails(data[currentField], locale, pathArr, queryBucket, shelf, assetsOnly, data, currentField, counter);
                 }
             }
@@ -1893,15 +1871,9 @@ class Stack {
                 return;
             }
             const { paths, pendingPath, schemaList, } = yield this.getReferencePath(ctQuery, locale, include);
-            // console.log('@paths 2', JSON.stringify(paths))
-            // console.log('@pending path', pendingPath)
-            // console.log('@schema list 2', JSON.stringify(schemaList))
             const { result, queries, shelf, } = yield this.fetchEntries(eQuery, locale, paths, include);
             // GC to avoid mem leaks!
-            // eQuery = null
-            // console.log('@entries 2', JSON.stringify(result))
-            // console.log('@queries 2', queries)
-            // console.log('@shelf-2', JSON.stringify(shelf))
+            eQuery = null;
             for (let i = 0, j = oldShelf.length; i < j; i++) {
                 const element = oldShelf[i];
                 for (let k = 0, l = result.length; k < l; k++) {
@@ -1958,9 +1930,9 @@ class Stack {
                 // tslint:disable-next-line: forin
                 for (const path in entryReferences) {
                     const idx = includePath.indexOf(path);
+                    // tslint:disable-next-line: no-bitwise
                     if (~idx) {
                         let subPath;
-                        // console.log('path vs includePath', path, includePath)
                         // Its the complete path!! Hurrah!
                         if (path.length !== includePath.length) {
                             subPath = includePath.slice(0, path.length);
@@ -2001,7 +1973,6 @@ class Stack {
     }
     fetchEntries(query, locale, paths, include, includeAll = false) {
         return __awaiter(this, void 0, void 0, function* () {
-            // console.log('@fetch entries query', JSON.stringify(query))
             const result = yield this.db.collection(util_1.getCollectionName({
                 content_type_uid: 'entries',
                 locale,
@@ -2053,8 +2024,6 @@ class Stack {
             };
             const { paths, // ref. fields in the current content types
             ctQueries, } = yield this.getAllReferencePaths(ctQuery, locale);
-            // console.log('paths: ' + paths)
-            // console.log('schema list: ' + JSON.stringify(schemaList))
             const queries = {
                 $or: [],
             }; // reference field paths
@@ -2064,13 +2033,10 @@ class Stack {
             for (let i = 0, j = paths.length; i < j; i++) {
                 this.fetchPathDetails(entries, locale, paths[i].split('.'), queries, objectPointerList, true, entries, 0);
             }
-            // console.log('@sub queries', queries)
-            // console.log('@objectPointerList', JSON.stringify(objectPointerList))
             // even after traversing, if no references were found, simply return the entries found thusfar
             if (objectPointerList.length === 0) {
                 return entries;
             }
-            // console.log('@shelf-1', JSON.stringify(shelf))
             // else, self-recursively iterate and fetch references
             // Note: Shelf is the one holding `pointers` to the actual entry
             // Once the pointer has been used, for GC, point the object to null
@@ -2083,7 +2049,6 @@ class Stack {
                 return;
             }
             const { ctQueries, paths, } = yield this.getAllReferencePaths(oldCtQueries, locale);
-            // console.log('@paths', paths)
             // GC to aviod mem leaks
             oldCtQueries = null;
             const { result, queries, shelf, } = yield this.fetchEntries(oldEntryQueries, locale, paths, [], true);
@@ -2124,8 +2089,6 @@ class Stack {
             };
             let paths = [];
             for (let i = 0, j = contents.length; i < j; i++) {
-                // console.log('_assets', contents[i]._assets)
-                // console.log('references', contents[i]._references)
                 let assetFieldPaths;
                 let entryReferencePaths;
                 if (contents[i].hasOwnProperty('_assets')) {
@@ -2157,8 +2120,6 @@ class Stack {
                     }
                 }
             }
-            // console.log('@paths later..', JSON.stringify(paths))
-            // console.log('@ctQueries later..', JSON.stringify(ctQueries))
             return {
                 ctQueries,
                 paths,
