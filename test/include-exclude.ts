@@ -2,6 +2,7 @@
  * @description Test contentstack-mongodb-sdk basic methods
  */
 
+import { cloneDeep } from 'lodash'
 import { Contentstack } from '../src'
 import { config } from './config'
 import { assets } from './data/assets'
@@ -10,70 +11,75 @@ import { entries as blogs } from './data/blog'
 import { entries as categories } from './data/category'
 import { content_types } from './data/content_types'
 
-config.contentStore.collectionName = 'include_exclude'
-const collectionName = config.contentStore.collectionName
-const Stack = Contentstack.Stack(config)
+const scriptConfig = cloneDeep(config)
+const collNameConfig: any = scriptConfig.contentStore.collection
+collNameConfig.asset = 'contents.include_exclude'
+collNameConfig.entry = 'contents.include_exclude'
+collNameConfig.schema = 'content_types.include_exclude'
+
+const Stack = Contentstack.Stack(scriptConfig)
+const collection = cloneDeep(collNameConfig)
+
+collection.asset = `en-us.${collNameConfig.asset}`
+collection.entry = `en-us.${collNameConfig.entry}`
+collection.schema = `en-us.${collNameConfig.schema}`
+
 let db
 
 const itemPropertyChecks = (result) => {
-  if (result instanceof Array) {
-    result.forEach((item) => {
-      expect(item).not.toHaveProperty('sys_keys')
-      expect(item).not.toHaveProperty('_version')
-      expect(item).not.toHaveProperty('content_type_uid')
-      expect(item).not.toHaveProperty('created_at')
-      expect(item).not.toHaveProperty('updated_at')
-    })
-    expect(result).toHaveProperty('content_type_uid')
-    expect(result).toHaveProperty('locale')
-    expect((result as any).locale).toEqual('en-us')
-  }
+  expect(result).toHaveProperty('entries')
+  expect(result).toHaveProperty('locale')
+  expect(result).toHaveProperty('content_type_uid')
+  expect(result.locale).toEqual('en-us')
+  result.entries.forEach((item) => {
+    expect(item).not.toHaveProperty('_version')
+    expect(item).not.toHaveProperty('_content_type_uid')
+    expect(item).not.toHaveProperty('created_at')
+    expect(item).not.toHaveProperty('updated_at')
+  })
 }
 
 describe('# Include Exclude', () => {
+
   beforeAll(() => {
     return Stack.connect().then((dbInstance) => {
       db = dbInstance
-    })
-  })
-  beforeAll(() => {
-    return db.collection(collectionName).insertMany(authors)
-      .then(() => {
-        return db.collection(collectionName).insertMany(blogs)
-      })
-      .then(() => {
-        return db.collection(collectionName).insertMany(categories)
-      })
-      .then(() => {
-        return db.collection(collectionName).insertMany(assets)
-      })
-      .then(() => {
-        return db.collection(collectionName).insertMany(content_types)
-      })
-      .catch((error) => {
-        expect(error).toBeNull()
-      })
-  })
-  afterAll(() => {
-    return db.collection(collectionName).drop().then(() => {
-      return Stack.close()
+
+      return
     })
   })
 
+  beforeAll(async () => {
+    await db.collection(collection.entry).insertMany(authors)
+    await db.collection(collection.entry).insertMany(blogs)
+    await db.collection(collection.entry).insertMany(categories)
+    await db.collection(collection.asset).insertMany(assets)
+    await db.collection(collection.schema).insertMany(content_types)
+
+    return
+  })
+
+  afterAll(async () => {
+    await db.collection(collection.entry).drop()
+    // await db.collection(collection.asset).drop()
+    await db.collection(collection.schema).drop()
+
+    return Stack.close()
+  })
+
   describe('basic inclusion', () => {
-    test('.includeCount()', () => {
+    test('1 .includeCount()', () => {
       return Stack.contentType('blog')
         .entries()
         .includeCount()
         .find()
-        .then((result) => {
-          (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(5)
-            expect((result as any)).toHaveProperty('count')
-            expect((result as any).count).toEqual(5)
+        .then((result: any) => {
+          itemPropertyChecks(result)
+          expect(result.content_type_uid).toEqual('blog')
+          expect(result.entries).toHaveLength(5)
+          expect(result).toHaveProperty('count')
+          expect(result.count).toEqual(5)
+          result.entries.forEach((entry) => {
             expect(entry).toHaveProperty('no')
           })
         }).catch((error) => {
@@ -81,41 +87,45 @@ describe('# Include Exclude', () => {
         })
     })
 
-    test('.includeSchema()', () => {
+    test('2 .includeSchema()', () => {
       return Stack.contentType('blog')
         .entries()
         .includeSchema()
         .find()
-        .then((result) => {
-          (result as any).entries.forEach(() => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(5)
-            expect((result as any)).toHaveProperty('content_type')
-            expect((result as any).content_type).toHaveProperty('uid')
-            expect((result as any).content_type).toHaveProperty('title')
-            expect((result as any).content_type).toHaveProperty('schema')
-          })
+        .then((result: any) => {
+          itemPropertyChecks(result)
+          expect(result.content_type_uid).toEqual('blog')
+          expect(result.entries).toHaveLength(5)
+          expect(result).toHaveProperty('content_type')
+          expect(result.content_type).toHaveProperty('uid')
+          expect(result.content_type).toHaveProperty('title')
+          expect(result.content_type).toHaveProperty('schema')
         }).catch((error) => {
           expect(error).toBeNull()
         })
     })
 
-    test('.excludeReferences()', () => {
+    test('3 .excludeReferences()', () => {
       return Stack.contentType('blog')
         .entries()
         .excludeReferences()
         .find()
-        .then((result) => {
-          (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(5)
-            expect(entry.authors).toHaveProperty('reference_to')
-            expect(entry.authors.reference_to).toEqual('author')
-            expect(entry.authors).toHaveProperty('values')
+        .then((result: any) => {
+          itemPropertyChecks(result)
+          expect(result.content_type_uid).toEqual('blog')
+          expect(result.entries).toHaveLength(5)
+          result.entries.forEach((entry) => {
+            if (entry.hasOwnProperty('authors')) {
+              if (entry.authors instanceof Array) {
+                entry.authors.forEach((ref) => {
+                  expect(ref).toHaveProperty('_content_type_uid')
+                  expect(ref).toHaveProperty('uid')
+                })
+              } else {
+                expect(entry.authors).toHaveProperty('_content_type_uid')
+                expect(entry.authors).toHaveProperty('uid')
+              }
+            }
           })
         }).catch((error) => {
           expect(error).toBeNull()
@@ -124,31 +134,39 @@ describe('# Include Exclude', () => {
   })
 
   describe('combination of include-exclude', () => {
-    test('.includeCount() + .includeSchema() + .excludeReferences()', () => {
+    test('1 .includeCount() + .includeSchema() + .excludeReferences()', () => {
       return Stack.contentType('blog')
         .entries()
         .includeCount()
         .includeSchema()
         .excludeReferences()
         .find()
-        .then((result) => {
-          (result as any).entries.forEach((entry) => {
-            itemPropertyChecks(result)
-            expect(result).toHaveProperty('entries')
-            expect((result as any).content_type_uid).toEqual('blog')
-            expect((result as any).entries).toHaveLength(5)
-            expect((result as any)).toHaveProperty('count')
-            expect((result as any).count).toEqual(5)
-            expect((result as any)).toHaveProperty('content_type')
-            expect((result as any).content_type).toHaveProperty('uid')
-            expect((result as any).content_type).toHaveProperty('title')
-            expect((result as any).content_type).toHaveProperty('schema')
-            expect(entry.authors).toHaveProperty('reference_to')
-            expect(entry.authors.reference_to).toEqual('author')
-            expect(entry.authors).toHaveProperty('values')
+        .then((result: any) => {
+          itemPropertyChecks(result)
+          expect(result.content_type_uid).toEqual('blog')
+          expect(result.entries).toHaveLength(5)
+          expect(result).toHaveProperty('count')
+          expect(result.count).toEqual(5)
+          expect(result).toHaveProperty('content_type')
+          expect(result.content_type).toHaveProperty('uid')
+          expect(result.content_type).toHaveProperty('title')
+          expect(result.content_type).toHaveProperty('schema')
+          result.entries.forEach((entry) => {
+            if (entry.authors && entry.authors instanceof Array) {
+              entry.authors.forEach((ref) => {
+                expect(ref).toHaveProperty('_content_type_uid')
+                expect(ref).toHaveProperty('uid')
+                expect(ref._content_type_uid).toEqual('author')
+              })
+            } else {
+              expect(entry.authors).toHaveProperty('_content_type_uid')
+              expect(entry.authors).toHaveProperty('uid')
+              expect(entry.authors._content_type_uid).toEqual('author')
+            }
             expect(entry).toHaveProperty('no')
           })
         }).catch((error) => {
+          console.error(error)
           expect(error).toBeNull()
         })
     })
