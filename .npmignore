@@ -9,6 +9,7 @@ jest.config.js
 # Configs
 .jsbeautifyrc
 tsconfig.json
+.jsdoc.conf.json
 
 # Source files
 src
