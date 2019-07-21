@@ -17,6 +17,7 @@ export const entries = [
     ],
     // tslint:disable-next-line: object-literal-sort-keys
     _content_type_uid: 'author',
+    _version: 3,
     locale: 'en-us',
     published_at: '2019-01-25T11:47:50.750Z',
     self_reference: [
@@ -79,6 +80,7 @@ export const entries = [
         uid: 'a4',
       },
     ],
+    _version: 5,
     tags: ['1'],
     title: 'author Two',
     uid: 'a2',
@@ -86,6 +88,7 @@ export const entries = [
   {
     // tslint:disable-next-line: object-literal-sort-keys
     _content_type_uid: 'author',
+    _version: 7,
     uid: 'a3',
     // tslint:disable-next-line: object-literal-sort-keys
     age: 3,
@@ -133,6 +136,7 @@ export const entries = [
   {
     // tslint:disable-next-line: object-literal-sort-keys
     _content_type_uid: 'author',
+    _version: 8,
     uid: 'a9',
     // tslint:disable-next-line: object-literal-sort-keys
     age: 9,
@@ -151,6 +155,7 @@ export const entries = [
     uid: 'a10',
     // tslint:disable-next-line: object-literal-sort-keys
     age: 10,
+    _version: 1,
     locale: 'en-us',
     published_at: '2019-01-25T11:47:50.760Z',
     title: 'author ten',

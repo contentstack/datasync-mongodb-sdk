@@ -33,10 +33,7 @@ const checkEntries = (result: any) => {
   expect(result.locale).toEqual('en-us')
   expect(result.entries instanceof Array).toBeTruthy()
   result.entries.forEach((item) => {
-    expect(item).not.toHaveProperty('_version')
     expect(item).not.toHaveProperty('_content_type_uid')
-    expect(item).not.toHaveProperty('created_at')
-    expect(item).not.toHaveProperty('updated_at')
   })
 }
 
@@ -73,45 +70,6 @@ describe('# References', () => {
     await db.collection(collection.schema).drop()
 
     return Stack.close()
-  })
-
-  expect.extend({
-    compareValue(value, compareValue, operator, strict = false) {
-      // tslint:disable-next-line: one-variable-per-declaration
-      let pass, comparison
-      // if operator is true, value >= compareValue, else the opposite
-      if (operator) {
-        if (strict) {
-          comparison = ' > '
-          pass = value > compareValue
-        } else {
-          comparison = ' >= '
-          pass = value >= compareValue
-        }
-      } else {
-        if (strict) {
-          comparison = ' < '
-          pass = value < compareValue
-        } else {
-          comparison = ' <= '
-          pass = value <= compareValue
-        }
-      }
-
-      if (pass) {
-        return {
-          message: () =>
-            `expected ${value} not to be ${comparison} than ${compareValue}`,
-          pass: true,
-        }
-      } else {
-        return {
-          message: () =>
-          `expected ${value} to be ${comparison} than ${compareValue}`,
-          pass: false,
-        }
-      }
-    },
   })
 
   describe('basic', () => {
@@ -187,12 +145,11 @@ describe('# References', () => {
                 entry.authors.forEach((ref) => {
                   expect(ref).toHaveProperty('title')
                   expect(ref).toHaveProperty('uid')
-                  expect(ref).not.toHaveProperty('_version')
+                  expect(ref).not.toHaveProperty('_content_type_uid')
                 })
               } else {
                 expect(entry.authors).toHaveProperty('title')
                 expect(entry.authors).toHaveProperty('uid')
-                expect(entry.authors).not.toHaveProperty('_version')
               }
             }
           })
