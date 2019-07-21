@@ -5,7 +5,6 @@
  */
 
 import {
-  find,
   merge,
   remove,
 } from 'lodash'
@@ -70,7 +69,7 @@ export class Stack {
     validateConfig(this.config)
     this.contentStore = this.config.contentStore
     this.collectionNames = this.contentStore.collection
-    this.types = this.contentStore.internalContentTypes
+    this.types = this.contentStore.internal.types
     this.q = {}
     this.internal = {}
     this.db = existingDB
@@ -99,27 +98,14 @@ export class Stack {
    *
    * @returns {Stack} Returns an instance of 'stack'
    */
-  public ascending(field ? ) {
-    if (typeof this.q.content_type_uid !== 'string') {
-      throw new Error('Kindly call \'.contentType()\' before \.ascending()\'')
-    }
-
-    if (!(field) || typeof field !== 'string') {
-      // throw new Error('Kindly provide a valid field name for \'.ascending()\'')
-      if (this.internal.sort && typeof this.internal.sort === 'object') {
-        this.internal.sort.published_at = 1
-      } else {
-        this.internal.sort = {
-          published_at: 1,
-        }
-      }
+  public ascending(field) {
+    if (typeof this.q.content_type_uid !== 'string' || typeof field !== 'string' || field.length === 0) {
+      throw new Error('Kindly provide valid parameters for .ascending!')
+    } else if (this.internal.sort && typeof this.internal.sort === 'object') {
+      this.internal.sort[field] = 1
     } else {
-      if (this.internal.sort && typeof this.internal.sort === 'object') {
-        this.internal.sort[field] = 1
-      } else {
-        this.internal.sort = {
-          [field]: 1,
-        }
+      this.internal.sort = {
+        [field]: 1,
       }
     }
 
@@ -150,26 +136,14 @@ export class Stack {
    *
    * @returns {Stack} Returns an instance of 'stack'
    */
-  public descending(field ? ) {
-    if (typeof this.q.content_type_uid !== 'string') {
-      throw new Error('Kindly call \'.contentType()\' before \.descending()\'')
-    }
-
-    if (!(field) || typeof field !== 'string') {
-      if (this.internal.sort && typeof this.internal.sort === 'object') {
-        this.internal.sort.published_at = -1
-      } else {
-        this.internal.sort = {
-          published_at: -1,
-        }
-      }
+  public descending(field) {
+    if (typeof this.q.content_type_uid !== 'string' || typeof field !== 'string' || field.length === 0) {
+      throw new Error('Kindly provide valid parameters for .descending()!')
+    } else if (this.internal.sort && typeof this.internal.sort === 'object') {
+      this.internal.sort[field] = -1
     } else {
-      if (this.internal.sort && typeof this.internal.sort === 'object') {
-        this.internal.sort[field] = -1
-      } else {
-        this.internal.sort = {
-          [field]: -1,
-        }
+      this.internal.sort = {
+        [field]: -1,
       }
     }
 
@@ -200,10 +174,10 @@ export class Stack {
 
     const dbConfig = merge({}, this.config, overrides).contentStore
 
-    const uri = validateURI(dbConfig.uri || dbConfig.url)
+    const url = validateURI(dbConfig.url)
     const options = dbConfig.options
     const dbName = dbConfig.dbName
-    const client = new MongoClient(uri, options)
+    const client = new MongoClient(url, options)
     this.client = client
 
     await client.connect()
@@ -273,10 +247,8 @@ export class Stack {
    * @returns {Stack} Returns an instance of 'stack'
    */
   public language(code) {
-    if (!(code) || typeof code !== 'string' || !(find(this.config.locales, {
-        code,
-      }))) {
-      throw new Error(`Language ${code} is invalid!`)
+    if (typeof code !== 'string' || code.length === 0) {
+      throw new Error('Kindly pass valid parameters for .language()!')
     }
     this.q.locale = code
 
@@ -1566,7 +1538,7 @@ export class Stack {
           // Ignore references include, for empty list, exclude call, content type & assets
           if (result.length === 0 || this.internal.excludeReferences || this.q.content_type_uid === this
             .types.content_types || this.q.content_type_uid
-            === this.types.assets || this.internal.onlyCount) {
+            === this.types.assets || (this.internal.onlyCount && !this.internal.queryReferences)) {
             // Do nothing
           } else if (this.internal.includeSpecificReferences) {
             await this.includeSpecificReferences(result, this.q.content_type_uid, this.q.locale, this
@@ -1680,6 +1652,13 @@ export class Stack {
       this.q.locale = this.contentStore.locale
     }
 
+    // by default, sort by latest content
+    if (!this.internal.sort) {
+      this.internal.sort = {
+        updated_at: -1,
+      }
+    }
+
     const filters = {
       _content_type_uid: this.q.content_type_uid,
       locale: this.q.locale,
@@ -1687,7 +1666,7 @@ export class Stack {
     }
 
     if (this.q.content_type_uid === this.types.assets) {
-      // since, content type will take up 1 item-space
+      // allow querying only on published assets..!
       queryFilters = {
         $and: [
           filters,
@@ -1734,6 +1713,8 @@ export class Stack {
       locale: this.q.locale,
     }
     if (this.internal.onlyCount) {
+      output.content_type_uid = (this.q.content_type_uid === this.types.assets) ? 'assets' : ((this.q.content_type_uid
+        === this.types.content_types) ? 'content_types' : this.q.content_type_uid)
       output.count = count
 
       return output
@@ -1767,13 +1748,19 @@ export class Stack {
     }
 
     if (this.internal.includeCount) {
-      output.count = count
+      output.count = await this.db.collection(getCollectionName({
+        content_type_uid: this.q.content_type_uid,
+        locale: this.q.locale,
+      }, this.collectionNames))
+      .count({
+        _content_type_uid: this.q.content_type_uid,
+      })
     }
 
     // console.log('this.internal.includeSchema', this.internal.includeSchema)
     if (this.internal.includeSchema) {
       output.content_type = await this.db.collection(getCollectionName({
-          content_type_uid: '_content_types',
+          content_type_uid: this.types.content_types,
           locale: this.q.locale,
         }, this.collectionNames))
         .findOne({
@@ -1794,11 +1781,11 @@ export class Stack {
   private async includeAssetsOnly(entries: any[], contentTypeUid: string, locale: string) {
     const schema = await this.db
       .collection(getCollectionName({
-        content_type_uid: '_content_types',
+        content_type_uid: this.types.content_types,
         locale,
       }, this.collectionNames))
       .findOne({
-        _content_type_uid: '_content_types',
+        _content_type_uid: this.types.content_types,
         uid: contentTypeUid,
       }, {
         _assets: 1,
@@ -1825,7 +1812,7 @@ export class Stack {
     }
 
     const assets = await this.db.collection(getCollectionName({
-        content_type_uid: '_assets',
+        content_type_uid: this.types.assets,
         locale,
       }, this.collectionNames))
       .find(queryBucket)
@@ -1858,7 +1845,7 @@ export class Stack {
    */
   private async includeSpecificReferences(entries: any[], contentTypeUid: string, locale: string, include: string[]) {
     const ctQuery = {
-      _content_type_uid: '_content_types',
+      _content_type_uid: this.types.content_types,
       uid: contentTypeUid,
     }
     /**
@@ -1914,7 +1901,7 @@ export class Stack {
           data.forEach((elem, idx) => {
             if (typeof elem === 'string') {
               queryBucket.$or.push({
-                _content_type_uid: '_assets',
+                _content_type_uid: this.types.assets,
                 _version: { $exists: true},
                 locale,
                 uid: elem,
@@ -1956,7 +1943,7 @@ export class Stack {
         }
       } else if (typeof data === 'string') {
         queryBucket.$or.push({
-          _content_type_uid: '_assets',
+          _content_type_uid: this.types.assets,
           _version: { $exists: true},
           locale,
           uid: data,
@@ -2032,7 +2019,7 @@ export class Stack {
 
   private async getReferencePath(query, locale, currentInclude) {
     const schemas = await this.db.collection(getCollectionName({
-        content_type_uid: '_content_types',
+        content_type_uid: this.types.content_types,
         locale,
       }, this.collectionNames))
       .find(query)
@@ -2087,14 +2074,14 @@ export class Stack {
 
           if (typeof entryReferences[path] === 'string') {
             schemasReferred.push({
-              _content_type_uid: '_content_types',
+              _content_type_uid: this.types.content_types,
               uid: entryReferences[path],
             })
           } else {
 
             entryReferences[path].forEach((contentTypeUid) => {
               schemasReferred.push({
-                _content_type_uid: '_content_types',
+                _content_type_uid: this.types.content_types,
                 uid: contentTypeUid,
               })
             })
@@ -2167,7 +2154,7 @@ export class Stack {
   private async bindReferences(entries: any[], contentTypeUid: string, locale: string) {
     const ctQuery = {
       $or: [{
-        _content_type_uid: '_content_types',
+        _content_type_uid: this.types.content_types,
         uid: contentTypeUid,
       }],
     }
@@ -2240,7 +2227,7 @@ export class Stack {
   private async getAllReferencePaths(contentTypeQueries: IQuery, locale: string) {
     const contents: any[] = await this.db
       .collection(getCollectionName({
-          content_type_uid: '_content_types',
+          content_type_uid: this.types.content_types,
           locale,
         },
         this.collectionNames,
@@ -2259,7 +2246,7 @@ export class Stack {
     for (let i = 0, j = contents.length; i < j; i++) {
       let assetFieldPaths: string[]
       let entryReferencePaths: string[]
-      if (contents[i].hasOwnProperty('_assets')) {
+      if (contents[i].hasOwnProperty(this.types.assets)) {
         assetFieldPaths = Object.keys(contents[i]._assets)
         paths = paths.concat(assetFieldPaths)
       }
@@ -2270,7 +2257,7 @@ export class Stack {
         for (let k = 0, l = entryReferencePaths.length; k < l; k++) {
           if (typeof contents[i]._references[entryReferencePaths[k]] === 'string') {
             ctQueries.$or.push({
-              _content_type_uid: '_content_types',
+              _content_type_uid: this.types.content_types,
               // this would probably make it slow in FS, avoid this there?
               // locale,
               uid: contents[i]._references[entryReferencePaths[k]],
@@ -2278,7 +2265,7 @@ export class Stack {
           } else if (contents[i]._references[entryReferencePaths[k]].length) {
             contents[i]._references[entryReferencePaths[k]].forEach((uid) => {
               ctQueries.$or.push({
-                _content_type_uid: '_content_types',
+                _content_type_uid: this.types.content_types,
                 // avoiding locale here, not sure if its required
                 // locale,
                 uid,

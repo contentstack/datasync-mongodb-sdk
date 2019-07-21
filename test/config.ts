@@ -6,15 +6,7 @@ export const config = {
       schema: 'content_types',
     },
     dbName: 'sync-test',
+    locale: 'en-us',
+    referenceDepth: 2,
   },
-  locales: [
-    {
-      code: 'en-us',
-      relative_url_prefix: '/',
-    },
-    {
-      code: 'es-es',
-      relative_url_prefix: '/es/',
-    },
-  ],
 }

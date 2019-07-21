@@ -39,10 +39,7 @@ const checkEntries = (result: any) => {
   expect(result.locale).toEqual('en-us')
   expect(result.entries instanceof Array).toBeTruthy()
   result.entries.forEach((item) => {
-    expect(item).not.toHaveProperty('_version')
     expect(item).not.toHaveProperty('_content_type_uid')
-    expect(item).not.toHaveProperty('created_at')
-    expect(item).not.toHaveProperty('updated_at')
   })
 }
 
@@ -54,10 +51,7 @@ const checkAssets = (result: any) => {
   expect(result.locale).toEqual('en-us')
   expect(result.assets instanceof Array).toBeTruthy()
   result.assets.forEach((item) => {
-    expect(item).not.toHaveProperty('_version')
     expect(item).not.toHaveProperty('_content_type_uid')
-    expect(item).not.toHaveProperty('created_at')
-    expect(item).not.toHaveProperty('updated_at')
   })
 }
 
@@ -134,10 +128,7 @@ describe('# Core', () => {
           expect(result.entries).toHaveLength(1)
           expect(result.entries instanceof Array).toBeTruthy()
           result.entries.forEach((item) => {
-            expect(item).not.toHaveProperty('_version')
             expect(item).not.toHaveProperty('_content_type_uid')
-            expect(item).not.toHaveProperty('created_at')
-            expect(item).not.toHaveProperty('updated_at')
           })
         }).catch((error) => {
           expect(error).toBeNull()
@@ -155,10 +146,7 @@ describe('# Core', () => {
           expect(result.content_type_uid).toEqual('blog')
           expect(result.locale).toEqual('en-us')
           expect(result.entry).toHaveProperty('title')
-          expect(result.entry).not.toHaveProperty('_version')
           expect(result.entry).not.toHaveProperty('content_type_uid')
-          expect(result.entry).not.toHaveProperty('created_at')
-          expect(result.entry).not.toHaveProperty('updated_at')
         }).catch((error) => {
           expect(error).toBeNull()
         })
@@ -170,6 +158,11 @@ describe('# Core', () => {
         .count()
         .then((result: any) => {
           expect(result).toHaveProperty('count')
+          expect(result).toHaveProperty('content_type_uid')
+          expect(result).toHaveProperty('locale')
+          expect(result.locale).toEqual('en-us')
+          expect(result.content_type_uid).toEqual('blog')
+          expect(Object.keys(result)).toHaveLength(3)
           expect(result.count).toEqual(5)
         }).catch((error) => {
           expect(error).toBeNull()
@@ -199,10 +192,7 @@ describe('# Core', () => {
           expect(result.content_type_uid).toEqual('assets')
           expect(result.locale).toEqual('en-us')
           expect(result.asset).toHaveProperty('title')
-          expect(result.asset).not.toHaveProperty('_version')
           expect(result.asset).not.toHaveProperty('_content_type_uid')
-          expect(result.asset).not.toHaveProperty('created_at')
-          expect(result.asset).not.toHaveProperty('updated_at')
         }).catch((error) => {
           expect(error).toBeNull()
         })
@@ -213,6 +203,11 @@ describe('# Core', () => {
         .count()
         .then((result: any) => {
           expect(result).toHaveProperty('count')
+          expect(result).toHaveProperty('content_type_uid')
+          expect(result).toHaveProperty('locale')
+          expect(result.locale).toEqual('en-us')
+          expect(result.content_type_uid).toEqual('assets')
+          expect(Object.keys(result)).toHaveLength(3)
           expect(result.count).toEqual(3)
         }).catch((error) => {
           expect(error).toBeNull()
@@ -253,10 +248,12 @@ describe('# Core', () => {
         .count()
         .then((result: any) => {
           expect(result).toHaveProperty('count')
+          expect(result).toHaveProperty('content_type_uid')
           expect(result).toHaveProperty('locale')
           expect(result.locale).toEqual('en-us')
+          expect(result.content_type_uid).toEqual('content_types')
+          expect(Object.keys(result)).toHaveLength(3)
           expect(result.count).toEqual(4)
-          expect(Object.keys(result).length).toEqual(2)
         }).catch((error) => {
           expect(error).toBeNull()
         })
@@ -275,11 +272,7 @@ describe('# Core', () => {
           expect(result.content_type_uid).toEqual('blog')
           expect(result.locale).toEqual('en-us')
           expect(result.entry).toHaveProperty('title')
-          expect(result.entry).not.toHaveProperty('sys_keys')
-          expect(result.entry).not.toHaveProperty('_version')
           expect(result.entry).not.toHaveProperty('content_type_uid')
-          expect(result.entry).not.toHaveProperty('created_at')
-          expect(result.entry).not.toHaveProperty('updated_at')
         }).catch((error) => {
           expect(error).toBeNull()
         })
@@ -297,11 +290,7 @@ describe('# Core', () => {
           expect(result.content_type_uid).toEqual('assets')
           expect(result.locale).toEqual('en-us')
           expect(result.asset).toHaveProperty('title')
-          expect(result.asset).not.toHaveProperty('sys_keys')
-          expect(result.asset).not.toHaveProperty('_version')
-          expect(result.asset).not.toHaveProperty('content_type_uid')
-          expect(result.asset).not.toHaveProperty('created_at')
-          expect(result.asset).not.toHaveProperty('updated_at')
+          expect(result.asset).not.toHaveProperty('_content_type_uid')
         }).catch((error) => {
           expect(error).toBeNull()
         })
@@ -329,6 +318,11 @@ describe('# Core', () => {
         .count()
         .then((result: any) => {
           expect(result).toHaveProperty('count')
+          expect(result).toHaveProperty('content_type_uid')
+          expect(result).toHaveProperty('locale')
+          expect(result.locale).toEqual('en-us')
+          expect(result.content_type_uid).toEqual('content_types')
+          expect(Object.keys(result)).toHaveLength(3)
           expect(result.count).toEqual(4)
         }).catch((error) => {
           expect(error).toBeNull()
