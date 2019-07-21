@@ -11,9 +11,17 @@ export declare const config: {
             schema: string;
         };
         dbName: string;
-        internalContentTypes: {
-            assets: string;
-            content_types: string;
+        indexes: {
+            _content_type_uid: number;
+            locale: number;
+            uid: number;
+            updated_at: number;
+        };
+        internal: {
+            types: {
+                assets: string;
+                content_types: string;
+            };
         };
         limit: number;
         locale: string;
@@ -29,11 +37,6 @@ export declare const config: {
         projections: {
             _content_type_uid: number;
             _id: number;
-            _synced_at: number;
-            _version: number;
-            created_at: number;
-            updated_at: number;
-            updated_by: number;
         };
         referenceDepth: number;
         skip: number;

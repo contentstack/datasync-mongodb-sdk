@@ -14,148 +14,153 @@ Contentstack is a headless CMS with an API-first approach. It is a CMS that deve
 
 ### Configuration
 
-|Property|Data Type|Default value|Description|
+|Property|Type|Default value|Description|
 |--|--|--|--|
 |dbName|string|contentstack-persistent-db|**Optional** The MongoDB database name|
-|collectionName|string|contents|**Optional** MongoDB database's collection name|
-|uri|string|mongodb://localhost:27017 |**Optional.** The MongoDB connection URI|
+|collection|string|contents|**Optional** MongoDB database's collection names|
+|url|string|mongodb://localhost:27017 |**Optional.** The MongoDB connection URI|
 |limit|number|100|**Optional.** Caps the total no of objects returned in a single call|
 |skip|number|0|**Optional.** Number of objects skipped before the result is returned|
 | indexes | object |**[see config below](https://github.com/contentstack/datasync-content-store-mongodb#detailed-configs)** |**Optional.** Option to create db indexes via configuration|
 |projections|object|**[see config below](https://github.com/contentstack/datasync-content-store-mongodb#detailed-configs)** |**Optional.** Mongodb projections. Keys provided here would be displayed/filtered out when fetching the result|
 |options|object|**[see config below](https://github.com/contentstack/datasync-content-store-mongodb#detailed-configs)** |**Optional.** MongoDB connection options [Ref.](http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html) for more info|
+|referenceDepth|number|2|**Optional** The default nested-reference-field depth that'd be considered when calling .includeReferences(). This can be overridden by passing a numerical argument to .includeReferences(4)|
 
-### Detailed configs
+### Config Overview
 
-By default, this module uses the following internal configuration.
+Here's an overview of the SDK's configurable properties
 
-```js
+```ts
 {
-  dbName: 'contentstack-persistent-db',
-  collectionName: 'contents',
-  uri: 'mongodb://localhost:27017',
-  indexes: {
-    published_at: -1,
-    content_type_uid: 1,
-    locale: 1,
-    uid: 1
+  contentStore: {
+    collection: {
+      asset: 'contents',
+      entry: 'contents',
+      schema: 'content_types',
+    },
+    dbName: 'contentstack-db',
+    indexes: {
+      _content_type_uid: 1,
+      locale: 1,
+      uid: 1,
+      updated_at: -1,
+    },
+    limit: 100,
+    locale: 'en-us',
+    // http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html
+    options: {
+      autoReconnect: true,
+      connectTimeoutMS: 15000,
+      keepAlive: true,
+      noDelay: true,
+      reconnectInterval: 1000,
+      reconnectTries: 20,
+      useNewUrlParser: true,
+    },
+    projections: {
+      _content_type_uid: 0,
+      _id: 0,
+    },
+    referenceDepth: 2,
+    skip: 0,
+    url: 'mongodb://localhost:27017',
   },
-  limit: 100,
-  locales: [
-  ],
-  options: {
-    autoReconnect: true,
-    connectTimeoutMS: 15000,
-    keepAlive: true,
-    noDelay: true,
-    reconnectInterval: 1000,
-    reconnectTries: 20,
-    useNewUrlParser: true,
-  },
-  projections: {
-    _id: 0,
-    _version: 0,
-    content_type_uid: 0,
-    created_at: 0,
-    sys_keys: 0,
-    updated_at: 0,
-    updated_by: 0,
-  },
-  skip: 0,
 }
 ```
 
-### Setup and Installation
+### Sample SDK Query
 
-To import the SDK in your project, use the following command:
-```js
-  import { Contentstack } from 'contentstack-sync-mongodb-sdk'
+Here's a sample SDK query to get started.
+
+Learn more on how to query using datasync-mongodb-sdk [here](https://contentstack.github.io/datasync-mongodb-sdk/).
+
+```ts
+import { Contentstack } from 'datasync-mongodb-sdk'
+const Stack = Contentstack.Stack(config)
+
+Stack.connect()
+  .then(() => {
+    return Stack.contentType('blog')
+      .entries()
+      .language('en-gb') // Optional. If not provided, defaults to en-us
+      .include(['authors'])
+      .includeCount()
+      .includeContentType()
+      .queryReferences({'authors.firstName': 'R.R. Martin'})
+      .then((result) => {
+        // Your result would be
+        // {
+        //   entries: [...], // All entries, who's first name is R.R. Martin
+        //   content_type_uid: 'blog',
+        //   locale: 'es-es',
+        //   content_type: {...}, // Blog content type's schema
+        //   count: 3, // Total count of blog content type
+        // }
+      })
+  })
+  .catch((error) => {
+    // handle errors..
+  })
 ```
+> Important: You need to call .connect(), to initiate SDK queries!
 
-To initialize the SDK, you'd need to perform the following steps
-
-1. Initialize stack instance.
-```js
-  const Stack = Contentstack.Stack(config)
-```
-
-2. Call the connect method. This method establishes a connection between the SDK and mongodb database.
-```js
-  Stack.connect(dbConfig)
-    .then(fnResolve)
-    .catch(fnReject)
-```
-> Important: You need to call this, before running SDK queries!
-
-Once you have initialized the SDK, you can start querying on the sync-utility's DB's
+Once you have initialized the SDK, you can start querying on mongodb
 
 ### Querying
-
 - Notes
   - By default, 'content_type_uid' and 'locale' keys as part of the response.
-  - If `.language()` is not provided, then the 1st language, provided in `config.locales` would be considered.
+  - If `.language()` is not provided, then the 1st language, provided in `config.defaultLocale` would be considered.
   - If querying for a single entry/asset (using `.entry()` OR `.findOne()`), the result will be an object i.e. `{ entry: {} }`, if the entry or asset is not found, `{ entry: null }` will be returned.
   - Querying multiple entries, would return `{ entries: [ {...} ] }`.
+  - By default, all entry responses would include their referred assets. If `.excludeReferences()` is called, no references (including assets) would **not** be returned in the response.
 
+- Query a single entry
+```ts
+// Sample 1. Returns the 1st entry that matches query filters
+Stack.contentType('blog')
+  .entry() // OR .asset()
+  .find()
+  .then((result) => {
+    // Response
+    // result = {
+    //   entry: any | null,
+    //   content_type_uid: string,
+    //   locale: string,
+    // }
+  })
+  .catch(reject)
 
-1. Query a single entry
-
-```js
-  // Sample 1. Returns the 1st entry that matches query filters
-  Stack.contentType('blogs')
-    .entry() // OR .asset()
-    .language('en-us')
-    .find()
-    .then((result) => {
-      // Response
-      // result = {
-      //   entry: {
-      //     title: '' || null
-      //   },
-      //   content_type_uid: '',
-      //   locale: ''
-      // }
-    })
-    .catch(reject)
-
-  // Sample 2. Returns the 1st entry that matches query filters
-  Stack.contentType('blogs')
-    .entries() // for .assets() OR .schemas() - ignore calling .contentType()
-    .language('en-us')
-    .findOne()
-    .then((result) => {
-      // Response
-      // result = {
-      //   entry: {
-      //     title: '' || null
-      //   },
-      //   content_type_uid: '',
-      //   locale: ''
-      // }
-    })
-    .catch(reject)
+// Sample 2. Returns the 1st entry that matches query filters
+Stack.contentType('blogs')
+  .entries() // for .assets() 
+  .findOne()
+  .then((result) => {
+    // Response
+    // result = {
+    //   entry: any | null,
+    //   content_type_uid: string,
+    //   locale: string,
+    // }
+  })
+  .catch(reject)
 ```
 
-2. Querying a set of entries, assets or content types
-```js
-  Stack.contentType('blogs')
-    .entries() // for .assets() OR .schemas() - ignore calling .contentType()
-    .includeCount()
-    .find()
-    .then((result) => {
-      // Response
-      // result = {
-      //   entries: [
-      //     {
-      //       title: ''
-      //     }
-      //   ],
-      //   content_type_uid: 'blogs',
-      //   locale: '',
-      //   count: 1
-      // }
-    })
-    .catch(reject)
+- Querying a set of entries, assets or content types
+```ts
+Stack.contentType('blog')
+  .entries() // for .assets() 
+  .includeCount()
+  .find()
+  .then((result) => {
+    // Response
+    // result = {
+    //   entry: any | null,
+    //   content_type_uid: string,
+    //   count: number,
+    //   locale: string,
+    // }
+  })
+  .catch(reject)
 ```
 
 ## Advanced Queries
@@ -169,7 +174,7 @@ In order to learn more about advance queries please refer the API documentation,
 
 ### Support and Feature requests
 
-If you have any issues working with the library, please file an issue [here](https://github.com/contentstack/datasync-content-store-mongodb/issues) at Github.
+If you have any issues working with the library, please file an issue [here](https://github.com/contentstack/datasync-mongodb-sdk/issues) at Github.
 
 You can send us an e-mail at [support@contentstack.com](mailto:support@contentstack.com) if you have any support or feature requests. Our support team is available 24/7 on the intercom. You can always get in touch and give us an opportunity to serve you better!
 

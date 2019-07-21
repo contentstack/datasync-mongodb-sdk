@@ -2,6 +2,7 @@
  * @description Test contentstack-mongodb-sdk basic methods
  */
 
+import Debug from 'debug'
 import { cloneDeep } from 'lodash'
 import { Contentstack } from '../src'
 import { config } from './config'
@@ -19,7 +20,7 @@ collNameConfig.schema = 'content_types.include_exclude'
 
 const Stack = Contentstack.Stack(scriptConfig)
 const collection = cloneDeep(collNameConfig)
-
+const debug = new Debug('test:include-exclude')
 collection.asset = `en-us.${collNameConfig.asset}`
 collection.entry = `en-us.${collNameConfig.entry}`
 collection.schema = `en-us.${collNameConfig.schema}`
@@ -32,10 +33,7 @@ const itemPropertyChecks = (result) => {
   expect(result).toHaveProperty('content_type_uid')
   expect(result.locale).toEqual('en-us')
   result.entries.forEach((item) => {
-    expect(item).not.toHaveProperty('_version')
     expect(item).not.toHaveProperty('_content_type_uid')
-    expect(item).not.toHaveProperty('created_at')
-    expect(item).not.toHaveProperty('updated_at')
   })
 }
 
@@ -44,6 +42,7 @@ describe('# Include Exclude', () => {
   beforeAll(() => {
     return Stack.connect().then((dbInstance) => {
       db = dbInstance
+      debug('Stack connected successfully!')
 
       return
     })
@@ -55,6 +54,7 @@ describe('# Include Exclude', () => {
     await db.collection(collection.entry).insertMany(categories)
     await db.collection(collection.asset).insertMany(assets)
     await db.collection(collection.schema).insertMany(content_types)
+    debug('Data populated..!')
 
     return
   })
@@ -63,6 +63,7 @@ describe('# Include Exclude', () => {
     await db.collection(collection.entry).drop()
     // await db.collection(collection.asset).drop()
     await db.collection(collection.schema).drop()
+    debug('Collections dropped..!')
 
     return Stack.close()
   })
@@ -74,6 +75,7 @@ describe('# Include Exclude', () => {
         .includeCount()
         .find()
         .then((result: any) => {
+          debug(`# include-exclude: .includeCount() result\n${JSON.stringify(result)}`)
           itemPropertyChecks(result)
           expect(result.content_type_uid).toEqual('blog')
           expect(result.entries).toHaveLength(5)
@@ -166,7 +168,6 @@ describe('# Include Exclude', () => {
             expect(entry).toHaveProperty('no')
           })
         }).catch((error) => {
-          console.error(error)
           expect(error).toBeNull()
         })
     })

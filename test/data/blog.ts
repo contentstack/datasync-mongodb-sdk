@@ -7,6 +7,8 @@ export const entries = [
     no: 1,
     // tslint:disable-next-line: object-literal-sort-keys
     _content_type_uid: 'blog',
+    created_at: '2019-07-21T13:59:39.196Z',
+    updated_at: '2019-07-21T13:59:39.196Z',
     files: ['a1', 'a2'],
     locale: 'en-us',
     published_at: '2019-01-25T11:47:50.750Z',
@@ -34,6 +36,8 @@ export const entries = [
     uid: 'b2',
     // tslint:disable-next-line: object-literal-sort-keys
     locale: 'en-us',
+    created_at: '2019-07-21T13:59:38.196Z',
+    updated_at: '2019-07-21T13:59:38.196Z',
     published_at: '2019-01-25T11:47:50.751Z',
     title: 'Blog Two',
     self_reference: [
@@ -65,6 +69,8 @@ export const entries = [
     _content_type_uid: 'blog',
     uid: 'b3',
     // tslint:disable-next-line: object-literal-sort-keys
+    created_at: '2019-07-21T13:59:36.196Z',
+    updated_at: '2019-07-21T13:59:36.196Z',
     locale: 'en-us',
     published_at: '2019-01-25T11:47:50.755Z',
     title: 'Blog Three',
@@ -102,6 +108,8 @@ export const entries = [
     _content_type_uid: 'blog',
     uid: 'b9',
     // tslint:disable-next-line: object-literal-sort-keys
+    created_at: '2019-07-21T13:59:37.196Z',
+    updated_at: '2019-07-21T13:59:37.196Z',
     locale: 'en-us',
     published_at: '2019-01-25T11:47:50.740Z',
     title: 'Blog Nine',
@@ -116,6 +124,8 @@ export const entries = [
     uid: 'b10',
     // tslint:disable-next-line: object-literal-sort-keys
     locale: 'en-us',
+    created_at: '2019-07-21T13:59:35.196Z',
+    updated_at: '2019-07-21T13:59:35.196Z',
     published_at: '2019-01-25T11:47:50.730Z',
     title: 'Blog Ten',
     authors: {

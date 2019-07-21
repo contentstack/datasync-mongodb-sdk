@@ -44,7 +44,7 @@ export declare class Stack {
      *
      * @returns {Stack} Returns an instance of 'stack'
      */
-    ascending(field?: any): this;
+    ascending(field: any): this;
     /**
      * @public
      * @method descending
@@ -69,7 +69,7 @@ export declare class Stack {
      *
      * @returns {Stack} Returns an instance of 'stack'
      */
-    descending(field?: any): this;
+    descending(field: any): this;
     /**
      * @public
      * @method connect

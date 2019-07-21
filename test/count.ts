@@ -63,8 +63,11 @@ describe('# Count', () => {
         .then((result: any) => {
           expect(result).toHaveProperty('count')
           expect(result).toHaveProperty('locale')
+          expect(result).toHaveProperty('content_type_uid')
+          expect(result.locale).toEqual('en-us')
+          expect(result.content_type_uid).toEqual('blog')
           expect(result.count).toEqual(blogCount)
-          expect(Object.keys(result)).toHaveLength(2)
+          expect(Object.keys(result)).toHaveLength(3)
         }).catch((error) => {
           expect(error).toBeNull()
         })
@@ -75,13 +78,17 @@ describe('# Count', () => {
     test('.count() + .queryReferences()', () => {
       return Stack.contentType('blog')
         .entries()
-        .queryReferences({'authors.uid': 'a10'})
+        .include(['authors'])
+        .queryReferences({'authors.published_at': '2019-01-25T11:47:50.760Z'})
         .count()
         .then((result: any) => {
           expect(result).toHaveProperty('count')
           expect(result).toHaveProperty('locale')
+          expect(result).toHaveProperty('content_type_uid')
+          expect(result.locale).toEqual('en-us')
+          expect(result.content_type_uid).toEqual('blog')
           expect(result.count).toEqual(1)
-          expect(Object.keys(result)).toHaveLength(2)
+          expect(Object.keys(result)).toHaveLength(3)
         }).catch((error) => {
           expect(error).toBeNull()
         })

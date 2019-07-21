@@ -35,7 +35,7 @@ class Stack {
         util_1.validateConfig(this.config);
         this.contentStore = this.config.contentStore;
         this.collectionNames = this.contentStore.collection;
-        this.types = this.contentStore.internalContentTypes;
+        this.types = this.contentStore.internal.types;
         this.q = {};
         this.internal = {};
         this.db = existingDB;
@@ -64,29 +64,16 @@ class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     ascending(field) {
-        if (typeof this.q.content_type_uid !== 'string') {
-            throw new Error('Kindly call \'.contentType()\' before \.ascending()\'');
+        if (typeof this.q.content_type_uid !== 'string' || typeof field !== 'string' || field.length === 0) {
+            throw new Error('Kindly provide valid parameters for .ascending!');
         }
-        if (!(field) || typeof field !== 'string') {
-            // throw new Error('Kindly provide a valid field name for \'.ascending()\'')
-            if (this.internal.sort && typeof this.internal.sort === 'object') {
-                this.internal.sort.published_at = 1;
-            }
-            else {
-                this.internal.sort = {
-                    published_at: 1,
-                };
-            }
+        else if (this.internal.sort && typeof this.internal.sort === 'object') {
+            this.internal.sort[field] = 1;
         }
         else {
-            if (this.internal.sort && typeof this.internal.sort === 'object') {
-                this.internal.sort[field] = 1;
-            }
-            else {
-                this.internal.sort = {
-                    [field]: 1,
-                };
-            }
+            this.internal.sort = {
+                [field]: 1,
+            };
         }
         return this;
     }
@@ -115,28 +102,16 @@ class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     descending(field) {
-        if (typeof this.q.content_type_uid !== 'string') {
-            throw new Error('Kindly call \'.contentType()\' before \.descending()\'');
+        if (typeof this.q.content_type_uid !== 'string' || typeof field !== 'string' || field.length === 0) {
+            throw new Error('Kindly provide valid parameters for .descending()!');
         }
-        if (!(field) || typeof field !== 'string') {
-            if (this.internal.sort && typeof this.internal.sort === 'object') {
-                this.internal.sort.published_at = -1;
-            }
-            else {
-                this.internal.sort = {
-                    published_at: -1,
-                };
-            }
+        else if (this.internal.sort && typeof this.internal.sort === 'object') {
+            this.internal.sort[field] = -1;
         }
         else {
-            if (this.internal.sort && typeof this.internal.sort === 'object') {
-                this.internal.sort[field] = -1;
-            }
-            else {
-                this.internal.sort = {
-                    [field]: -1,
-                };
-            }
+            this.internal.sort = {
+                [field]: -1,
+            };
         }
         return this;
     }
@@ -163,10 +138,10 @@ class Stack {
     connect(overrides = {}) {
         return __awaiter(this, void 0, void 0, function* () {
             const dbConfig = lodash_1.merge({}, this.config, overrides).contentStore;
-            const uri = util_1.validateURI(dbConfig.uri || dbConfig.url);
+            const url = util_1.validateURI(dbConfig.url);
             const options = dbConfig.options;
             const dbName = dbConfig.dbName;
-            const client = new mongodb_1.MongoClient(uri, options);
+            const client = new mongodb_1.MongoClient(url, options);
             this.client = client;
             yield client.connect();
             this.db = client.db(dbName);
@@ -230,10 +205,8 @@ class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     language(code) {
-        if (!(code) || typeof code !== 'string' || !(lodash_1.find(this.config.locales, {
-            code,
-        }))) {
-            throw new Error(`Language ${code} is invalid!`);
+        if (typeof code !== 'string' || code.length === 0) {
+            throw new Error('Kindly pass valid parameters for .language()!');
         }
         this.q.locale = code;
         return this;
@@ -1471,7 +1444,7 @@ class Stack {
                 // Ignore references include, for empty list, exclude call, content type & assets
                 if (result.length === 0 || this.internal.excludeReferences || this.q.content_type_uid === this
                     .types.content_types || this.q.content_type_uid
-                    === this.types.assets || this.internal.onlyCount) {
+                    === this.types.assets || (this.internal.onlyCount && !this.internal.queryReferences)) {
                     // Do nothing
                 }
                 else if (this.internal.includeSpecificReferences) {
@@ -1580,9 +1553,15 @@ class Stack {
         if (!(this.q.locale)) {
             this.q.locale = this.contentStore.locale;
         }
+        // by default, sort by latest content
+        if (!this.internal.sort) {
+            this.internal.sort = {
+                updated_at: -1,
+            };
+        }
         const filters = Object.assign({ _content_type_uid: this.q.content_type_uid, locale: this.q.locale }, this.q.query);
         if (this.q.content_type_uid === this.types.assets) {
-            // since, content type will take up 1 item-space
+            // allow querying only on published assets..!
             queryFilters = {
                 $and: [
                     filters,
@@ -1627,6 +1606,8 @@ class Stack {
                 locale: this.q.locale,
             };
             if (this.internal.onlyCount) {
+                output.content_type_uid = (this.q.content_type_uid === this.types.assets) ? 'assets' : ((this.q.content_type_uid
+                    === this.types.content_types) ? 'content_types' : this.q.content_type_uid);
                 output.count = count;
                 return output;
             }
@@ -1660,12 +1641,18 @@ class Stack {
                     break;
             }
             if (this.internal.includeCount) {
-                output.count = count;
+                output.count = yield this.db.collection(util_1.getCollectionName({
+                    content_type_uid: this.q.content_type_uid,
+                    locale: this.q.locale,
+                }, this.collectionNames))
+                    .count({
+                    _content_type_uid: this.q.content_type_uid,
+                });
             }
             // console.log('this.internal.includeSchema', this.internal.includeSchema)
             if (this.internal.includeSchema) {
                 output.content_type = yield this.db.collection(util_1.getCollectionName({
-                    content_type_uid: '_content_types',
+                    content_type_uid: this.types.content_types,
                     locale: this.q.locale,
                 }, this.collectionNames))
                     .findOne({
@@ -1685,11 +1672,11 @@ class Stack {
         return __awaiter(this, void 0, void 0, function* () {
             const schema = yield this.db
                 .collection(util_1.getCollectionName({
-                content_type_uid: '_content_types',
+                content_type_uid: this.types.content_types,
                 locale,
             }, this.collectionNames))
                 .findOne({
-                _content_type_uid: '_content_types',
+                _content_type_uid: this.types.content_types,
                 uid: contentTypeUid,
             }, {
                 _assets: 1,
@@ -1711,7 +1698,7 @@ class Stack {
                 return;
             }
             const assets = yield this.db.collection(util_1.getCollectionName({
-                content_type_uid: '_assets',
+                content_type_uid: this.types.assets,
                 locale,
             }, this.collectionNames))
                 .find(queryBucket)
@@ -1743,7 +1730,7 @@ class Stack {
     includeSpecificReferences(entries, contentTypeUid, locale, include) {
         return __awaiter(this, void 0, void 0, function* () {
             const ctQuery = {
-                _content_type_uid: '_content_types',
+                _content_type_uid: this.types.content_types,
                 uid: contentTypeUid,
             };
             /**
@@ -1791,7 +1778,7 @@ class Stack {
                     data.forEach((elem, idx) => {
                         if (typeof elem === 'string') {
                             queryBucket.$or.push({
-                                _content_type_uid: '_assets',
+                                _content_type_uid: this.types.assets,
                                 _version: { $exists: true },
                                 locale,
                                 uid: elem,
@@ -1833,7 +1820,7 @@ class Stack {
             }
             else if (typeof data === 'string') {
                 queryBucket.$or.push({
-                    _content_type_uid: '_assets',
+                    _content_type_uid: this.types.assets,
                     _version: { $exists: true },
                     locale,
                     uid: data,
@@ -1893,7 +1880,7 @@ class Stack {
     getReferencePath(query, locale, currentInclude) {
         return __awaiter(this, void 0, void 0, function* () {
             const schemas = yield this.db.collection(util_1.getCollectionName({
-                content_type_uid: '_content_types',
+                content_type_uid: this.types.content_types,
                 locale,
             }, this.collectionNames))
                 .find(query)
@@ -1943,14 +1930,14 @@ class Stack {
                         }
                         if (typeof entryReferences[path] === 'string') {
                             schemasReferred.push({
-                                _content_type_uid: '_content_types',
+                                _content_type_uid: this.types.content_types,
                                 uid: entryReferences[path],
                             });
                         }
                         else {
                             entryReferences[path].forEach((contentTypeUid) => {
                                 schemasReferred.push({
-                                    _content_type_uid: '_content_types',
+                                    _content_type_uid: this.types.content_types,
                                     uid: contentTypeUid,
                                 });
                             });
@@ -2018,7 +2005,7 @@ class Stack {
         return __awaiter(this, void 0, void 0, function* () {
             const ctQuery = {
                 $or: [{
-                        _content_type_uid: '_content_types',
+                        _content_type_uid: this.types.content_types,
                         uid: contentTypeUid,
                     }],
             };
@@ -2075,7 +2062,7 @@ class Stack {
         return __awaiter(this, void 0, void 0, function* () {
             const contents = yield this.db
                 .collection(util_1.getCollectionName({
-                content_type_uid: '_content_types',
+                content_type_uid: this.types.content_types,
                 locale,
             }, this.collectionNames))
                 .find(contentTypeQueries)
@@ -2091,7 +2078,7 @@ class Stack {
             for (let i = 0, j = contents.length; i < j; i++) {
                 let assetFieldPaths;
                 let entryReferencePaths;
-                if (contents[i].hasOwnProperty('_assets')) {
+                if (contents[i].hasOwnProperty(this.types.assets)) {
                     assetFieldPaths = Object.keys(contents[i]._assets);
                     paths = paths.concat(assetFieldPaths);
                 }
@@ -2101,7 +2088,7 @@ class Stack {
                     for (let k = 0, l = entryReferencePaths.length; k < l; k++) {
                         if (typeof contents[i]._references[entryReferencePaths[k]] === 'string') {
                             ctQueries.$or.push({
-                                _content_type_uid: '_content_types',
+                                _content_type_uid: this.types.content_types,
                                 // this would probably make it slow in FS, avoid this there?
                                 // locale,
                                 uid: contents[i]._references[entryReferencePaths[k]],
@@ -2110,7 +2097,7 @@ class Stack {
                         else if (contents[i]._references[entryReferencePaths[k]].length) {
                             contents[i]._references[entryReferencePaths[k]].forEach((uid) => {
                                 ctQueries.$or.push({
-                                    _content_type_uid: '_content_types',
+                                    _content_type_uid: this.types.content_types,
                                     // avoiding locale here, not sure if its required
                                     // locale,
                                     uid,

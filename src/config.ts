@@ -12,15 +12,17 @@ export const config = {
       schema: 'content_types',
     },
     dbName: 'contentstack-db',
-    // indexes: {
-    //   event_at: -1,
-    //   _content_type_uid: 1,
-    //   locale: 1,
-    //   uid: 1
-    // },
-    internalContentTypes: {
-      assets: '_assets',
-      content_types: '_content_types',
+    indexes: {
+      _content_type_uid: 1,
+      locale: 1,
+      uid: 1,
+      updated_at: -1,
+    },
+    internal: {
+      types: {
+        assets: '_assets',
+        content_types: '_content_types',
+      },
     },
     limit: 100,
     locale: 'en-us',
@@ -37,13 +39,8 @@ export const config = {
     projections: {
       _content_type_uid: 0,
       _id: 0,
-      _synced_at: 0,
-      _version: 0,
-      created_at: 0,
-      updated_at: 0,
-      updated_by: 0,
     },
-    referenceDepth: 20,
+    referenceDepth: 2,
     skip: 0,
     uri: 'mongodb://localhost:27017',
   },
