@@ -45,17 +45,20 @@
     <section>
         <article><p><a href="https://www.contentstack.com/"><img src="https://www.contentstack.com/docs/static/images/contentstack.png" alt="Contentstack"></a></p>
 <p>Contentstack is a headless CMS with an API-first approach. It is a CMS that developers can use to build powerful cross-platform applications in their favorite languages. Build your application frontend, and Contentstack will take care of the rest. <a href="https://www.contentstack.com/">Read More</a>.</p>
-<h2>Contentstack DataSync MongoDB SDK</h2><p><a href="https://www.contentstack.com/docs/guide/synchronization/contentstack-datasync">Contentstack DataSync</a> provides MongoDB SDK to query applications that have locally stored contents in mongodb. Given below is the detailed guide and helpful resources to get started.</p>
-<h3>Prerequisite</h3><ul>
+<h2>Contentstack DataSync MongoDB SDK</h2>
+<p><a href="https://www.contentstack.com/docs/guide/synchronization/contentstack-datasync">Contentstack DataSync</a> provides MongoDB SDK to query applications that have locally stored contents in mongodb. Given below is the detailed guide and helpful resources to get started.</p>
+<h3>Prerequisite</h3>
+<ul>
 <li>nodejs, v8+</li>
 <li>MongoDB, v3.6 or higher</li>
-<li>You should have the data synced through <a href="https://www.contentstack.com/docs/guide/synchronization/contentstack-datasync">Contentstack DataSync</a> </li>
+<li>You should have the data synced through <a href="https://www.contentstack.com/docs/guide/synchronization/contentstack-datasync">Contentstack DataSync</a></li>
 </ul>
-<h3>Configuration</h3><table>
+<h3>Configuration</h3>
+<table>
 <thead>
 <tr>
 <th>Property</th>
-<th>Data Type</th>
+<th>Type</th>
 <th>Default value</th>
 <th>Description</th>
 </tr>
@@ -68,13 +71,13 @@
 <td><strong>Optional</strong> The MongoDB database name</td>
 </tr>
 <tr>
-<td>collectionName</td>
+<td>collection</td>
 <td>string</td>
 <td>contents</td>
-<td><strong>Optional</strong> MongoDB database's collection name</td>
+<td><strong>Optional</strong> MongoDB database's collection names</td>
 </tr>
 <tr>
-<td>uri</td>
+<td>url</td>
 <td>string</td>
 <td>mongodb://localhost:27017</td>
 <td><strong>Optional.</strong> The MongoDB connection URI</td>
@@ -109,127 +112,160 @@
 <td><strong><a href="https://github.com/contentstack/datasync-content-store-mongodb#detailed-configs">see config below</a></strong></td>
 <td><strong>Optional.</strong> MongoDB connection options <a href="http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html">Ref.</a> for more info</td>
 </tr>
+<tr>
+<td>referenceDepth</td>
+<td>number</td>
+<td>2</td>
+<td><strong>Optional</strong> The default nested-reference-field depth that'd be considered when calling .includeReferences(). This can be overridden by passing a numerical argument to .includeReferences(4)</td>
+</tr>
 </tbody>
 </table>
-<h3>Detailed configs</h3><p>By default, this module uses the following internal configuration.</p>
-<pre class="prettyprint source lang-js"><code>{
-  dbName: 'contentstack-persistent-db',
-  collectionName: 'contents',
-  uri: 'mongodb://localhost:27017',
-  indexes: {
-    published_at: -1,
-    content_type_uid: 1,
-    locale: 1,
-    uid: 1
+<h3>Config Overview</h3>
+<p>Here's an overview of the SDK's configurable properties</p>
+<pre class="prettyprint source lang-ts"><code>{
+  contentStore: {
+    collection: {
+      asset: 'contents',
+      entry: 'contents',
+      schema: 'content_types',
+    },
+    dbName: 'contentstack-db',
+    indexes: {
+      _content_type_uid: 1,
+      locale: 1,
+      uid: 1,
+      updated_at: -1,
+    },
+    limit: 100,
+    locale: 'en-us',
+    // http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html
+    options: {
+      autoReconnect: true,
+      connectTimeoutMS: 15000,
+      keepAlive: true,
+      noDelay: true,
+      reconnectInterval: 1000,
+      reconnectTries: 20,
+      useNewUrlParser: true,
+    },
+    projections: {
+      _content_type_uid: 0,
+      _id: 0,
+    },
+    referenceDepth: 2,
+    skip: 0,
+    url: 'mongodb://localhost:27017',
   },
-  limit: 100,
-  locales: [
-  ],
-  options: {
-    autoReconnect: true,
-    connectTimeoutMS: 15000,
-    keepAlive: true,
-    noDelay: true,
-    reconnectInterval: 1000,
-    reconnectTries: 20,
-    useNewUrlParser: true,
-  },
-  projections: {
-    _id: 0,
-    _version: 0,
-    content_type_uid: 0,
-    created_at: 0,
-    sys_keys: 0,
-    updated_at: 0,
-    updated_by: 0,
-  },
-  skip: 0,
-}</code></pre><h3>Setup and Installation</h3><p>To import the SDK in your project, use the following command:</p>
-<pre class="prettyprint source lang-js"><code>  import { Contentstack } from 'contentstack-sync-mongodb-sdk'</code></pre><p>To initialize the SDK, you'd need to perform the following steps</p>
-<ol>
-<li><p>Initialize stack instance.</p>
-<pre class="prettyprint source lang-js"><code>const Stack = Contentstack.Stack(config)</code></pre></li>
-<li><p>Call the connect method. This method establishes a connection between the SDK and mongodb database.</p>
-<pre class="prettyprint source lang-js"><code>Stack.connect(dbConfig)
- .then(fnResolve)
- .catch(fnReject)</code></pre><blockquote>
-<p>Important: You need to call this, before running SDK queries!</p>
+}
+</code></pre>
+<h3>Sample SDK Query</h3>
+<p>Here's a sample SDK query to get started.</p>
+<p>Learn more on how to query using datasync-mongodb-sdk <a href="https://contentstack.github.io/datasync-mongodb-sdk/">here</a>.</p>
+<pre class="prettyprint source lang-ts"><code>import { Contentstack } from 'datasync-mongodb-sdk'
+const Stack = Contentstack.Stack(config)
+
+Stack.connect()
+  .then(() => {
+    return Stack.contentType('blog')
+      .entries()
+      .language('en-gb') // Optional. If not provided, defaults to en-us
+      .include(['authors'])
+      .includeCount()
+      .includeContentType()
+      .queryReferences({'authors.firstName': 'R.R. Martin'})
+      .then((result) => {
+        // Your result would be
+        // {
+        //   entries: [...], // All entries, who's first name is R.R. Martin
+        //   content_type_uid: 'blog',
+        //   locale: 'es-es',
+        //   content_type: {...}, // Blog content type's schema
+        //   count: 3, // Total count of blog content type
+        // }
+      })
+  })
+  .catch((error) => {
+    // handle errors..
+  })
+</code></pre>
+<blockquote>
+<p>Important: You need to call .connect(), to initiate SDK queries!</p>
 </blockquote>
-</li>
-</ol>
-<p>Once you have initialized the SDK, you can start querying on the sync-utility's DB's</p>
-<h3>Querying</h3><ul>
-<li>Notes<ul>
+<p>Once you have initialized the SDK, you can start querying on mongodb</p>
+<h3>Querying</h3>
+<ul>
+<li>
+<p>Notes</p>
+<ul>
 <li>By default, 'content_type_uid' and 'locale' keys as part of the response.</li>
-<li>If <code>.language()</code> is not provided, then the 1st language, provided in <code>config.locales</code> would be considered.</li>
+<li>If <code>.language()</code> is not provided, then the 1st language, provided in <code>config.defaultLocale</code> would be considered.</li>
 <li>If querying for a single entry/asset (using <code>.entry()</code> OR <code>.findOne()</code>), the result will be an object i.e. <code>{ entry: {} }</code>, if the entry or asset is not found, <code>{ entry: null }</code> will be returned.</li>
 <li>Querying multiple entries, would return <code>{ entries: [ {...} ] }</code>.</li>
+<li>By default, all entry responses would include their referred assets. If <code>.excludeReferences()</code> is called, no references (including assets) would <strong>not</strong> be returned in the response.</li>
 </ul>
 </li>
+<li>
+<p>Query a single entry</p>
+</li>
 </ul>
-<ol>
-<li>Query a single entry</li>
-</ol>
-<pre class="prettyprint source lang-js"><code>  // Sample 1. Returns the 1st entry that matches query filters
-  Stack.contentType('blogs')
-    .entry() // OR .asset()
-    .language('en-us')
-    .find()
-    .then((result) => {
-      // Response
-      // result = {
-      //   entry: {
-      //     title: '' || null
-      //   },
-      //   content_type_uid: '',
-      //   locale: ''
-      // }
-    })
-    .catch(reject)
+<pre class="prettyprint source lang-ts"><code>// Sample 1. Returns the 1st entry that matches query filters
+Stack.contentType('blog')
+  .entry() // OR .asset()
+  .find()
+  .then((result) => {
+    // Response
+    // result = {
+    //   entry: any | null,
+    //   content_type_uid: string,
+    //   locale: string,
+    // }
+  })
+  .catch(reject)
 
-  // Sample 2. Returns the 1st entry that matches query filters
-  Stack.contentType('blogs')
-    .entries() // for .assets() OR .schemas() - ignore calling .contentType()
-    .language('en-us')
-    .findOne()
-    .then((result) => {
-      // Response
-      // result = {
-      //   entry: {
-      //     title: '' || null
-      //   },
-      //   content_type_uid: '',
-      //   locale: ''
-      // }
-    })
-    .catch(reject)</code></pre><ol start="2">
-<li>Querying a set of entries, assets or content types<pre class="prettyprint source lang-js"><code>Stack.contentType('blogs')
- .entries() // for .assets() OR .schemas() - ignore calling .contentType()
- .includeCount()
- .find()
- .then((result) => {
-   // Response
-   // result = {
-   //   entries: [
-   //     {
-   //       title: ''
-   //     }
-   //   ],
-   //   content_type_uid: 'blogs',
-   //   locale: '',
-   //   count: 1
-   // }
- })
- .catch(reject)</code></pre></li>
-</ol>
-<h2>Advanced Queries</h2><p>In order to learn more about advance queries please refer the API documentation, <a href="https://contentstack.github.io/datasync-mongodb-sdk/">here</a>.</p>
-<h3>Further Reading</h3><ul>
-<li><a href="https://www.contentstack.com/docs/guide/synchronization/contentstack-datasync">Getting started with Contentstack DataSync</a>    </li>
+// Sample 2. Returns the 1st entry that matches query filters
+Stack.contentType('blogs')
+  .entries() // for .assets() 
+  .findOne()
+  .then((result) => {
+    // Response
+    // result = {
+    //   entry: any | null,
+    //   content_type_uid: string,
+    //   locale: string,
+    // }
+  })
+  .catch(reject)
+</code></pre>
+<ul>
+<li>Querying a set of entries, assets or content types</li>
+</ul>
+<pre class="prettyprint source lang-ts"><code>Stack.contentType('blog')
+  .entries() // for .assets() 
+  .includeCount()
+  .find()
+  .then((result) => {
+    // Response
+    // result = {
+    //   entry: any | null,
+    //   content_type_uid: string,
+    //   count: number,
+    //   locale: string,
+    // }
+  })
+  .catch(reject)
+</code></pre>
+<h2>Advanced Queries</h2>
+<p>In order to learn more about advance queries please refer the API documentation, <a href="https://contentstack.github.io/datasync-mongodb-sdk/">here</a>.</p>
+<h3>Further Reading</h3>
+<ul>
+<li><a href="https://www.contentstack.com/docs/guide/synchronization/contentstack-datasync">Getting started with Contentstack DataSync</a></li>
 <li><a href="https://www.contentstack.com/docs/guide/synchronization/contentstack-datasync/configuration-files-for-contentstack-datasync">Contentstack DataSync</a> doc lists the configuration for different modules</li>
 </ul>
-<h3>Support and Feature requests</h3><p>If you have any issues working with the library, please file an issue <a href="https://github.com/contentstack/datasync-content-store-mongodb/issues">here</a> at Github.</p>
+<h3>Support and Feature requests</h3>
+<p>If you have any issues working with the library, please file an issue <a href="https://github.com/contentstack/datasync-mongodb-sdk/issues">here</a> at Github.</p>
 <p>You can send us an e-mail at <a href="mailto:support@contentstack.com">support@contentstack.com</a> if you have any support or feature requests. Our support team is available 24/7 on the intercom. You can always get in touch and give us an opportunity to serve you better!</p>
-<h3>License</h3><p>This repository is published under the <a href="LICENSE">MIT license</a>.</p></article>
+<h3>License</h3>
+<p>This repository is published under the <a href="LICENSE">MIT license</a>.</p></article>
     </section>
 
 
@@ -240,13 +276,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="global.html#Stack">Stack</a></li></ul><h3>Global</h3><ul><li><a href="global.html#and">and</a></li><li><a href="global.html#ascending">ascending</a></li><li><a href="global.html#asset">asset</a></li><li><a href="global.html#assets">assets</a></li><li><a href="global.html#close">close</a></li><li><a href="global.html#connect">connect</a></li><li><a href="global.html#containedIn">containedIn</a></li><li><a href="global.html#contentType">contentType</a></li><li><a href="global.html#count">count</a></li><li><a href="global.html#descending">descending</a></li><li><a href="global.html#entries">entries</a></li><li><a href="global.html#entry">entry</a></li><li><a href="global.html#excludeReferences">excludeReferences</a></li><li><a href="global.html#exists">exists</a></li><li><a href="global.html#find">find</a></li><li><a href="global.html#findOne">findOne</a></li><li><a href="global.html#getQuery">getQuery</a></li><li><a href="global.html#greaterThan">greaterThan</a></li><li><a href="global.html#greaterThanOrEqualTo">greaterThanOrEqualTo</a></li><li><a href="global.html#includeCount">includeCount</a></li><li><a href="global.html#language">language</a></li><li><a href="global.html#lessThan">lessThan</a></li><li><a href="global.html#lessThanOrEqualTo">lessThanOrEqualTo</a></li><li><a href="global.html#notContainedIn">notContainedIn</a></li><li><a href="global.html#notEqualTo">notEqualTo</a></li><li><a href="global.html#notExists">notExists</a></li><li><a href="global.html#or">or</a></li><li><a href="global.html#queryReferences">queryReferences</a></li><li><a href="global.html#schema">schema</a></li><li><a href="global.html#schemas">schemas</a></li><li><a href="global.html#tags">tags</a></li><li><a href="global.html#where">where</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="global.html#Stack">Stack</a></li></ul><h3>Global</h3><ul><li><a href="global.html#and">and</a></li><li><a href="global.html#ascending">ascending</a></li><li><a href="global.html#asset">asset</a></li><li><a href="global.html#assets">assets</a></li><li><a href="global.html#close">close</a></li><li><a href="global.html#connect">connect</a></li><li><a href="global.html#containedIn">containedIn</a></li><li><a href="global.html#contentType">contentType</a></li><li><a href="global.html#count">count</a></li><li><a href="global.html#descending">descending</a></li><li><a href="global.html#entries">entries</a></li><li><a href="global.html#entry">entry</a></li><li><a href="global.html#except">except</a></li><li><a href="global.html#excludeReferences">excludeReferences</a></li><li><a href="global.html#exists">exists</a></li><li><a href="global.html#find">find</a></li><li><a href="global.html#findOne">findOne</a></li><li><a href="global.html#getQuery">getQuery</a></li><li><a href="global.html#greaterThan">greaterThan</a></li><li><a href="global.html#greaterThanOrEqualTo">greaterThanOrEqualTo</a></li><li><a href="global.html#include">include</a></li><li><a href="global.html#includeAllReferences">includeAllReferences</a></li><li><a href="global.html#includeContentType">includeContentType</a></li><li><a href="global.html#includeCount">includeCount</a></li><li><a href="global.html#language">language</a></li><li><a href="global.html#lessThan">lessThan</a></li><li><a href="global.html#lessThanOrEqualTo">lessThanOrEqualTo</a></li><li><a href="global.html#limit">limit</a></li><li><a href="global.html#notContainedIn">notContainedIn</a></li><li><a href="global.html#notEqualTo">notEqualTo</a></li><li><a href="global.html#notExists">notExists</a></li><li><a href="global.html#only">only</a></li><li><a href="global.html#or">or</a></li><li><a href="global.html#query">query</a></li><li><a href="global.html#queryReferences">queryReferences</a></li><li><a href="global.html#regex">regex</a></li><li><a href="global.html#schema">schema</a></li><li><a href="global.html#schemas">schemas</a></li><li><a href="global.html#skip">skip</a></li><li><a href="global.html#tags">tags</a></li><li><a href="global.html#where">where</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Mar 28 2019 13:13:50 GMT+0530 (IST)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Sun Jul 21 2019 23:27:42 GMT+0530 (India Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

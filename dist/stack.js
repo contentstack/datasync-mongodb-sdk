@@ -779,6 +779,7 @@ class Stack {
         return this;
     }
     /**
+     * @public
      * @method entries
      * @description
      * Query for a set of entries on a content type
@@ -804,6 +805,7 @@ class Stack {
         throw new Error('Kindly call \'contentType()\' before \'entries()\'!');
     }
     /**
+     * @public
      * @method asset
      * @description
      * Query for a single asset
@@ -835,6 +837,7 @@ class Stack {
         return stack;
     }
     /**
+     * @public
      * @method assets
      * @description
      * Query for a set of assets
@@ -859,6 +862,7 @@ class Stack {
         return stack;
     }
     /**
+     * @public
      * @method schema
      * @description
      * Query for a single content type's schema
@@ -891,10 +895,10 @@ class Stack {
         return stack;
     }
     /**
+     * @public
      * @method schemas
      * @description
      * Query for a set of content type schemas
-     * @public
      * @example
      * Stack
      *  .schemas()
@@ -915,9 +919,11 @@ class Stack {
         return stack;
     }
     /**
+     * @public
+     * @method limit
+     * @description
      * Parameter - used to limit the total no of items returned/scanned
      * Defaults to 100 (internally, which is overridden)
-     *
      * @param {number} no Max count of the 'items' returned
      *
      * @example
@@ -944,9 +950,11 @@ class Stack {
         throw new Error('Kindly provide a valid \'numeric\' value for \'limit()\'');
     }
     /**
+     * @public
+     * @method skip
+     * @description
      * Parameter - used to skip initial no of items scanned
      * Defaults to 0 (internally, which is overridden)
-     *
      * @param {number} no Min count of the 'items' to be scanned
      *
      * @example
@@ -973,6 +981,9 @@ class Stack {
         throw new Error('Kindly provide a valid \'numeric\' value for \'skip()\'');
     }
     /**
+     * @public
+     * @method query
+     * @description
      * Wrapper around a raw query wrapper
      * @param {object} queryObject Query filter
      *
@@ -1001,6 +1012,9 @@ class Stack {
         return this;
     }
     /**
+     * @public
+     * @method only
+     * @description
      * Projections - returns only the fields passed here
      *
      * @param {array} fields Array of 'fields', separated by dot ('.') notation for embedded document query
@@ -1034,6 +1048,9 @@ class Stack {
         return this;
     }
     /**
+     * @public
+     * @method except
+     * @description
      * Projections - returns fields except the ones passed here
      *
      * @param {array} fields Array of 'fields', separated by dot ('.') notation for embedded document query
@@ -1066,6 +1083,9 @@ class Stack {
         return this;
     }
     /**
+     * @public
+     * @method regex
+     * @description
      * Raw regex to be applied on a field - wrapper
      *
      * @param {string} field Field on which the regex is to be applied on
@@ -1152,6 +1172,7 @@ class Stack {
         return this;
     }
     /**
+     * @public
      * @method where
      * @summary Pass JS expression or a full function to the query system
      * @description
@@ -1252,6 +1273,8 @@ class Stack {
         return this;
     }
     /**
+     * @public
+     * @method includeContentType
      * @description
      * Includes 'content_type' key in response, which is the content type schema of the entries filtered/scanned
      * @example
@@ -1274,6 +1297,7 @@ class Stack {
         return this;
     }
     /**
+     * @public
      * @method excludeReferences
      * @description
      * Excludes all references of the entries being scanned
@@ -1299,6 +1323,7 @@ class Stack {
         return this;
     }
     /**
+     * @public
      * @method queryReferences
      * @description
      * Wrapper, that allows querying on the entry's references.
@@ -1329,14 +1354,8 @@ class Stack {
         }
         throw new Error('Kindly pass a query object for \'.queryReferences()\'');
     }
-    queryReferencesBeta(query) {
-        if (query && typeof query === 'object') {
-            this.internal.queryReferencesBeta = query;
-            return this;
-        }
-        throw new Error('Kindly pass a query object for \'.queryReferences()\'');
-    }
     /**
+     * @public
      * @method getQuery
      * @description
      * Returns the query build thusfar
@@ -1364,7 +1383,11 @@ class Stack {
      *  .includeAllReferences()
      * @returns {Stack} Returns 'this' instance (of Stack)
      */
-    includeReferences() {
+    includeReferences(depth) {
+        console.warn('.includeReferences() is a relatively slow query..!');
+        if (typeof depth === 'number') {
+            this.q.referenceDepth = depth;
+        }
         this.internal.includeAllReferences = true;
         return this;
     }
@@ -1394,6 +1417,7 @@ class Stack {
         return this;
     }
     /**
+     * @public
      * @method find
      * @description
      * Queries the db using the query built/passed
@@ -1476,6 +1500,7 @@ class Stack {
         }));
     }
     /**
+     * @public
      * @method count
      * @descriptionReturns the count of the entries/assets that match the filter
      * @param {object} query Optional query filter object
@@ -1501,6 +1526,7 @@ class Stack {
         });
     }
     /**
+     * @public
      * @method findOne
      * @description
      * Queries the db using the query built/passed. Returns a single entry/asset/content type object
