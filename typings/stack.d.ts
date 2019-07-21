@@ -493,6 +493,7 @@ export declare class Stack {
      */
     entry(uid?: any): this;
     /**
+     * @public
      * @method entries
      * @description
      * Query for a set of entries on a content type
@@ -513,6 +514,7 @@ export declare class Stack {
      */
     entries(): this;
     /**
+     * @public
      * @method asset
      * @description
      * Query for a single asset
@@ -534,6 +536,7 @@ export declare class Stack {
      */
     asset(uid?: any): Stack;
     /**
+     * @public
      * @method assets
      * @description
      * Query for a set of assets
@@ -553,6 +556,7 @@ export declare class Stack {
      */
     assets(): Stack;
     /**
+     * @public
      * @method schema
      * @description
      * Query for a single content type's schema
@@ -575,10 +579,10 @@ export declare class Stack {
      */
     schema(uid?: any): Stack;
     /**
+     * @public
      * @method schemas
      * @description
      * Query for a set of content type schemas
-     * @public
      * @example
      * Stack
      *  .schemas()
@@ -594,9 +598,11 @@ export declare class Stack {
      */
     schemas(): Stack;
     /**
+     * @public
+     * @method limit
+     * @description
      * Parameter - used to limit the total no of items returned/scanned
      * Defaults to 100 (internally, which is overridden)
-     *
      * @param {number} no Max count of the 'items' returned
      *
      * @example
@@ -617,9 +623,11 @@ export declare class Stack {
      */
     limit(no: any): this;
     /**
+     * @public
+     * @method skip
+     * @description
      * Parameter - used to skip initial no of items scanned
      * Defaults to 0 (internally, which is overridden)
-     *
      * @param {number} no Min count of the 'items' to be scanned
      *
      * @example
@@ -640,6 +648,9 @@ export declare class Stack {
      */
     skip(no: any): this;
     /**
+     * @public
+     * @method query
+     * @description
      * Wrapper around a raw query wrapper
      * @param {object} queryObject Query filter
      *
@@ -660,6 +671,9 @@ export declare class Stack {
      */
     query(queryObject?: {}): this;
     /**
+     * @public
+     * @method only
+     * @description
      * Projections - returns only the fields passed here
      *
      * @param {array} fields Array of 'fields', separated by dot ('.') notation for embedded document query
@@ -681,6 +695,9 @@ export declare class Stack {
      */
     only(fields: any): this;
     /**
+     * @public
+     * @method except
+     * @description
      * Projections - returns fields except the ones passed here
      *
      * @param {array} fields Array of 'fields', separated by dot ('.') notation for embedded document query
@@ -701,6 +718,9 @@ export declare class Stack {
      */
     except(fields: any): this;
     /**
+     * @public
+     * @method regex
+     * @description
      * Raw regex to be applied on a field - wrapper
      *
      * @param {string} field Field on which the regex is to be applied on
@@ -745,6 +765,7 @@ export declare class Stack {
      */
     tags(values: any): this;
     /**
+     * @public
      * @method where
      * @summary Pass JS expression or a full function to the query system
      * @description
@@ -818,6 +839,8 @@ export declare class Stack {
      */
     includeSchema(): this;
     /**
+     * @public
+     * @method includeContentType
      * @description
      * Includes 'content_type' key in response, which is the content type schema of the entries filtered/scanned
      * @example
@@ -837,6 +860,7 @@ export declare class Stack {
      */
     includeContentType(): this;
     /**
+     * @public
      * @method excludeReferences
      * @description
      * Excludes all references of the entries being scanned
@@ -859,6 +883,7 @@ export declare class Stack {
      */
     excludeReferences(): this;
     /**
+     * @public
      * @method queryReferences
      * @description
      * Wrapper, that allows querying on the entry's references.
@@ -883,8 +908,8 @@ export declare class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     queryReferences(query: any): this;
-    queryReferencesBeta(query: any): this;
     /**
+     * @public
      * @method getQuery
      * @description
      * Returns the query build thusfar
@@ -910,7 +935,7 @@ export declare class Stack {
      *  .includeAllReferences()
      * @returns {Stack} Returns 'this' instance (of Stack)
      */
-    includeReferences(): this;
+    includeReferences(depth: any): this;
     /**
      * @public
      * @method include
@@ -926,6 +951,7 @@ export declare class Stack {
      */
     include(fields: any): this;
     /**
+     * @public
      * @method find
      * @description
      * Queries the db using the query built/passed
@@ -949,6 +975,7 @@ export declare class Stack {
      */
     find(query?: {}): Promise<unknown>;
     /**
+     * @public
      * @method count
      * @descriptionReturns the count of the entries/assets that match the filter
      * @param {object} query Optional query filter object
@@ -969,6 +996,7 @@ export declare class Stack {
      */
     count(query?: any): Promise<unknown>;
     /**
+     * @public
      * @method findOne
      * @description
      * Queries the db using the query built/passed. Returns a single entry/asset/content type object

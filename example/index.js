@@ -1,7 +1,7 @@
 const Contentstack = require('../dist').Contentstack
 
 const Stack = Contentstack.Stack({
-  // locale: 'en-us',
+  locale: 'en-us',
   contentStore: {
     dbName: 'references',
     collection: {
@@ -26,17 +26,14 @@ function close () {
 
 function find (contentType = 'blog') {
   return Stack.contentType(contentType)
-      .entries()
-      .find()
+    .entries()
+    .find()
 }
 
 return connect()
   .then(() => {
-    console.time('t')
     return find()
       .then((result) => {
-        console.timeEnd('t')
-        const keys = Object.keys(result)
         // Sample output
         // {
         //   entries: [
@@ -55,7 +52,7 @@ return connect()
         //   locale: 'es-es',
         //   count: 10
         // }
-        console.log(JSON.stringify(result, null, 1))
+        console.log(JSON.stringify(result, null, 2))
         return
       })
   })
