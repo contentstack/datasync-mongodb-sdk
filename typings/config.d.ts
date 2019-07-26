@@ -40,6 +40,6 @@ export declare const config: {
         };
         referenceDepth: number;
         skip: number;
-        uri: string;
+        url: string;
     };
 };

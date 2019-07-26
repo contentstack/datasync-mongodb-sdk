@@ -43,6 +43,6 @@ exports.config = {
         },
         referenceDepth: 2,
         skip: 0,
-        uri: 'mongodb://localhost:27017',
+        url: 'mongodb://localhost:27017',
     },
 };

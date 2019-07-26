@@ -1471,7 +1471,7 @@ export class Stack {
    *  .includeAllReferences()
    * @returns {Stack} Returns 'this' instance (of Stack)
    */
-  public includeReferences(depth) {
+  public includeReferences(depth?: number) {
     console.warn('.includeReferences() is a relatively slow query..!')
     if (typeof depth === 'number') {
       this.q.referenceDepth = depth
