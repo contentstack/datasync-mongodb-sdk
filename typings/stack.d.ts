@@ -935,7 +935,7 @@ export declare class Stack {
      *  .includeAllReferences()
      * @returns {Stack} Returns 'this' instance (of Stack)
      */
-    includeReferences(depth: any): this;
+    includeReferences(depth?: number): this;
     /**
      * @public
      * @method include
