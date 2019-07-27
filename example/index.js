@@ -13,11 +13,7 @@ const Stack = Contentstack.Stack({
 })
 
 function connect () {
-  return new Promise((resolve, reject) => {
-    return Stack.connect()
-      .then(resolve)
-      .catch(reject)
-  })
+  return Stack.connect()
 }
 
 function close () {
