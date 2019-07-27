@@ -1560,7 +1560,8 @@ class Stack {
         else {
             this.q.query = {};
         }
-        this.q.referenceDepth = this.q.referenceDepth || this.contentStore.referenceDepth;
+        // tslint:disable-next-line: max-line-length
+        this.q.referenceDepth = (typeof this.q.referenceDepth === 'number') ? this.q.referenceDepth : this.contentStore.referenceDepth;
         if (this.internal.only) {
             this.internal.projections = this.internal.only;
         }
@@ -1675,7 +1676,6 @@ class Stack {
                     _content_type_uid: this.q.content_type_uid,
                 });
             }
-            // console.log('this.internal.includeSchema', this.internal.includeSchema)
             if (this.internal.includeSchema) {
                 output.content_type = yield this.db.collection(util_1.getCollectionName({
                     content_type_uid: this.types.content_types,
@@ -1889,10 +1889,21 @@ class Stack {
             eQuery = null;
             for (let i = 0, j = oldShelf.length; i < j; i++) {
                 const element = oldShelf[i];
+                let flag = true;
                 for (let k = 0, l = result.length; k < l; k++) {
                     if (result[k].uid === element.uid) {
                         element.path[element.position] = result[k];
+                        flag = false;
                         break;
+                    }
+                }
+                if (flag) {
+                    for (let e = 0, f = oldShelf[i].path.length; e < f; e++) {
+                        // tslint:disable-next-line: max-line-length
+                        if (oldShelf[i].path[e].hasOwnProperty('_content_type_uid') && Object.keys(oldShelf[i].path[e]).length === 2) {
+                            oldShelf[i].path.splice(e, 1);
+                            break;
+                        }
                     }
                 }
             }
@@ -1942,13 +1953,12 @@ class Stack {
                 const includePath = currentInclude[i];
                 // tslint:disable-next-line: forin
                 for (const path in entryReferences) {
-                    const idx = includePath.indexOf(path);
-                    // tslint:disable-next-line: no-bitwise
-                    if (~idx) {
+                    const subStr = includePath.slice(0, path.length);
+                    if (subStr === path) {
                         let subPath;
                         // Its the complete path!! Hurrah!
                         if (path.length !== includePath.length) {
-                            subPath = includePath.slice(0, path.length);
+                            subPath = subStr;
                             pendingPath.push(includePath.slice(path.length + 1));
                         }
                         else {
@@ -1960,7 +1970,7 @@ class Stack {
                                 uid: entryReferences[path],
                             });
                         }
-                        else {
+                        else if (entryReferences[path].length) {
                             entryReferences[path].forEach((contentTypeUid) => {
                                 schemasReferred.push({
                                     _content_type_uid: this.types.content_types,
@@ -2069,10 +2079,21 @@ class Stack {
             oldEntryQueries = null;
             for (let i = 0, j = oldObjectPointerList.length; i < j; i++) {
                 const element = oldObjectPointerList[i];
+                let flag = true;
                 for (let k = 0, l = result.length; k < l; k++) {
                     if (result[k].uid === element.uid) {
                         element.path[element.position] = result[k];
+                        flag = false;
                         break;
+                    }
+                }
+                if (flag) {
+                    for (let e = 0, f = oldObjectPointerList[i].path.length; e < f; e++) {
+                        // tslint:disable-next-line: max-line-length
+                        if (oldObjectPointerList[i].path[e].hasOwnProperty('_content_type_uid') && Object.keys(oldObjectPointerList[i].path[e]).length === 2) {
+                            oldObjectPointerList[i].path.splice(e, 1);
+                            break;
+                        }
                     }
                 }
             }
