@@ -980,6 +980,32 @@ export class Stack {
 
   /**
    * @public
+   * @method contentTypes
+   * @description
+   * Query for a set of content type schemas
+   * @example
+   * Stack
+   *  .contentTypes()
+   *  .find()
+   *  .then((result) => {
+   *    // returns a set of content type schemas
+   *  })
+   *  .catch((error) => {
+   *    // handle query errors
+   *  })
+   *
+   * @returns {Stack} Returns an instance of 'stack'
+   */
+  public contentTypes() {
+    const stack = new Stack(this.config, this.db)
+    stack.q.content_type_uid = this.types.content_types
+    // stack.collection = stack.db.collection(stack.contentStore.collectionName)
+
+    return stack
+  }
+
+  /**
+   * @public
    * @method limit
    * @description
    * Parameter - used to limit the total no of items returned/scanned
@@ -1380,7 +1406,7 @@ export class Stack {
    * @public
    * @method excludeReferences
    * @description
-   * Excludes all references of the entries being scanned
+   * Excludes all references of the entries being scanned.
    * Note: On calling this, assets will not be binded in the result being returned.
    *
    * @example
@@ -1461,14 +1487,15 @@ export class Stack {
 
   /**
    * @public
-   * @method includeAllReferences
+   * @method includeReferences
    * @description
-   * This method would return all the references of your queried entries (until depth 4)
-   * Note: If you wish to increase the depth of the references fetched, call .referenceDepth()
+   * This method would return all the references of your queried entries (until depth 2)
+   * Note: If you wish to increase the depth of the references fetched, call pass a numeric parameter
    * @example
-   * Stack.contentType('blog')
+   * Stack
+   *  .contentType('blog')
    *  .entries()
-   *  .includeAllReferences()
+   *  .includeReferences(3)
    * @returns {Stack} Returns 'this' instance (of Stack)
    */
   public includeReferences(depth?: number) {
@@ -1486,7 +1513,7 @@ export class Stack {
    * @method include
    * @description
    * Pass in reference field uids, that you want included in your result.
-   * If you want all the references, use .includeAllReferences()
+   * If you want all the references, use .includeReferences()
    * @example
    * Stack.contentType('blog')
    *  .entries()
@@ -1618,6 +1645,7 @@ export class Stack {
   /**
    * @public
    * @method findOne
+   * @deprecated - Use .fetch() instead
    * @description
    * Queries the db using the query built/passed. Returns a single entry/asset/content type object
    * Does all the processing, filtering, referencing after querying the DB
@@ -1632,6 +1660,28 @@ export class Stack {
    * @returns {object} - Returns an object, that has been processed, filtered and referenced
    */
   public findOne(query = {}) {
+    this.internal.single = true
+
+    return this.find(query)
+  }
+
+  /**
+   * @public
+   * @method fetch
+   * @description
+   * Queries the db using the query built/passed. Returns a single entry/asset/content type object
+   * Does all the processing, filtering, referencing after querying the DB
+   * @param {object} query Optional query object, that overrides all the previously build queries
+   *
+   * @example
+   * Stack
+   *  .contentType('blog')
+   *  .entries()
+   *  .fetch()
+   *
+   * @returns {object} - Returns an object, that has been processed, filtered and referenced
+   */
+  public fetch(query = {}) {
     this.internal.single = true
 
     return this.find(query)
@@ -1815,12 +1865,11 @@ export class Stack {
         _id: 0,
       })
 
-    if (schema === null) {
+    if (schema === null || schema[this.types.assets] !== 'object') {
       return
     }
 
-    const assetPaths = schema._assets
-    const paths = Object.keys(assetPaths)
+    const paths = Object.keys(schema[this.types.assets])
     const shelf = []
     const queryBucket = {
       $or: [],
@@ -1871,22 +1920,6 @@ export class Stack {
       _content_type_uid: this.types.content_types,
       uid: contentTypeUid,
     }
-    /**
-     * key: {
-     *  $in_query: {
-     *    $or: [
-     *      {
-     *        range: { $in: [10, 100] }
-     *      },
-     *      {
-     *        key2: {
-     *          $in_query: ...
-     *        }
-     *      }
-     *    ]
-     *  }
-     * }
-     */
 
     const {
       paths, // ref. fields in the current content types
@@ -2083,9 +2116,9 @@ export class Stack {
 
     schemas.forEach((schema) => {
       // Entry references
-      entryReferences = merge(entryReferences, schema._references)
+      entryReferences = merge(entryReferences, schema[this.types.references])
       // tslint:disable-next-line: forin
-      for (const path in schema._assets) {
+      for (const path in schema[this.types.assets]) {
         paths.push(path)
       }
     })
@@ -2292,23 +2325,23 @@ export class Stack {
       let assetFieldPaths: string[]
       let entryReferencePaths: string[]
       if (contents[i].hasOwnProperty(this.types.assets)) {
-        assetFieldPaths = Object.keys(contents[i]._assets)
+        assetFieldPaths = Object.keys(contents[i][this.types.assets])
         paths = paths.concat(assetFieldPaths)
       }
       if (contents[i].hasOwnProperty('_references')) {
-        entryReferencePaths = Object.keys(contents[i]._references)
+        entryReferencePaths = Object.keys(contents[i][this.types.references])
         paths = paths.concat(entryReferencePaths)
 
         for (let k = 0, l = entryReferencePaths.length; k < l; k++) {
-          if (typeof contents[i]._references[entryReferencePaths[k]] === 'string') {
+          if (typeof contents[i][this.types.references][entryReferencePaths[k]] === 'string') {
             ctQueries.$or.push({
               _content_type_uid: this.types.content_types,
               // this would probably make it slow in FS, avoid this there?
               // locale,
-              uid: contents[i]._references[entryReferencePaths[k]],
+              uid: contents[i][this.types.references][entryReferencePaths[k]],
             })
-          } else if (contents[i]._references[entryReferencePaths[k]].length) {
-            contents[i]._references[entryReferencePaths[k]].forEach((uid) => {
+          } else if (contents[i][this.types.references][entryReferencePaths[k]].length) {
+            contents[i][this.types.references][entryReferencePaths[k]].forEach((uid) => {
               ctQueries.$or.push({
                 _content_type_uid: this.types.content_types,
                 // avoiding locale here, not sure if its required
