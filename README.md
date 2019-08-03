@@ -8,9 +8,17 @@ Contentstack is a headless CMS with an API-first approach. It is a CMS that deve
 
 ### Prerequisite
 
-- nodejs, v8+
+- Nodejs, v8+
 - MongoDB, v3.6 or higher
 - You should have the data synced through [Contentstack DataSync](https://www.contentstack.com/docs/guide/synchronization/contentstack-datasync) 
+
+**Note**
+For optimal performance, we recommend that you add indexes on the following keys of your collections
+- `_content_type_uid: 1`
+- `uid: 1`
+- `locale: 1`
+<!-- Since by default, the contents are sorted in descending order on 'updated_at' key -->
+- `updated_at: -1`
 
 ### Configuration
 
