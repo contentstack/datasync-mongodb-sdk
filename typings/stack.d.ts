@@ -599,6 +599,25 @@ export declare class Stack {
     schemas(): Stack;
     /**
      * @public
+     * @method contentTypes
+     * @description
+     * Query for a set of content type schemas
+     * @example
+     * Stack
+     *  .contentTypes()
+     *  .find()
+     *  .then((result) => {
+     *    // returns a set of content type schemas
+     *  })
+     *  .catch((error) => {
+     *    // handle query errors
+     *  })
+     *
+     * @returns {Stack} Returns an instance of 'stack'
+     */
+    contentTypes(): Stack;
+    /**
+     * @public
      * @method limit
      * @description
      * Parameter - used to limit the total no of items returned/scanned
@@ -863,7 +882,7 @@ export declare class Stack {
      * @public
      * @method excludeReferences
      * @description
-     * Excludes all references of the entries being scanned
+     * Excludes all references of the entries being scanned.
      * Note: On calling this, assets will not be binded in the result being returned.
      *
      * @example
@@ -925,14 +944,15 @@ export declare class Stack {
     getQuery(): any;
     /**
      * @public
-     * @method includeAllReferences
+     * @method includeReferences
      * @description
-     * This method would return all the references of your queried entries (until depth 4)
-     * Note: If you wish to increase the depth of the references fetched, call .referenceDepth()
+     * This method would return all the references of your queried entries (until depth 2)
+     * Note: If you wish to increase the depth of the references fetched, call pass a numeric parameter
      * @example
-     * Stack.contentType('blog')
+     * Stack
+     *  .contentType('blog')
      *  .entries()
-     *  .includeAllReferences()
+     *  .includeReferences(3)
      * @returns {Stack} Returns 'this' instance (of Stack)
      */
     includeReferences(depth?: number): this;
@@ -941,7 +961,7 @@ export declare class Stack {
      * @method include
      * @description
      * Pass in reference field uids, that you want included in your result.
-     * If you want all the references, use .includeAllReferences()
+     * If you want all the references, use .includeReferences()
      * @example
      * Stack.contentType('blog')
      *  .entries()
@@ -998,6 +1018,7 @@ export declare class Stack {
     /**
      * @public
      * @method findOne
+     * @deprecated - Use .fetch() instead
      * @description
      * Queries the db using the query built/passed. Returns a single entry/asset/content type object
      * Does all the processing, filtering, referencing after querying the DB
@@ -1012,6 +1033,23 @@ export declare class Stack {
      * @returns {object} - Returns an object, that has been processed, filtered and referenced
      */
     findOne(query?: {}): Promise<unknown>;
+    /**
+     * @public
+     * @method fetch
+     * @description
+     * Queries the db using the query built/passed. Returns a single entry/asset/content type object
+     * Does all the processing, filtering, referencing after querying the DB
+     * @param {object} query Optional query object, that overrides all the previously build queries
+     *
+     * @example
+     * Stack
+     *  .contentType('blog')
+     *  .entries()
+     *  .fetch()
+     *
+     * @returns {object} - Returns an object, that has been processed, filtered and referenced
+     */
+    fetch(query?: {}): Promise<unknown>;
     /**
      * @private
      * @method preProcess

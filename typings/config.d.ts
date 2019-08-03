@@ -21,6 +21,7 @@ export declare const config: {
             types: {
                 assets: string;
                 content_types: string;
+                references: string;
             };
         };
         limit: number;

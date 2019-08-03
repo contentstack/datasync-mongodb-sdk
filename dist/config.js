@@ -23,6 +23,7 @@ exports.config = {
             types: {
                 assets: '_assets',
                 content_types: '_content_types',
+                references: '_references',
             },
         },
         limit: 100,
