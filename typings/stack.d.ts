@@ -1084,6 +1084,7 @@ export declare class Stack {
      */
     private includeSpecificReferences;
     private fetchPathDetails;
+    private bindLeftoverAssets;
     private includeReferenceIteration;
     private getReferencePath;
     private fetchEntries;
