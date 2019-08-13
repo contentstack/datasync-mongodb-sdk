@@ -171,7 +171,6 @@ export class Stack {
    * @returns {object} Mongodb 'db' instance
    */
   public async connect(overrides = {}) {
-
     const dbConfig = merge({}, this.config, overrides).contentStore
 
     const url = validateURI(dbConfig.url)
@@ -184,36 +183,7 @@ export class Stack {
     this.db = client.db(dbName)
 
     return this.db
-
-    // // Create indexes in the background
-    // const bucket: any = []
-    // const indexes = this.config.contentStore.indexes
-    // const collectionName = this.config.contentStore.collectionName
-    // for (let index in indexes) {
-    //   if (indexes[index] === 1 || indexes[index] === -1) {
-    //     bucket.push(this.createIndexes(this.config.contentStore.collectionName, index, indexes[index]))
-    //   }
-    // }
-
-    // Promise.all(bucket)
-    //   .then(() => {
-    //     console.info(`Indexes created successfully in '${collectionName}' collection`)
-    //   })
-    //   .catch((error) => {
-    //     console.error(`Failed while creating indexes in '${collectionName}' collection`)
-    //     console.error(error)
-    //   })
   }
-
-  // private createIndexes(collectionId, index, type) {
-  //   return this.db.collection(collectionId)
-  //     .createIndex({
-  //       [index]: type
-  //     })
-  //     .then(() => {
-  //       return
-  //     })
-  // }
 
   /**
    * @public
@@ -284,7 +254,9 @@ export class Stack {
    * @returns {Stack} Returns an instance of 'stack'
    */
   public and(queries) {
-    if (this.q.query && typeof this.q.query === 'object') {
+    if (typeof queries !== 'object' || !Array.isArray(queries)) {
+      throw new Error('Kindly provide valid parameters for .and()!')
+    } else if (this.q.query && typeof this.q.query === 'object') {
       this.q.query = merge(this.q.query, {
         $and: queries,
       })
@@ -326,7 +298,9 @@ export class Stack {
    * @returns {Stack} Returns an instance of 'stack'
    */
   public or(queries) {
-    if (this.q.query && typeof this.q.query === 'object') {
+    if (typeof queries !== 'object' || !Array.isArray(queries)) {
+      throw new Error('Kindly provide valid parameters for .or()!')
+    } else if (this.q.query && typeof this.q.query === 'object') {
       this.q.query = merge(this.q.query, {
         $or: queries,
       })
@@ -820,7 +794,8 @@ export class Stack {
       throw new Error('Kindly call \'contentType()\' before \'entry()\'!')
     }
     if (uid && typeof uid === 'string') {
-      this.q.uid = uid
+      this.q.query = this.q.query || {}
+      this.q.query.uid = uid
     }
     this.internal.limit = 1
     this.internal.single = true
@@ -880,7 +855,8 @@ export class Stack {
   public asset(uid ? ) {
     const stack = new Stack(this.config, this.db)
     if (uid && typeof uid === 'string') {
-      stack.q.uid = uid
+      stack.q.query = stack.q.query || {}
+      stack.q.query.uid = uid
     }
     stack.q.content_type_uid = this.types.assets
     // stack.collection = stack.db.collection(stack.contentStore.collectionName)
@@ -942,7 +918,8 @@ export class Stack {
   public schema(uid ? ) {
     const stack = new Stack(this.config, this.db)
     if (uid && typeof uid === 'string') {
-      stack.q.uid = uid
+      stack.q.query = stack.q.query || {}
+      stack.q.query.uid = uid
     }
     stack.q.content_type_uid = this.types.content_types
     // stack.collection = stack.db.collection(stack.contentStore.collectionName)
@@ -1247,7 +1224,7 @@ export class Stack {
    * @returns {Stack} Returns an instance of 'stack'
    */
   public tags(values) {
-    if (!values || typeof values !== 'object' || !(values instanceof Array) || values.length === 0) {
+    if (!values || typeof values !== 'object' || !(values instanceof Array)) {
       throw new Error('Kindly provide valid \'field\' values for \'tags()\'')
     }
     // filter non-string keys
@@ -1255,15 +1232,14 @@ export class Stack {
       return typeof value !== 'string'
     })
 
-    if (this.q.query && typeof this.q.query === 'object') {
+    this.q.query = this.q.query || {}
+    if (values.length === 0) {
       this.q.query.tags = {
-        $in: values,
+        $size: 0,
       }
     } else {
-      this.q.query = {
-        tags: {
-          $in: values,
-        },
+      this.q.query.tags = {
+        $in: values,
       }
     }
 
@@ -2033,9 +2009,38 @@ export class Stack {
     return
   }
 
+  private async bindLeftoverAssets(queries: IQuery, locale: string, pointerList: IShelf[]) {
+    // const contents = await readFile(getAssetsPath(locale) + '.json')
+    const filteredAssets = await this.db.collection(getCollectionName({
+      content_type_uid: this.types.assets,
+      locale,
+    }, this.collectionNames))
+    .find(queries)
+    .project({
+      _content_type_uid: 0,
+      _id: 0,
+    })
+    .toArray()
+
+    for (let l = 0, m = pointerList.length; l < m; l++) {
+      for (let n = 0, o = filteredAssets.length; n < o; n++) {
+        if (pointerList[l].uid === filteredAssets[n].uid) {
+          pointerList[l].path[pointerList[l].position] = filteredAssets[n]
+          break
+        }
+      }
+    }
+
+    return
+  }
+
   private async includeReferenceIteration(eQuery: any, ctQuery: any, locale: string, include: string[], oldShelf:
     IShelf[]) {
-    if (oldShelf.length === 0 || ctQuery.$or.length === 0) {
+    if (oldShelf.length === 0) {
+      return
+    } else if (ctQuery.$or.length === 0 && eQuery.$or.length > 0) {
+      await this.bindLeftoverAssets(eQuery, locale, oldShelf)
+
       return
     }
 
@@ -2253,9 +2258,14 @@ export class Stack {
 
   private async includeAllReferencesIteration(oldEntryQueries: IQuery, oldCtQueries: IQuery, locale:
     string,                                   oldObjectPointerList: IShelf[], depth = 0) {
-    if (depth > this.q.referenceDepth || oldObjectPointerList.length === 0 || oldCtQueries.$or.length === 0) {
+    if (depth > this.q.referenceDepth || oldObjectPointerList.length === 0) {
+      return
+    } else if (oldCtQueries.$or.length === 0 && oldObjectPointerList.length > 0 && oldEntryQueries.$or.length > 0) {
+      await this.bindLeftoverAssets(oldEntryQueries, locale, oldObjectPointerList)
+
       return
     }
+
     const {
       ctQueries,
       paths,
