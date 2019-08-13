@@ -146,34 +146,8 @@ class Stack {
             yield client.connect();
             this.db = client.db(dbName);
             return this.db;
-            // // Create indexes in the background
-            // const bucket: any = []
-            // const indexes = this.config.contentStore.indexes
-            // const collectionName = this.config.contentStore.collectionName
-            // for (let index in indexes) {
-            //   if (indexes[index] === 1 || indexes[index] === -1) {
-            //     bucket.push(this.createIndexes(this.config.contentStore.collectionName, index, indexes[index]))
-            //   }
-            // }
-            // Promise.all(bucket)
-            //   .then(() => {
-            //     console.info(`Indexes created successfully in '${collectionName}' collection`)
-            //   })
-            //   .catch((error) => {
-            //     console.error(`Failed while creating indexes in '${collectionName}' collection`)
-            //     console.error(error)
-            //   })
         });
     }
-    // private createIndexes(collectionId, index, type) {
-    //   return this.db.collection(collectionId)
-    //     .createIndex({
-    //       [index]: type
-    //     })
-    //     .then(() => {
-    //       return
-    //     })
-    // }
     /**
      * @public
      * @method close
@@ -240,7 +214,10 @@ class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     and(queries) {
-        if (this.q.query && typeof this.q.query === 'object') {
+        if (typeof queries !== 'object' || !Array.isArray(queries)) {
+            throw new Error('Kindly provide valid parameters for .and()!');
+        }
+        else if (this.q.query && typeof this.q.query === 'object') {
             this.q.query = lodash_1.merge(this.q.query, {
                 $and: queries,
             });
@@ -281,7 +258,10 @@ class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     or(queries) {
-        if (this.q.query && typeof this.q.query === 'object') {
+        if (typeof queries !== 'object' || !Array.isArray(queries)) {
+            throw new Error('Kindly provide valid parameters for .or()!');
+        }
+        else if (this.q.query && typeof this.q.query === 'object') {
             this.q.query = lodash_1.merge(this.q.query, {
                 $or: queries,
             });
@@ -772,7 +752,8 @@ class Stack {
             throw new Error('Kindly call \'contentType()\' before \'entry()\'!');
         }
         if (uid && typeof uid === 'string') {
-            this.q.uid = uid;
+            this.q.query = this.q.query || {};
+            this.q.query.uid = uid;
         }
         this.internal.limit = 1;
         this.internal.single = true;
@@ -828,7 +809,8 @@ class Stack {
     asset(uid) {
         const stack = new Stack(this.config, this.db);
         if (uid && typeof uid === 'string') {
-            stack.q.uid = uid;
+            stack.q.query = stack.q.query || {};
+            stack.q.query.uid = uid;
         }
         stack.q.content_type_uid = this.types.assets;
         // stack.collection = stack.db.collection(stack.contentStore.collectionName)
@@ -886,7 +868,8 @@ class Stack {
     schema(uid) {
         const stack = new Stack(this.config, this.db);
         if (uid && typeof uid === 'string') {
-            stack.q.uid = uid;
+            stack.q.query = stack.q.query || {};
+            stack.q.query.uid = uid;
         }
         stack.q.content_type_uid = this.types.content_types;
         // stack.collection = stack.db.collection(stack.contentStore.collectionName)
@@ -1174,23 +1157,22 @@ class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     tags(values) {
-        if (!values || typeof values !== 'object' || !(values instanceof Array) || values.length === 0) {
+        if (!values || typeof values !== 'object' || !(values instanceof Array)) {
             throw new Error('Kindly provide valid \'field\' values for \'tags()\'');
         }
         // filter non-string keys
         lodash_1.remove(values, (value) => {
             return typeof value !== 'string';
         });
-        if (this.q.query && typeof this.q.query === 'object') {
+        this.q.query = this.q.query || {};
+        if (values.length === 0) {
             this.q.query.tags = {
-                $in: values,
+                $size: 0,
             };
         }
         else {
-            this.q.query = {
-                tags: {
-                    $in: values,
-                },
+            this.q.query.tags = {
+                $in: values,
             };
         }
         return this;
@@ -1907,9 +1889,37 @@ class Stack {
         // since we've reached last of the paths, return!
         return;
     }
+    bindLeftoverAssets(queries, locale, pointerList) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // const contents = await readFile(getAssetsPath(locale) + '.json')
+            const filteredAssets = yield this.db.collection(util_1.getCollectionName({
+                content_type_uid: this.types.assets,
+                locale,
+            }, this.collectionNames))
+                .find(queries)
+                .project({
+                _content_type_uid: 0,
+                _id: 0,
+            })
+                .toArray();
+            for (let l = 0, m = pointerList.length; l < m; l++) {
+                for (let n = 0, o = filteredAssets.length; n < o; n++) {
+                    if (pointerList[l].uid === filteredAssets[n].uid) {
+                        pointerList[l].path[pointerList[l].position] = filteredAssets[n];
+                        break;
+                    }
+                }
+            }
+            return;
+        });
+    }
     includeReferenceIteration(eQuery, ctQuery, locale, include, oldShelf) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (oldShelf.length === 0 || ctQuery.$or.length === 0) {
+            if (oldShelf.length === 0) {
+                return;
+            }
+            else if (ctQuery.$or.length === 0 && eQuery.$or.length > 0) {
+                yield this.bindLeftoverAssets(eQuery, locale, oldShelf);
                 return;
             }
             const { paths, pendingPath, schemaList, } = yield this.getReferencePath(ctQuery, locale, include);
@@ -2097,7 +2107,11 @@ class Stack {
     }
     includeAllReferencesIteration(oldEntryQueries, oldCtQueries, locale, oldObjectPointerList, depth = 0) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (depth > this.q.referenceDepth || oldObjectPointerList.length === 0 || oldCtQueries.$or.length === 0) {
+            if (depth > this.q.referenceDepth || oldObjectPointerList.length === 0) {
+                return;
+            }
+            else if (oldCtQueries.$or.length === 0 && oldObjectPointerList.length > 0 && oldEntryQueries.$or.length > 0) {
+                yield this.bindLeftoverAssets(oldEntryQueries, locale, oldObjectPointerList);
                 return;
             }
             const { ctQueries, paths, } = yield this.getAllReferencePaths(oldCtQueries, locale);
