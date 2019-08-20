@@ -79,3 +79,13 @@ exports.getCollectionName = ({ locale, content_type_uid }, collection) => {
             return `${locale}.${collection.entry}`;
     }
 };
+exports.difference = (obj, baseObj) => {
+    const changes = (data, base) => {
+        return lodash_1.transform(data, (result, value, key) => {
+            if (!lodash_1.isEqual(value, base[key])) {
+                result[key] = (lodash_1.isObject(value) && lodash_1.isObject(base[key])) ? changes(value, base[key]) : value;
+            }
+        });
+    };
+    return changes(obj, baseObj);
+};

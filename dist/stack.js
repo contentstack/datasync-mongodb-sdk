@@ -1,9 +1,4 @@
 "use strict";
-/*!
- * Contentstack DataSync Mongodb SDK
- * Copyright (c) 2019 Contentstack LLC
- * MIT Licensed
- */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -16,6 +11,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/*!
+ * Contentstack DataSync Mongodb SDK
+ * Copyright (c) 2019 Contentstack LLC
+ * MIT Licensed
+ */
+const json_mask_1 = __importDefault(require("json-mask"));
 const lodash_1 = require("lodash");
 const mongodb_1 = require("mongodb");
 const sift_1 = __importDefault(require("sift"));
@@ -1047,8 +1048,14 @@ class Stack {
         }
         this.internal.only = this.internal.only || {};
         this.internal.only._id = 0;
+        this.internal.nested = false;
         fields.forEach((field) => {
-            if (typeof field === 'string') {
+            if (typeof field === 'string' && field.indexOf('.') === -1) {
+                this.internal.only[field] = 1;
+            }
+            else {
+                this.internal.nested = true;
+                delete this.internal.only._id;
                 this.internal.only[field] = 1;
             }
         });
@@ -1080,9 +1087,14 @@ class Stack {
         if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
             throw new Error('Kindly provide valid \'field\' values for \'except()\'');
         }
+        this.internal.nested = false;
         this.internal.except = this.internal.except || {};
         fields.forEach((field) => {
-            if (typeof field === 'string') {
+            if (typeof field === 'string' && field.indexOf('.') === -1) {
+                this.internal.except[field] = 0;
+            }
+            else {
+                this.internal.nested = true;
                 this.internal.except[field] = 0;
             }
         });
@@ -1590,11 +1602,13 @@ class Stack {
         }
         // tslint:disable-next-line: max-line-length
         this.q.referenceDepth = (typeof this.q.referenceDepth === 'number') ? this.q.referenceDepth : this.contentStore.referenceDepth;
-        if (this.internal.only) {
-            this.internal.projections = this.internal.only;
-        }
-        else {
-            this.internal.projections = lodash_1.merge(this.contentStore.projections, this.internal.except);
+        if (!this.internal.nested) {
+            if (this.internal.only) {
+                this.internal.projections = this.internal.only;
+            }
+            else {
+                this.internal.projections = lodash_1.merge(this.contentStore.projections, this.internal.except);
+            }
         }
         // set default limit, if .limit() hasn't been called
         if (!(this.internal.limit)) {
@@ -1657,7 +1671,7 @@ class Stack {
     postProcess(result) {
         return __awaiter(this, void 0, void 0, function* () {
             const count = (result === null) ? 0 : result.length;
-            const output = {
+            let output = {
                 locale: this.q.locale,
             };
             if (this.internal.onlyCount) {
@@ -1666,34 +1680,54 @@ class Stack {
                 output.count = count;
                 return output;
             }
+            let type;
             switch (this.q.content_type_uid) {
                 case this.types.assets:
                     if (this.internal.single) {
                         output.asset = (result === null) ? result : result[0];
+                        type = 'asset';
                     }
                     else {
                         output.assets = result;
+                        type = 'assets';
                     }
                     output.content_type_uid = 'assets';
                     break;
                 case this.types.content_types:
                     if (this.internal.single) {
                         output.content_type = (result === null) ? result : result[0];
+                        type = 'content_type';
                     }
                     else {
                         output.content_types = result;
+                        type = 'content_types';
                     }
                     output.content_type_uid = 'content_types';
                     break;
                 default:
                     if (this.internal.single) {
                         output.entry = (result === null) ? result : result[0];
+                        type = 'entry';
                     }
                     else {
                         output.entries = result;
+                        type = 'entries';
                     }
                     output.content_type_uid = this.q.content_type_uid;
                     break;
+            }
+            if (this.internal.nested) {
+                if (this.internal.only) {
+                    this.internal.only = Object.keys(this.internal.only);
+                    const only = this.internal.only.toString().replace(/\./g, '/');
+                    output[type] = json_mask_1.default(output[type], only);
+                }
+                else if (this.internal.except) {
+                    this.internal.except = Object.keys(this.internal.except);
+                    const bukcet = this.internal.except.toString().replace(/\./g, '/');
+                    const except = json_mask_1.default(output[type], bukcet);
+                    output[type] = util_1.difference(output[type], except);
+                }
             }
             if (this.internal.includeCount) {
                 output.count = yield this.db.collection(util_1.getCollectionName({

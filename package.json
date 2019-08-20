@@ -17,6 +17,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "json-mask": "^0.3.8",
     "lodash": "4.17.15",
     "mongodb": "3.1.12",
     "sift": "8.5.0"

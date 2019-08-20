@@ -4,7 +4,11 @@
  * MIT Licensed
  */
 
-import { uniq } from 'lodash'
+import { 
+  uniq,
+  isEqual,
+  isObject,
+  transform, } from 'lodash'
 
 /**
  * @private
@@ -90,4 +94,16 @@ export const getCollectionName = ({locale, content_type_uid}, collection) => {
     default:
       return `${locale}.${collection.entry}`
   }
+}
+
+export const difference = (obj, baseObj) => {
+  const changes = (data, base) => {
+    return transform(data, (result, value, key) => {
+      if (!isEqual(value, base[key])) {
+        result[key] = (isObject(value) && isObject(base[key])) ? changes(value, base[key]) : value
+      }
+    })
+  }
+
+  return changes(obj, baseObj)
 }

@@ -26,3 +26,4 @@ export declare const getCollectionName: ({ locale, content_type_uid }: {
     locale: any;
     content_type_uid: any;
 }, collection: any) => string;
+export declare const difference: (obj: any, baseObj: any) => unknown;
