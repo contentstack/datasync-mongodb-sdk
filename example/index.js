@@ -20,7 +20,7 @@ function find (contentType = 'product') {
   return Stack.contentType(contentType)
     .entries()
     .includeReferences()
-    .only(['image_thumbnails.title'])
+    //.only(['image_thumbnails.title'])
     .limit(1)
     .find()
 }
@@ -51,5 +51,5 @@ return connect()
         return
       })
   })
-  .then(close)
+  .then(close())
   .catch(console.error)
