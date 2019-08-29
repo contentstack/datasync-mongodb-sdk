@@ -3,7 +3,7 @@ const Contentstack = require('../dist').Contentstack
 const Stack = Contentstack.Stack({
   locale: 'en-us',
   contentStore: {
-    //dbName: 'references',
+    dbName: 'test-db',
     
   }
 })
@@ -16,11 +16,31 @@ function close () {
   return Stack.close()
 }
 
-function find (contentType = 'product') {
+function find (contentType = 'test') {
   return Stack.contentType(contentType)
     .entries()
     .includeReferences()
-    //.only(['image_thumbnails.title'])
+    .except([
+      {
+        reference_test: [
+          [{
+            image_thumbnails: ['_internal_url', 'apiKey']
+          },
+          { 
+            category:['title', 'uid']
+          }]
+        ]
+      }
+    ])
+    // .except([
+    //   {
+    //     reference_test: [
+    //       'title',
+    //       'url',
+    //       'uid'
+    //     ]
+    //   }
+    // ])
     .limit(1)
     .find()
 }
@@ -51,5 +71,5 @@ return connect()
         return
       })
   })
-  .then(close())
+  .then(close)
   .catch(console.error)

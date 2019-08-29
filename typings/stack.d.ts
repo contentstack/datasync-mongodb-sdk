@@ -1,8 +1,3 @@
-/*!
- * Contentstack DataSync Mongodb SDK
- * Copyright (c) 2019 Contentstack LLC
- * MIT Licensed
- */
 /**
  * @class Stack
  * @descriptionExpose SDK query methods on Stack
@@ -695,7 +690,7 @@ export declare class Stack {
      * @description
      * Projections - returns only the fields passed here
      *
-     * @param {array} fields Array of 'fields', separated by dot ('.') notation for embedded document query
+     * @param {any} fields Array of 'fields', separated by dot ('.') notation for embedded document query
      *
      * @example
      * Stack
@@ -713,6 +708,7 @@ export declare class Stack {
      * @returns {Stack} Returns an instance of 'stack'
      */
     only(fields: any): this;
+    private calculateProjection;
     /**
      * @public
      * @method except

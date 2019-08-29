@@ -3,7 +3,7 @@
  * Copyright (c) 2019 Contentstack LLC
  * MIT Licensed
  */
-import mask from 'json-mask'
+//import mask from 'json-mask'
 import {
   merge,
   remove,
@@ -17,7 +17,7 @@ import {
   config,
 } from './config'
 import {
-  difference,
+  //difference,
   getCollectionName,
   validateConfig,
   validateURI,
@@ -25,25 +25,27 @@ import {
 
 interface IShelf {
   path: string,
-  position: string,
-  uid: string,
+    position: string,
+    uid: string,
 }
 
 interface IQuery {
   $or: Array < {
     _content_type_uid: string,
-    _version?: {
+    _version ? : {
       $exists: boolean,
     },
     uid: string,
-    locale?: string,
-  } >
+    locale ? : string
+  }
+    
+   >
 }
 
 interface ICollectionNames {
   asset: string,
-  entry: string,
-  schema: string,
+    entry: string,
+    schema: string,
 }
 
 /**
@@ -63,7 +65,7 @@ export class Stack {
   private collection: any
   private internal: any
   private db: Db
-
+  
   constructor(stackConfig, existingDB ? ) {
     this.config = merge(config, stackConfig)
     // validates config.locales property
@@ -171,7 +173,7 @@ export class Stack {
    *
    * @returns {object} Mongodb 'db' instance
    */
-  public async connect(overrides = {}) {
+  public async connect (overrides = {}) {
     const dbConfig = merge({}, this.config, overrides).contentStore
 
     const url = validateURI(dbConfig.url)
@@ -1086,7 +1088,7 @@ export class Stack {
    * @description
    * Projections - returns only the fields passed here
    *
-   * @param {array} fields Array of 'fields', separated by dot ('.') notation for embedded document query
+   * @param {any} fields Array of 'fields', separated by dot ('.') notation for embedded document query
    *
    * @example
    * Stack
@@ -1104,25 +1106,71 @@ export class Stack {
    * @returns {Stack} Returns an instance of 'stack'
    */
   public only(fields) {
-    if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
+    if (!fields || typeof fields !== 'object' ||!(fields instanceof Array)|| fields.length === 0) {
       throw new Error('Kindly provide valid \'field\' values for \'only()\'')
     }
     this.internal.only = this.internal.only || {}
-    this.internal.only._id = 0
-    this.internal.nested = false 
-    fields.forEach((field) => {
-      if (typeof field === 'string' && field.indexOf('.') === -1) {
-        this.internal.only[field] = 1
-      }else{
-        this.internal.nested = true
-        delete this.internal.only._id
-        this.internal.only[field] = 1
-      }
-    })
-
+    this.internal.only['_id'] = 0
+    //this.internal.nested = false
+    this.internal.referenced = {}
+    
+    this.calculateProjection(fields, 'only', 1)
+    // fields.forEach(feild => {
+    //   if(typeof feild === 'string'){
+    //     this.internal.base = true
+    //     this.internal.only[feild] = 1
+    //     //this.internal.referenced[feild] = 1
+    //   }
+    //   else if(feild instanceof Array){
+    //     this.internal.base = true
+    //     feild.forEach(data=>{
+    //       this.internal.only[data] = 1
+    //       //this.internal.referenced[data] = 1
+    //     })
+    //   } else {
+    //     //this.referenced = true
+    //     Object.keys(feild).forEach(key=>{
+    //       //this.internal.only[key] =1
+    //       if(typeof feild[key] === 'string'){
+    //         let projectionFeild = key +'.'+ feild[key]
+    //         this.internal.referenced[projectionFeild]= 1
+    //       } else {
+    //         feild[key].forEach(element=>{
+    //           let projectionFeild = key +'.'+ element
+    //           this.internal.referenced[projectionFeild]= 1
+    //         })
+    //       }
+    //     })
+    //   }
+    // })
+    
+    
     return this
   }
-
+  private calculateProjection(data, projectionType, value, base?){
+    data.forEach(feild => {
+      if(typeof feild === 'string'){
+        this.internal.base = true
+        let projectionFeild = base ? base+'.'+feild : feild
+        this.internal[projectionType][projectionFeild] = value
+      } else {
+          Object.keys(feild).forEach(key=>{
+            if(feild[key] instanceof Array){
+              feild[key].forEach(element=>{
+                if(typeof element === 'object'){
+                  this.calculateProjection(element, projectionType ,value,key)
+                } else{
+                  if(element !== 'uid'){
+                    let projectionFeild = base ? base+'.'+key +'.'+ element : key +'.'+ element
+                    this.internal.referenced[projectionFeild]= value
+                  }
+                }
+              })
+            } 
+          })
+      }
+    })
+  }
   /**
    * @public
    * @method except
@@ -1149,18 +1197,18 @@ export class Stack {
     if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
       throw new Error('Kindly provide valid \'field\' values for \'except()\'')
     }
-    this.internal.nested = false 
+    
     this.internal.except = this.internal.except || {}
-    fields.forEach((field) => {
-      if (typeof field === 'string' && field.indexOf('.') === -1) {
-        this.internal.except[field] = 0
-      } else {
-        this.internal.nested = true
-        this.internal.except[field] = 0
-      }
-    })
-    this.internal.except = merge(this.contentStore.projections, this.internal.except)
-
+    this.internal.referenced = {}
+    
+    this.calculateProjection(fields, 'except', 0)
+    if(this.internal.base){
+      this.internal.except = merge(this.contentStore.projections, this.internal.except)
+    } else {
+      this.internal.except = merge(this.contentStore.projections, this.internal.referenced)
+    }
+   
+    //console.log( this.internal.except ," this.internal.except ")
     return this
   }
 
@@ -1482,7 +1530,7 @@ export class Stack {
    *  .includeReferences(3)
    * @returns {Stack} Returns 'this' instance (of Stack)
    */
-  public includeReferences(depth?: number) {
+  public includeReferences(depth ? : number) {
     console.warn('.includeReferences() is a relatively slow query..!')
     if (typeof depth === 'number') {
       this.q.referenceDepth = depth
@@ -1553,6 +1601,7 @@ export class Stack {
           .find(queryFilters)
       }
 
+      //console.log(this.internal.projections,"inetrna projections")
       if (this.internal.queryReferences) {
         this.collection = this.collection
           .project(this.internal.projections)
@@ -1580,6 +1629,7 @@ export class Stack {
           } else {
             await this.includeAssetsOnly(result, this.q.content_type_uid, this.q.locale)
           }
+
           if (this.internal.queryReferences) {
             result = result.filter(sift(this.internal.queryReferences))
             if (this.internal.skip) {
@@ -1620,7 +1670,7 @@ export class Stack {
    *
    * @returns {object} Returns count of the entries/asset's matched
    */
-  public async count(query ? ) {
+  public async count (query ? ) {
     this.internal.onlyCount = true
 
     return this.find(query)
@@ -1687,18 +1737,19 @@ export class Stack {
     }
 
     // tslint:disable-next-line: max-line-length
-    this.q.referenceDepth = (typeof this.q.referenceDepth === 'number') ? this.q.referenceDepth : this.contentStore.referenceDepth
+    this.q.referenceDepth = (typeof this.q.referenceDepth === 'number') ? this.q.referenceDepth : this.contentStore
+      .referenceDepth
 
-    if(!this.internal.nested){
+    //if (!this.internal.nested) {
       if (this.internal.only) {
-        this.internal.projections = this.internal.only
+        this.internal.projections = this.internal.base ? this.internal.only : {_id:0, _content_type_uid:0, _synced_at:0}
       } else {
         this.internal.projections = merge(this.contentStore.projections, this.internal.except)
       }
-    }
-    
-    
-    
+    //}
+
+
+
 
     // set default limit, if .limit() hasn't been called
     if (!(this.internal.limit)) {
@@ -1770,7 +1821,7 @@ export class Stack {
    * @param {object} result Result, which's to be manipulated
    * @returns {object} Returns the formatted version of the `result` object
    */
-  private async postProcess(result) {
+  private async postProcess (result) {
     const count = (result === null) ? 0 : result.length
     let output: any = {
       locale: this.q.locale,
@@ -1782,61 +1833,48 @@ export class Stack {
 
       return output
     }
-    let type
+    //let type
     switch (this.q.content_type_uid) {
     case this.types.assets:
       if (this.internal.single) {
         output.asset = (result === null) ? result : result[0]
-        type = 'asset'
+        //type = 'asset'
       } else {
         output.assets = result
-        type = 'assets'
+        //type = 'assets'
       }
       output.content_type_uid = 'assets'
       break
     case this.types.content_types:
       if (this.internal.single) {
         output.content_type = (result === null) ? result : result[0]
-        type = 'content_type'
+        //type = 'content_type'
       } else {
         output.content_types = result
-        type = 'content_types'
+        //type = 'content_types'
       }
       output.content_type_uid = 'content_types'
       break
     default:
       if (this.internal.single) {
         output.entry = (result === null) ? result : result[0]
-        type = 'entry'
+        //type = 'entry'
       } else {
         output.entries = result
-        type = 'entries'
+        //type = 'entries'
       }
       output.content_type_uid = this.q.content_type_uid
       break
     }
-    
-    if(this.internal.nested){
-      if (this.internal.only) {
-        this.internal.only = Object.keys(this.internal.only)
-        const only = this.internal.only.toString().replace(/\./g, '/')
-        output[type] = mask(output[type], only)
-      } else if (this.internal.except) {
-        this.internal.except = Object.keys(this.internal.except)
-        const bukcet = this.internal.except.toString().replace(/\./g, '/')
-        const except = mask(output[type], bukcet)
-        output[type] = difference(output[type], except)
-      }
-    }
-    
+
     if (this.internal.includeCount) {
       output.count = await this.db.collection(getCollectionName({
-        content_type_uid: this.q.content_type_uid,
-        locale: this.q.locale,
-      }, this.collectionNames))
-      .count({
-        _content_type_uid: this.q.content_type_uid,
-      })
+          content_type_uid: this.q.content_type_uid,
+          locale: this.q.locale,
+        }, this.collectionNames))
+        .count({
+          _content_type_uid: this.q.content_type_uid,
+        })
     }
 
     if (this.internal.includeSchema) {
@@ -1859,7 +1897,7 @@ export class Stack {
     return output
   }
 
-  private async includeAssetsOnly(entries: any[], contentTypeUid: string, locale: string) {
+  private async includeAssetsOnly (entries: any[], contentTypeUid: string, locale: string) {
     const schema = await this.db
       .collection(getCollectionName({
         content_type_uid: this.types.content_types,
@@ -1923,7 +1961,7 @@ export class Stack {
    * @param {Object} include - Array of field paths, to be included
    * @returns {Object} - Returns `entries`, that has all of its reference binded
    */
-  private async includeSpecificReferences(entries: any[], contentTypeUid: string, locale: string, include: string[]) {
+  private async includeSpecificReferences (entries: any[], contentTypeUid: string, locale: string, include: string[]) {
     const ctQuery = {
       _content_type_uid: this.types.content_types,
       uid: contentTypeUid,
@@ -1956,19 +1994,44 @@ export class Stack {
     return this.includeReferenceIteration(queries, schemaList, locale, pendingPath, shelf)
   }
 
-  private fetchPathDetails(data: any, locale: string, pathArr: string[], queryBucket: IQuery, shelf,
-                           assetsOnly = false, parent, pos, counter = 0) {
+  private fetchPathDetails(data: any, locale: string, pathArr: string[], queryBucket, shelf,
+    assetsOnly = false, parent, pos, counter = 0) {
+      let pth  = pathArr.slice(-1).pop()
+      let projectionQuery = {}
+      projectionQuery['project'] = {}
+      // tslint:disable-next-line: prefer-for-of
+      //console.log( this.internal.referenced, " this.internal.referenced@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+      for(let projection in this.internal.referenced){
+        //console.log(projection.split('.'),"splitted array")
+        if(projection.split('.')[counter].indexOf(pth) !== -1){
+          projectionQuery['project'][projection.split('.')[counter+1]] =  this.internal.referenced[projection]
+        }
+      }
+    //console.log(counter, "counter", pathArr, projectionQuery,"projectionQuery")
     if (counter === (pathArr.length)) {
+      if(Object.keys(projectionQuery['project']).length === 0){
+        for(let projection in this.internal.referenced){
+          if(projection.split('.')[counter-1].indexOf(pth) !== -1){
+            projectionQuery['project'][projection.split('.')[1]] =  this.internal.referenced[projection]
+          }
+        }
+      }
+
+      //console.log(projectionQuery,"projectionQuery", pth,"pth", counter)
       if (data && typeof data === 'object') {
         if (data instanceof Array && data.length) {
           data.forEach((elem, idx) => {
             if (typeof elem === 'string') {
-              queryBucket.$or.push({
+              queryBucket.$or.push(
+                {
                 _content_type_uid: this.types.assets,
-                _version: { $exists: true},
+                _version: {
+                  $exists: true
+                },
                 locale,
                 uid: elem,
-              })
+                _project: projectionQuery['project']
+            })
 
               shelf.push({
                 path: data,
@@ -1976,10 +2039,13 @@ export class Stack {
                 uid: elem,
               })
             } else if (elem && typeof elem === 'object' && elem.hasOwnProperty('_content_type_uid')) {
+              
               queryBucket.$or.push({
                 _content_type_uid: elem._content_type_uid,
                 locale,
                 uid: elem.uid,
+                _project: projectionQuery['project']
+              
               })
 
               shelf.push({
@@ -1995,6 +2061,7 @@ export class Stack {
               _content_type_uid: data._content_type_uid,
               locale,
               uid: data.uid,
+              _project: projectionQuery['project']
             })
 
             shelf.push({
@@ -2007,9 +2074,12 @@ export class Stack {
       } else if (typeof data === 'string') {
         queryBucket.$or.push({
           _content_type_uid: this.types.assets,
-          _version: { $exists: true},
+          _version: {
+            $exists: true
+          },
           locale,
           uid: data,
+          _project: projectionQuery['project']
         })
 
         shelf.push({
@@ -2036,23 +2106,23 @@ export class Stack {
         }
       }
     }
-
+    
     // since we've reached last of the paths, return!
     return
   }
 
-  private async bindLeftoverAssets(queries: IQuery, locale: string, pointerList: IShelf[]) {
-    // const contents = await readFile(getAssetsPath(locale) + '.json')
+  private async bindLeftoverAssets (queries: IQuery, locale: string, pointerList: IShelf[]) {
+    // const contents = await readFile(getAssetsPath(locale) + '.json') //console.log(queries,"queries")
     const filteredAssets = await this.db.collection(getCollectionName({
-      content_type_uid: this.types.assets,
-      locale,
-    }, this.collectionNames))
-    .find(queries)
-    .project({
-      _content_type_uid: 0,
-      _id: 0,
-    })
-    .toArray()
+        content_type_uid: this.types.assets,
+        locale,
+      }, this.collectionNames))
+      .find(queries)
+      .project({
+        _content_type_uid: 0,
+        _id: 0,
+      })
+      .toArray()
 
     for (let l = 0, m = pointerList.length; l < m; l++) {
       for (let n = 0, o = filteredAssets.length; n < o; n++) {
@@ -2066,8 +2136,10 @@ export class Stack {
     return
   }
 
-  private async includeReferenceIteration(eQuery: any, ctQuery: any, locale: string, include: string[], oldShelf:
+  private async includeReferenceIteration (eQuery: any, ctQuery: any, locale: string, include: string[], oldShelf:
     IShelf[]) {
+
+    
     if (oldShelf.length === 0) {
       return
     } else if (ctQuery.$or.length === 0 && eQuery.$or.length > 0) {
@@ -2090,6 +2162,7 @@ export class Stack {
     // GC to avoid mem leaks!
     eQuery = null
 
+   
     for (let i = 0, j = oldShelf.length; i < j; i++) {
       const element: IShelf = oldShelf[i]
       let flag = true
@@ -2104,7 +2177,8 @@ export class Stack {
       if (flag) {
         for (let e = 0, f = oldShelf[i].path.length; e < f; e++) {
           // tslint:disable-next-line: max-line-length
-          if (oldShelf[i].path[e].hasOwnProperty('_content_type_uid') && Object.keys(oldShelf[i].path[e]).length === 2) {
+          if (oldShelf[i].path[e].hasOwnProperty('_content_type_uid') && Object.keys(oldShelf[i].path[e]).length ===
+            2) {
             (oldShelf[i].path as any).splice(e, 1)
             break
           }
@@ -2121,7 +2195,7 @@ export class Stack {
     return
   }
 
-  private async getReferencePath(query, locale, currentInclude) {
+  private async getReferencePath (query, locale, currentInclude) {
     const schemas = await this.db.collection(getCollectionName({
         content_type_uid: this.types.content_types,
         locale,
@@ -2207,21 +2281,44 @@ export class Stack {
     }
   }
 
-  private async fetchEntries(query: IQuery, locale: string, paths: string[], include: string[], includeAll:
+  private async fetchEntries (query: IQuery, locale: string, paths: string[], include: string[], includeAll:
     boolean = false) {
-    const result = await this.db.collection(getCollectionName({
-        content_type_uid: 'entries',
-        locale,
-      }, this.collectionNames))
-      .find(query)
-      .project({
-        _content_type_uid: 0,
-        _id: 0,
-        _synced_at: 0,
-        event_at: 0,
-      })
-      .toArray()
+    //console.log("query",query)
+    let result = []
+    
+      for (let i = 0, j = query.$or.length; i < j; i++) {
+        let project = {}
+        if(query.$or[i].hasOwnProperty('_project') && Object.keys(query.$or[i]['_project']).length > 0){
+          //if(this.internal.only) project['uid'] = 1 
+         
+          project = this.internal.only ? merge(project, query.$or[i]['_project'], {uid:1, _id:0}) : merge(project, query.$or[i]['_project'], {_id: 0, _content_type_uid:0, _synced_at:0})
+        } else {
+          project = merge(project, {_id: 0, _content_type_uid:0, _synced_at:0})
+        }
+        delete query.$or[i]['_project']
+        let tempResult = await this.db.collection(getCollectionName({
+          content_type_uid: 'entries',
+          locale,
+        }, this.collectionNames))
+        .find(query.$or[i])
+        .project(project)
+        .toArray()
+        
+        console.log((query.$or[i])[0],"query.$or[i])[0]")
+        result = result.concat(tempResult)
+        
+    }
+    
+    //console.log(JSON.stringify(result, null, 2),"<<<<<<<<FetchEntriesresult")
+    // const result = await this.db.collection(getCollectionName({
+    //     content_type_uid: 'entries',
+    //     locale,
+    //   }, this.collectionNames))
+    //   .find(query)
+    //   .project({})
+    //   .toArray()
 
+   
     const queries = {
       $or: [],
     }
@@ -2253,7 +2350,8 @@ export class Stack {
     }
   }
 
-  private async bindReferences(entries: any[], contentTypeUid: string, locale: string) {
+  private async bindReferences (entries: any[], contentTypeUid: string, locale: string) {
+    
     const ctQuery = {
       $or: [{
         _content_type_uid: this.types.content_types,
@@ -2266,6 +2364,7 @@ export class Stack {
       ctQueries, // list of content type uids, the current content types refer to
     } = await this.getAllReferencePaths(ctQuery, locale)
 
+    //console.log(paths,"paths", ctQueries,"ctquiersssssssssssssssssssssssssssssssss")
     const queries = {
       $or: [],
     } // reference field paths
@@ -2284,12 +2383,13 @@ export class Stack {
     // else, self-recursively iterate and fetch references
     // Note: Shelf is the one holding `pointers` to the actual entry
     // Once the pointer has been used, for GC, point the object to null
-
+    //console.log(JSON.stringify(queries,null,2),"<<<<<<<<<<<<<<queries")
     return this.includeAllReferencesIteration(queries, ctQueries, locale, objectPointerList)
   }
 
-  private async includeAllReferencesIteration(oldEntryQueries: IQuery, oldCtQueries: IQuery, locale:
-    string,                                   oldObjectPointerList: IShelf[], depth = 0) {
+  private async includeAllReferencesIteration (oldEntryQueries: IQuery, oldCtQueries: IQuery, locale:
+    string, oldObjectPointerList: IShelf[], depth = 0) {
+    //console.log(oldEntryQueries ,"oldEntryQueries", oldCtQueries,"oldCtQueries")
     if (depth > this.q.referenceDepth || oldObjectPointerList.length === 0) {
       return
     } else if (oldCtQueries.$or.length === 0 && oldObjectPointerList.length > 0 && oldEntryQueries.$or.length > 0) {
@@ -2302,6 +2402,8 @@ export class Stack {
       ctQueries,
       paths,
     } = await this.getAllReferencePaths(oldCtQueries, locale)
+
+    //console.log(ctQueries,"ctQueries")
     // GC to aviod mem leaks
     oldCtQueries = null
     const {
@@ -2309,6 +2411,8 @@ export class Stack {
       queries,
       shelf,
     } = await this.fetchEntries(oldEntryQueries, locale, paths, [], true)
+    
+    //console.log(result, "<<<<<<<<<<<<result")
     // GC to avoid mem leaks!
     oldEntryQueries = null
 
@@ -2326,7 +2430,8 @@ export class Stack {
       if (flag) {
         for (let e = 0, f = oldObjectPointerList[i].path.length; e < f; e++) {
           // tslint:disable-next-line: max-line-length
-          if (oldObjectPointerList[i].path[e].hasOwnProperty('_content_type_uid') && Object.keys(oldObjectPointerList[i].path[e]).length === 2) {
+          if (oldObjectPointerList[i].path[e].hasOwnProperty('_content_type_uid') && Object.keys(oldObjectPointerList[
+              i].path[e]).length === 2) {
             (oldObjectPointerList[i].path as any).splice(e, 1)
             break
           }
@@ -2337,14 +2442,14 @@ export class Stack {
     // GC to avoid mem leaks!
     oldObjectPointerList = null
 
-    ++depth
+      ++depth
     // Iterative loops, that traverses paths and binds them onto entries
     await this.includeAllReferencesIteration(queries, ctQueries, locale, shelf, depth)
 
     return
   }
 
-  private async getAllReferencePaths(contentTypeQueries: IQuery, locale: string) {
+  private async getAllReferencePaths (contentTypeQueries: IQuery, locale: string) {
     const contents: any[] = await this.db
       .collection(getCollectionName({
           content_type_uid: this.types.content_types,
@@ -2358,6 +2463,8 @@ export class Stack {
         _references: 1,
       })
       .toArray()
+
+  
     const ctQueries: IQuery = {
       $or: [],
     }

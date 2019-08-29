@@ -13,7 +13,7 @@
     "prepare": "npm run compile",
     "start": "dist/index.js",
     "tslint": "npx tslint -c tslint.json 'src/**/*.ts' --fix",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "license": "MIT",
   "dependencies": {

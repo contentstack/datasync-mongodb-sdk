@@ -16,7 +16,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Copyright (c) 2019 Contentstack LLC
  * MIT Licensed
  */
-const json_mask_1 = __importDefault(require("json-mask"));
+//import mask from 'json-mask'
 const lodash_1 = require("lodash");
 const mongodb_1 = require("mongodb");
 const sift_1 = __importDefault(require("sift"));
@@ -1025,7 +1025,7 @@ class Stack {
      * @description
      * Projections - returns only the fields passed here
      *
-     * @param {array} fields Array of 'fields', separated by dot ('.') notation for embedded document query
+     * @param {any} fields Array of 'fields', separated by dot ('.') notation for embedded document query
      *
      * @example
      * Stack
@@ -1047,19 +1047,65 @@ class Stack {
             throw new Error('Kindly provide valid \'field\' values for \'only()\'');
         }
         this.internal.only = this.internal.only || {};
-        this.internal.only._id = 0;
-        this.internal.nested = false;
-        fields.forEach((field) => {
-            if (typeof field === 'string' && field.indexOf('.') === -1) {
-                this.internal.only[field] = 1;
+        this.internal.only['_id'] = 0;
+        //this.internal.nested = false
+        this.internal.referenced = {};
+        this.calculateProjection(fields, 'only', 1);
+        // fields.forEach(feild => {
+        //   if(typeof feild === 'string'){
+        //     this.internal.base = true
+        //     this.internal.only[feild] = 1
+        //     //this.internal.referenced[feild] = 1
+        //   }
+        //   else if(feild instanceof Array){
+        //     this.internal.base = true
+        //     feild.forEach(data=>{
+        //       this.internal.only[data] = 1
+        //       //this.internal.referenced[data] = 1
+        //     })
+        //   } else {
+        //     //this.referenced = true
+        //     Object.keys(feild).forEach(key=>{
+        //       //this.internal.only[key] =1
+        //       if(typeof feild[key] === 'string'){
+        //         let projectionFeild = key +'.'+ feild[key]
+        //         this.internal.referenced[projectionFeild]= 1
+        //       } else {
+        //         feild[key].forEach(element=>{
+        //           let projectionFeild = key +'.'+ element
+        //           this.internal.referenced[projectionFeild]= 1
+        //         })
+        //       }
+        //     })
+        //   }
+        // })
+        return this;
+    }
+    calculateProjection(data, projectionType, value, base) {
+        data.forEach(feild => {
+            if (typeof feild === 'string') {
+                this.internal.base = true;
+                let projectionFeild = base ? base + '.' + feild : feild;
+                this.internal[projectionType][projectionFeild] = value;
             }
             else {
-                this.internal.nested = true;
-                delete this.internal.only._id;
-                this.internal.only[field] = 1;
+                Object.keys(feild).forEach(key => {
+                    if (feild[key] instanceof Array) {
+                        feild[key].forEach(element => {
+                            if (typeof element === 'object') {
+                                this.calculateProjection(element, projectionType, value, key);
+                            }
+                            else {
+                                if (element !== 'uid') {
+                                    let projectionFeild = base ? base + '.' + key + '.' + element : key + '.' + element;
+                                    this.internal.referenced[projectionFeild] = value;
+                                }
+                            }
+                        });
+                    }
+                });
             }
         });
-        return this;
     }
     /**
      * @public
@@ -1087,18 +1133,16 @@ class Stack {
         if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
             throw new Error('Kindly provide valid \'field\' values for \'except()\'');
         }
-        this.internal.nested = false;
         this.internal.except = this.internal.except || {};
-        fields.forEach((field) => {
-            if (typeof field === 'string' && field.indexOf('.') === -1) {
-                this.internal.except[field] = 0;
-            }
-            else {
-                this.internal.nested = true;
-                this.internal.except[field] = 0;
-            }
-        });
-        this.internal.except = lodash_1.merge(this.contentStore.projections, this.internal.except);
+        this.internal.referenced = {};
+        this.calculateProjection(fields, 'except', 0);
+        if (this.internal.base) {
+            this.internal.except = lodash_1.merge(this.contentStore.projections, this.internal.except);
+        }
+        else {
+            this.internal.except = lodash_1.merge(this.contentStore.projections, this.internal.referenced);
+        }
+        //console.log( this.internal.except ," this.internal.except ")
         return this;
     }
     /**
@@ -1470,6 +1514,7 @@ class Stack {
                 this.collection = this.collection
                     .find(queryFilters);
             }
+            //console.log(this.internal.projections,"inetrna projections")
             if (this.internal.queryReferences) {
                 this.collection = this.collection
                     .project(this.internal.projections)
@@ -1601,15 +1646,16 @@ class Stack {
             this.q.query = {};
         }
         // tslint:disable-next-line: max-line-length
-        this.q.referenceDepth = (typeof this.q.referenceDepth === 'number') ? this.q.referenceDepth : this.contentStore.referenceDepth;
-        if (!this.internal.nested) {
-            if (this.internal.only) {
-                this.internal.projections = this.internal.only;
-            }
-            else {
-                this.internal.projections = lodash_1.merge(this.contentStore.projections, this.internal.except);
-            }
+        this.q.referenceDepth = (typeof this.q.referenceDepth === 'number') ? this.q.referenceDepth : this.contentStore
+            .referenceDepth;
+        //if (!this.internal.nested) {
+        if (this.internal.only) {
+            this.internal.projections = this.internal.base ? this.internal.only : { _id: 0, _content_type_uid: 0, _synced_at: 0 };
         }
+        else {
+            this.internal.projections = lodash_1.merge(this.contentStore.projections, this.internal.except);
+        }
+        //}
         // set default limit, if .limit() hasn't been called
         if (!(this.internal.limit)) {
             this.internal.limit = this.contentStore.limit;
@@ -1680,54 +1726,41 @@ class Stack {
                 output.count = count;
                 return output;
             }
-            let type;
+            //let type
             switch (this.q.content_type_uid) {
                 case this.types.assets:
                     if (this.internal.single) {
                         output.asset = (result === null) ? result : result[0];
-                        type = 'asset';
+                        //type = 'asset'
                     }
                     else {
                         output.assets = result;
-                        type = 'assets';
+                        //type = 'assets'
                     }
                     output.content_type_uid = 'assets';
                     break;
                 case this.types.content_types:
                     if (this.internal.single) {
                         output.content_type = (result === null) ? result : result[0];
-                        type = 'content_type';
+                        //type = 'content_type'
                     }
                     else {
                         output.content_types = result;
-                        type = 'content_types';
+                        //type = 'content_types'
                     }
                     output.content_type_uid = 'content_types';
                     break;
                 default:
                     if (this.internal.single) {
                         output.entry = (result === null) ? result : result[0];
-                        type = 'entry';
+                        //type = 'entry'
                     }
                     else {
                         output.entries = result;
-                        type = 'entries';
+                        //type = 'entries'
                     }
                     output.content_type_uid = this.q.content_type_uid;
                     break;
-            }
-            if (this.internal.nested) {
-                if (this.internal.only) {
-                    this.internal.only = Object.keys(this.internal.only);
-                    const only = this.internal.only.toString().replace(/\./g, '/');
-                    output[type] = json_mask_1.default(output[type], only);
-                }
-                else if (this.internal.except) {
-                    this.internal.except = Object.keys(this.internal.except);
-                    const bukcet = this.internal.except.toString().replace(/\./g, '/');
-                    const except = json_mask_1.default(output[type], bukcet);
-                    output[type] = util_1.difference(output[type], except);
-                }
             }
             if (this.internal.includeCount) {
                 output.count = yield this.db.collection(util_1.getCollectionName({
@@ -1843,16 +1876,39 @@ class Stack {
         });
     }
     fetchPathDetails(data, locale, pathArr, queryBucket, shelf, assetsOnly = false, parent, pos, counter = 0) {
+        let pth = pathArr.slice(-1).pop();
+        let projectionQuery = {};
+        projectionQuery['project'] = {};
+        // tslint:disable-next-line: prefer-for-of
+        //console.log( this.internal.referenced, " this.internal.referenced@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+        for (let projection in this.internal.referenced) {
+            //console.log(projection.split('.'),"splitted array")
+            if (projection.split('.')[counter].indexOf(pth) !== -1) {
+                projectionQuery['project'][projection.split('.')[counter + 1]] = this.internal.referenced[projection];
+            }
+        }
+        //console.log(counter, "counter", pathArr, projectionQuery,"projectionQuery")
         if (counter === (pathArr.length)) {
+            if (Object.keys(projectionQuery['project']).length === 0) {
+                for (let projection in this.internal.referenced) {
+                    if (projection.split('.')[counter - 1].indexOf(pth) !== -1) {
+                        projectionQuery['project'][projection.split('.')[1]] = this.internal.referenced[projection];
+                    }
+                }
+            }
+            //console.log(projectionQuery,"projectionQuery", pth,"pth", counter)
             if (data && typeof data === 'object') {
                 if (data instanceof Array && data.length) {
                     data.forEach((elem, idx) => {
                         if (typeof elem === 'string') {
                             queryBucket.$or.push({
                                 _content_type_uid: this.types.assets,
-                                _version: { $exists: true },
+                                _version: {
+                                    $exists: true
+                                },
                                 locale,
                                 uid: elem,
+                                _project: projectionQuery['project']
                             });
                             shelf.push({
                                 path: data,
@@ -1865,6 +1921,7 @@ class Stack {
                                 _content_type_uid: elem._content_type_uid,
                                 locale,
                                 uid: elem.uid,
+                                _project: projectionQuery['project']
                             });
                             shelf.push({
                                 path: data,
@@ -1880,6 +1937,7 @@ class Stack {
                             _content_type_uid: data._content_type_uid,
                             locale,
                             uid: data.uid,
+                            _project: projectionQuery['project']
                         });
                         shelf.push({
                             path: parent,
@@ -1892,9 +1950,12 @@ class Stack {
             else if (typeof data === 'string') {
                 queryBucket.$or.push({
                     _content_type_uid: this.types.assets,
-                    _version: { $exists: true },
+                    _version: {
+                        $exists: true
+                    },
                     locale,
                     uid: data,
+                    _project: projectionQuery['project']
                 });
                 shelf.push({
                     path: parent,
@@ -1925,7 +1986,7 @@ class Stack {
     }
     bindLeftoverAssets(queries, locale, pointerList) {
         return __awaiter(this, void 0, void 0, function* () {
-            // const contents = await readFile(getAssetsPath(locale) + '.json')
+            // const contents = await readFile(getAssetsPath(locale) + '.json') //console.log(queries,"queries")
             const filteredAssets = yield this.db.collection(util_1.getCollectionName({
                 content_type_uid: this.types.assets,
                 locale,
@@ -1973,7 +2034,8 @@ class Stack {
                 if (flag) {
                     for (let e = 0, f = oldShelf[i].path.length; e < f; e++) {
                         // tslint:disable-next-line: max-line-length
-                        if (oldShelf[i].path[e].hasOwnProperty('_content_type_uid') && Object.keys(oldShelf[i].path[e]).length === 2) {
+                        if (oldShelf[i].path[e].hasOwnProperty('_content_type_uid') && Object.keys(oldShelf[i].path[e]).length ===
+                            2) {
                             oldShelf[i].path.splice(e, 1);
                             break;
                         }
@@ -2069,18 +2131,36 @@ class Stack {
     }
     fetchEntries(query, locale, paths, include, includeAll = false) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.db.collection(util_1.getCollectionName({
-                content_type_uid: 'entries',
-                locale,
-            }, this.collectionNames))
-                .find(query)
-                .project({
-                _content_type_uid: 0,
-                _id: 0,
-                _synced_at: 0,
-                event_at: 0,
-            })
-                .toArray();
+            //console.log("query",query)
+            let result = [];
+            for (let i = 0, j = query.$or.length; i < j; i++) {
+                let project = {};
+                if (query.$or[i].hasOwnProperty('_project') && Object.keys(query.$or[i]['_project']).length > 0) {
+                    //if(this.internal.only) project['uid'] = 1 
+                    project = this.internal.only ? lodash_1.merge(project, query.$or[i]['_project'], { uid: 1, _id: 0 }) : lodash_1.merge(project, query.$or[i]['_project'], { _id: 0, _content_type_uid: 0, _synced_at: 0 });
+                }
+                else {
+                    project = lodash_1.merge(project, { _id: 0, _content_type_uid: 0, _synced_at: 0 });
+                }
+                delete query.$or[i]['_project'];
+                let tempResult = yield this.db.collection(util_1.getCollectionName({
+                    content_type_uid: 'entries',
+                    locale,
+                }, this.collectionNames))
+                    .find(query.$or[i])
+                    .project(project)
+                    .toArray();
+                console.log((query.$or[i])[0], "query.$or[i])[0]");
+                result = result.concat(tempResult);
+            }
+            //console.log(JSON.stringify(result, null, 2),"<<<<<<<<FetchEntriesresult")
+            // const result = await this.db.collection(getCollectionName({
+            //     content_type_uid: 'entries',
+            //     locale,
+            //   }, this.collectionNames))
+            //   .find(query)
+            //   .project({})
+            //   .toArray()
             const queries = {
                 $or: [],
             };
@@ -2120,6 +2200,7 @@ class Stack {
             };
             const { paths, // ref. fields in the current content types
             ctQueries, } = yield this.getAllReferencePaths(ctQuery, locale);
+            //console.log(paths,"paths", ctQueries,"ctquiersssssssssssssssssssssssssssssssss")
             const queries = {
                 $or: [],
             }; // reference field paths
@@ -2136,11 +2217,13 @@ class Stack {
             // else, self-recursively iterate and fetch references
             // Note: Shelf is the one holding `pointers` to the actual entry
             // Once the pointer has been used, for GC, point the object to null
+            //console.log(JSON.stringify(queries,null,2),"<<<<<<<<<<<<<<queries")
             return this.includeAllReferencesIteration(queries, ctQueries, locale, objectPointerList);
         });
     }
     includeAllReferencesIteration(oldEntryQueries, oldCtQueries, locale, oldObjectPointerList, depth = 0) {
         return __awaiter(this, void 0, void 0, function* () {
+            //console.log(oldEntryQueries ,"oldEntryQueries", oldCtQueries,"oldCtQueries")
             if (depth > this.q.referenceDepth || oldObjectPointerList.length === 0) {
                 return;
             }
@@ -2149,9 +2232,11 @@ class Stack {
                 return;
             }
             const { ctQueries, paths, } = yield this.getAllReferencePaths(oldCtQueries, locale);
+            //console.log(ctQueries,"ctQueries")
             // GC to aviod mem leaks
             oldCtQueries = null;
             const { result, queries, shelf, } = yield this.fetchEntries(oldEntryQueries, locale, paths, [], true);
+            //console.log(result, "<<<<<<<<<<<<result")
             // GC to avoid mem leaks!
             oldEntryQueries = null;
             for (let i = 0, j = oldObjectPointerList.length; i < j; i++) {
