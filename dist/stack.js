@@ -1085,12 +1085,8 @@ class Stack {
         this.internal.nested = false;
         this.internal.except = this.internal.except || {};
         fields.forEach((field) => {
-            if (typeof field === 'string' && field.indexOf('.') === -1) {
-                this.internal.except[field] = 0;
-            }
-            else {
-                this.internal.nested = true;
-                this.internal.except[field] = 0;
+            if (typeof field === 'string') {
+                this.internal.only[field] = 0;
             }
         });
         this.internal.except = lodash_1.merge(this.contentStore.projections, this.internal.except);
