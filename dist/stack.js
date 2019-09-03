@@ -1048,14 +1048,9 @@ class Stack {
         }
         this.internal.only = this.internal.only || {};
         this.internal.only._id = 0;
-        this.internal.nested = false;
+        //this.internal.nested = false 
         fields.forEach((field) => {
-            if (typeof field === 'string' && field.indexOf('.') === -1) {
-                this.internal.only[field] = 1;
-            }
-            else {
-                this.internal.nested = true;
-                delete this.internal.only._id;
+            if (typeof field === 'string') {
                 this.internal.only[field] = 1;
             }
         });
@@ -1472,12 +1467,12 @@ class Stack {
             }
             if (this.internal.queryReferences) {
                 this.collection = this.collection
-                    .project(this.internal.projections)
+                    //.project(this.internal.projections)
                     .toArray();
             }
             else {
                 this.collection = this.collection
-                    .project(this.internal.projections)
+                    //.project(this.internal.projections)
                     .limit(this.internal.limit)
                     .skip(this.internal.skip)
                     .toArray();
@@ -1602,14 +1597,13 @@ class Stack {
         }
         // tslint:disable-next-line: max-line-length
         this.q.referenceDepth = (typeof this.q.referenceDepth === 'number') ? this.q.referenceDepth : this.contentStore.referenceDepth;
-        if (!this.internal.nested) {
-            if (this.internal.only) {
-                this.internal.projections = this.internal.only;
-            }
-            else {
-                this.internal.projections = lodash_1.merge(this.contentStore.projections, this.internal.except);
-            }
-        }
+        // if(!this.internal.nested){
+        //   if (this.internal.only) {
+        //     this.internal.projections = this.internal.only
+        //   } else {
+        //     this.internal.projections = merge(this.contentStore.projections, this.internal.except)
+        //   }
+        // }
         // set default limit, if .limit() hasn't been called
         if (!(this.internal.limit)) {
             this.internal.limit = this.contentStore.limit;
@@ -1716,19 +1710,19 @@ class Stack {
                     output.content_type_uid = this.q.content_type_uid;
                     break;
             }
-            if (this.internal.nested) {
-                if (this.internal.only) {
-                    this.internal.only = Object.keys(this.internal.only);
-                    const only = this.internal.only.toString().replace(/\./g, '/');
-                    output[type] = json_mask_1.default(output[type], only);
-                }
-                else if (this.internal.except) {
-                    this.internal.except = Object.keys(this.internal.except);
-                    const bukcet = this.internal.except.toString().replace(/\./g, '/');
-                    const except = json_mask_1.default(output[type], bukcet);
-                    output[type] = util_1.difference(output[type], except);
-                }
+            //if(this.internal.nested){
+            if (this.internal.only) {
+                this.internal.only = Object.keys(this.internal.only);
+                const only = this.internal.only.toString().replace(/\./g, '/');
+                output[type] = json_mask_1.default(output[type], only);
             }
+            else if (this.internal.except) {
+                this.internal.except = Object.keys(this.internal.except);
+                const bukcet = this.internal.except.toString().replace(/\./g, '/');
+                const except = json_mask_1.default(output[type], bukcet);
+                output[type] = util_1.difference(output[type], except);
+            }
+            //}
             if (this.internal.includeCount) {
                 output.count = yield this.db.collection(util_1.getCollectionName({
                     content_type_uid: this.q.content_type_uid,
