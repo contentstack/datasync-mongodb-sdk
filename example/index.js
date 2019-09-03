@@ -23,24 +23,31 @@ function find (contentType = 'test') {
     .except([
       {
         reference_test: [
-          [{
+          {
             image_thumbnails: ['_internal_url', 'apiKey']
           },
           { 
             category:['title', 'uid']
-          }]
-        ]
+          }
+        ],
+        
+      },
+      ['title','uid']
+    ])
+
+    .except([
+      {
+        'reference_test.image_thumbnails': [
+          'title',
+          'url',
+          'uid'
+        ],
+       'reference_test.category': [
+          'title',
+          'url',
+        ],
       }
     ])
-    // .except([
-    //   {
-    //     reference_test: [
-    //       'title',
-    //       'url',
-    //       'uid'
-    //     ]
-    //   }
-    // ])
     .limit(1)
     .find()
 }
@@ -67,7 +74,7 @@ return connect()
         //   locale: 'es-es',
         //   count: 10
         // }
-        console.log(JSON.stringify(result, null, 2))
+        //console.log(JSON.stringify(result, null, 2))
         return
       })
   })
