@@ -1082,11 +1082,11 @@ class Stack {
         if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
             throw new Error('Kindly provide valid \'field\' values for \'except()\'');
         }
-        this.internal.nested = false;
+        //this.internal.nested = false 
         this.internal.except = this.internal.except || {};
         fields.forEach((field) => {
             if (typeof field === 'string') {
-                this.internal.only[field] = 0;
+                this.internal.except[field] = 0;
             }
         });
         this.internal.except = lodash_1.merge(this.contentStore.projections, this.internal.except);
@@ -1463,12 +1463,12 @@ class Stack {
             }
             if (this.internal.queryReferences) {
                 this.collection = this.collection
-                    //.project(this.internal.projections)
+                    .project(this.contentStore.projections)
                     .toArray();
             }
             else {
                 this.collection = this.collection
-                    //.project(this.internal.projections)
+                    .project(this.contentStore.projections)
                     .limit(this.internal.limit)
                     .skip(this.internal.skip)
                     .toArray();
@@ -1593,13 +1593,6 @@ class Stack {
         }
         // tslint:disable-next-line: max-line-length
         this.q.referenceDepth = (typeof this.q.referenceDepth === 'number') ? this.q.referenceDepth : this.contentStore.referenceDepth;
-        // if(!this.internal.nested){
-        //   if (this.internal.only) {
-        //     this.internal.projections = this.internal.only
-        //   } else {
-        //     this.internal.projections = merge(this.contentStore.projections, this.internal.except)
-        //   }
-        // }
         // set default limit, if .limit() hasn't been called
         if (!(this.internal.limit)) {
             this.internal.limit = this.contentStore.limit;
@@ -1760,7 +1753,7 @@ class Stack {
                 _assets: 1,
                 _id: 0,
             });
-            if (schema === null || schema[this.types.assets] !== 'object') {
+            if (schema === null || typeof schema[this.types.assets] !== 'object') {
                 return;
             }
             const paths = Object.keys(schema[this.types.assets]);

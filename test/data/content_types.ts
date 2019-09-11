@@ -4,30 +4,29 @@ export const content_types = [
     _content_type_uid: '_content_types',
     locale: 'en-us',
     published_at: '2019-02-07T14:52:37.617Z',
-    schema: [
-      {
-        display_name : 'Title',
-        uid : 'title',
+    schema: [{
+        display_name: 'Title',
+        uid: 'title',
         // tslint:disable-next-line: object-literal-sort-keys
         data_type: 'text',
-        mandatory : true,
-        unique : true,
-        field_metadata : {
-          _default : true,
+        mandatory: true,
+        unique: true,
+        field_metadata: {
+          _default: true,
         },
-        multiple : false,
+        multiple: false,
       },
       {
-        display_name : 'URL',
-        uid : 'url',
+        display_name: 'URL',
+        uid: 'url',
         // tslint:disable-next-line: object-literal-sort-keys
         data_type: 'text',
-        mandatory : false,
-        field_metadata : {
-          _default : true,
+        mandatory: false,
+        field_metadata: {
+          _default: true,
         },
-        multiple : false,
-        unique : false,
+        multiple: false,
+        unique: false,
       },
     ],
     title: 'Blog',
@@ -45,30 +44,29 @@ export const content_types = [
     _content_type_uid: '_content_types',
     locale: 'en-us',
     published_at: '2019-02-07T14:52:37.618Z',
-    schema: [
-      {
-        display_name : 'Title',
-        uid : 'title',
+    schema: [{
+        display_name: 'Title',
+        uid: 'title',
         // tslint:disable-next-line: object-literal-sort-keys
         data_type: 'text',
-        mandatory : true,
-        unique : true,
-        field_metadata : {
-          _default : true,
+        mandatory: true,
+        unique: true,
+        field_metadata: {
+          _default: true,
         },
-        multiple : false,
+        multiple: false,
       },
       {
-        display_name : 'URL',
-        uid : 'url',
+        display_name: 'URL',
+        uid: 'url',
         // tslint:disable-next-line: object-literal-sort-keys
         data_type: 'text',
-        mandatory : false,
-        field_metadata : {
-          _default : true,
+        mandatory: false,
+        field_metadata: {
+          _default: true,
         },
-        multiple : false,
-        unique : false,
+        multiple: false,
+        unique: false,
       },
     ],
     title: 'Author',
@@ -87,30 +85,29 @@ export const content_types = [
     _content_type_uid: '_content_types',
     locale: 'en-us',
     published_at: '2019-02-07T14:52:37.616Z',
-    schema: [
-      {
-        display_name : 'Title',
-        uid : 'title',
+    schema: [{
+        display_name: 'Title',
+        uid: 'title',
         // tslint:disable-next-line: object-literal-sort-keys
         data_type: 'text',
-        mandatory : true,
-        unique : true,
-        field_metadata : {
-          _default : true,
+        mandatory: true,
+        unique: true,
+        field_metadata: {
+          _default: true,
         },
-        multiple : false,
+        multiple: false,
       },
       {
-        display_name : 'URL',
-        uid : 'url',
+        display_name: 'URL',
+        uid: 'url',
         // tslint:disable-next-line: object-literal-sort-keys
         data_type: 'text',
-        mandatory : false,
-        field_metadata : {
-          _default : true,
+        mandatory: false,
+        field_metadata: {
+          _default: true,
         },
-        multiple : false,
-        unique : false,
+        multiple: false,
+        unique: false,
       },
     ],
     title: 'Category',
@@ -123,30 +120,29 @@ export const content_types = [
     _content_type_uid: '_content_types',
     locale: 'en-us',
     published_at: '2019-02-07T14:52:37.616Z',
-    schema: [
-      {
-        display_name : 'Title',
-        uid : 'title',
+    schema: [{
+        display_name: 'Title',
+        uid: 'title',
         // tslint:disable-next-line: object-literal-sort-keys
         data_type: 'text',
-        mandatory : true,
-        unique : true,
-        field_metadata : {
-          _default : true,
+        mandatory: true,
+        unique: true,
+        field_metadata: {
+          _default: true,
         },
-        multiple : false,
+        multiple: false,
       },
       {
-        display_name : 'URL',
-        uid : 'url',
+        display_name: 'URL',
+        uid: 'url',
         // tslint:disable-next-line: object-literal-sort-keys
         data_type: 'text',
-        mandatory : false,
-        field_metadata : {
-          _default : true,
+        mandatory: false,
+        field_metadata: {
+          _default: true,
         },
-        multiple : false,
-        unique : false,
+        multiple: false,
+        unique: false,
       },
     ],
     title: 'Products',
@@ -160,5 +156,6 @@ export const content_types = [
       files: '_assets',
       single_file: '_assets',
     },
-  },
-]
+  }
+
+  ]

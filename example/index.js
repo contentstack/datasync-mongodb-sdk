@@ -3,7 +3,7 @@ const Contentstack = require('../dist').Contentstack
 const Stack = Contentstack.Stack({
   locale: 'en-us',
   contentStore: {
-    //dbName: 'references',
+    dbName: 'snippet-contentstack-db',
     
   }
 })
@@ -16,11 +16,11 @@ function close () {
   return Stack.close()
 }
 
-function find (contentType = 'product') {
+function find (contentType = 'dinu1996') {
   return Stack.contentType(contentType)
     .entries()
-    .includeReferences()
-    .only(['image_thumbnails.title'])
+    //.includeReferences()
+    //.except(['image_thumbnails.title', 'image_thumbnails._internal_url'])
     .limit(1)
     .find()
 }

@@ -1145,11 +1145,11 @@ export class Stack {
     if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
       throw new Error('Kindly provide valid \'field\' values for \'except()\'')
     }
-    this.internal.nested = false 
+    //this.internal.nested = false 
     this.internal.except = this.internal.except || {}
     fields.forEach((field) => {
       if (typeof field === 'string') {
-        this.internal.only[field] = 0
+        this.internal.except[field] = 0
       }
     })
     this.internal.except = merge(this.contentStore.projections, this.internal.except)
@@ -1548,11 +1548,11 @@ export class Stack {
 
       if (this.internal.queryReferences) {
         this.collection = this.collection
-          //.project(this.internal.projections)
+          .project(this.contentStore.projections)
           .toArray()
       } else {
         this.collection = this.collection
-          //.project(this.internal.projections)
+          .project(this.contentStore.projections)
           .limit(this.internal.limit)
           .skip(this.internal.skip)
           .toArray()
@@ -1682,17 +1682,6 @@ export class Stack {
     // tslint:disable-next-line: max-line-length
     this.q.referenceDepth = (typeof this.q.referenceDepth === 'number') ? this.q.referenceDepth : this.contentStore.referenceDepth
 
-    // if(!this.internal.nested){
-    //   if (this.internal.only) {
-    //     this.internal.projections = this.internal.only
-    //   } else {
-    //     this.internal.projections = merge(this.contentStore.projections, this.internal.except)
-    //   }
-    // }
-    
-    
-    
-
     // set default limit, if .limit() hasn't been called
     if (!(this.internal.limit)) {
       this.internal.limit = this.contentStore.limit
@@ -1814,6 +1803,7 @@ export class Stack {
       this.internal.only = Object.keys(this.internal.only)
       const only = this.internal.only.toString().replace(/\./g, '/')
       output[type] = mask(output[type], only)
+
     } else if (this.internal.except) {
       this.internal.except = Object.keys(this.internal.except)
       const bukcet = this.internal.except.toString().replace(/\./g, '/')
@@ -1866,7 +1856,8 @@ export class Stack {
         _id: 0,
       })
 
-    if (schema === null || schema[this.types.assets] !== 'object') {
+     
+    if (schema === null || typeof schema[this.types.assets] !== 'object') {
       return
     }
 

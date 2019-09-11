@@ -69,7 +69,7 @@ describe('# Projections', () => {
     test('.only()', () => {
       return Stack.contentType('blog')
         .entries()
-        .only(['uid', 'title', '_id'])
+        .only(['uid', 'title'])
         .find()
         .then((result: any) => {
           checkEntries(result)
@@ -78,8 +78,7 @@ describe('# Projections', () => {
           result.entries.forEach((entry) => {
             expect(entry).toHaveProperty('uid')
             expect(entry).toHaveProperty('title')
-            expect(entry).toHaveProperty('_id')
-            expect(Object.keys(entry)).toHaveLength(3)
+            expect(Object.keys(entry)).toHaveLength(2)
           })
         }).catch((error) => {
           expect(error).toBeNull()
