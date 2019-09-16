@@ -1841,7 +1841,7 @@ export class Stack {
         _id: 0,
       })
 
-    if (schema === null || schema[this.types.assets] !== 'object') {
+    if (schema === null || typeof schema[this.types.assets] !== 'object') {
       return
     }
 
