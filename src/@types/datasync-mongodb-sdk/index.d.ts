@@ -4,9 +4,9 @@
  * MIT Licensed
  */
 
-declare module "datasync-mongodb-sdk" {
+declare module 'datasync-mongodb-sdk' {
 	
-	export declare const getCollectionName: ({ locale, content_type_uid }: {
+	export const getCollectionName: ({ locale, content_type_uid }: {
 	    locale: any;
 	    content_type_uid: any;
 	}, collection: any) => string;
@@ -18,7 +18,7 @@ declare module "datasync-mongodb-sdk" {
 	 * @descriptionProvides a range of connection/disconnect, filters and projections on mongodb
 	 * @returns {Stack} Returns an instance of `Stack`
 	 */
-	export declare class Stack {
+	export class Stack {
 	    private q;
 	    private readonly collectionNames;
 	    private readonly config;
@@ -1120,7 +1120,7 @@ declare module "datasync-mongodb-sdk" {
 	 *
 	 * @returns {Stack} Returns Stack method, which's used to create an instance of Stack
 	 */
-	export declare class Contentstack {
+	export class Contentstack {
 	    /**
 	     * @public
 	     * @method Stack
