@@ -27,3 +27,4 @@ export declare const getCollectionName: ({ locale, content_type_uid }: {
     content_type_uid: any;
 }, collection: any) => string;
 export declare const difference: (obj: any, baseObj: any) => unknown;
+export declare const applyProjections: (data: any, keys: any, depth: any, parent: any) => void;

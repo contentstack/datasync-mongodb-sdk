@@ -16,7 +16,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Copyright (c) 2019 Contentstack LLC
  * MIT Licensed
  */
-const json_mask_1 = __importDefault(require("json-mask"));
+//import mask from 'json-mask'
 const lodash_1 = require("lodash");
 const mongodb_1 = require("mongodb");
 const sift_1 = __importDefault(require("sift"));
@@ -1046,12 +1046,11 @@ class Stack {
         if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
             throw new Error('Kindly provide valid \'field\' values for \'only()\'');
         }
-        this.internal.only = this.internal.only || {};
-        this.internal.only._id = 0;
-        //this.internal.nested = false 
+        this.internal.only = [];
+        //this.internal.only._id = 0
         fields.forEach((field) => {
             if (typeof field === 'string') {
-                this.internal.only[field] = 1;
+                this.internal.only.push(field);
             }
         });
         return this;
@@ -1083,13 +1082,20 @@ class Stack {
             throw new Error('Kindly provide valid \'field\' values for \'except()\'');
         }
         //this.internal.nested = false 
-        this.internal.except = this.internal.except || {};
+        // this.internal.except = this.internal.except || {}
+        // fields.forEach((field) => {
+        //   if (typeof field === 'string') {
+        //     this.internal.except[field] = 0
+        //   }
+        // })
+        // this.internal.except = merge(this.contentStore.projections, this.internal.except)
+        this.internal.except = [];
+        //this.internal.only._id = 0
         fields.forEach((field) => {
             if (typeof field === 'string') {
-                this.internal.except[field] = 0;
+                this.internal.except.push(field);
             }
         });
-        this.internal.except = lodash_1.merge(this.contentStore.projections, this.internal.except);
         return this;
     }
     /**
@@ -1699,17 +1705,49 @@ class Stack {
                     output.content_type_uid = this.q.content_type_uid;
                     break;
             }
-            //if(this.internal.nested){
             if (this.internal.only) {
-                this.internal.only = Object.keys(this.internal.only);
-                const only = this.internal.only.toString().replace(/\./g, '/');
-                output[type] = json_mask_1.default(output[type], only);
+                const bukcet = JSON.parse(JSON.stringify(output[type]));
+                this.internal.only.forEach(field => {
+                    let splittedField = field.split('.');
+                    bukcet.forEach(obj => {
+                        if (obj.hasOwnProperty(field)) {
+                            delete obj[field];
+                        }
+                        else {
+                            let depth = 0;
+                            let parent = '';
+                            util_1.applyProjections(obj, splittedField, depth, parent);
+                        }
+                    });
+                });
+                output[type] = util_1.difference(output[type], bukcet);
             }
             else if (this.internal.except) {
-                this.internal.except = Object.keys(this.internal.except);
-                const bukcet = this.internal.except.toString().replace(/\./g, '/');
-                const except = json_mask_1.default(output[type], bukcet);
-                output[type] = util_1.difference(output[type], except);
+                this.internal.except.forEach(field => {
+                    let splittedField = field.split('.');
+                    output[type].forEach(obj => {
+                        if (obj.hasOwnProperty(field)) {
+                            delete obj[field];
+                        }
+                        else {
+                            let depth = 0;
+                            let parent = '';
+                            util_1.applyProjections(obj, splittedField, depth, parent);
+                        }
+                    });
+                });
+            }
+            //if(this.internal.nested){
+            if (this.internal.only) {
+                // this.internal.only = Object.keys(this.internal.only)
+                // const only = this.internal.only.toString().replace(/\./g, '/')
+                // output[type] = mask(output[type], only)
+            }
+            else if (this.internal.except) {
+                // this.internal.except = Object.keys(this.internal.except)
+                // const bukcet = this.internal.except.toString().replace(/\./g, '/')
+                // const except = mask(output[type], bukcet)
+                // output[type] = difference(output[type], except)
             }
             //}
             if (this.internal.includeCount) {

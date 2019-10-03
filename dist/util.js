@@ -89,3 +89,28 @@ exports.difference = (obj, baseObj) => {
     };
     return changes(obj, baseObj);
 };
+exports.applyProjections = (data, keys, depth, parent) => {
+    for (let prop in data) {
+        if (prop === keys[depth] && keys.length - 1 === depth) {
+            let field = keys.slice(-1).pop();
+            let array = keys;
+            array.pop();
+            if ((array.join('.')) === parent)
+                delete data[field];
+        }
+        else if (typeof data[prop] === 'object') {
+            if (prop === keys[depth]) {
+                depth = depth + 1;
+                parent = parent !== '' ? parent + '.' + prop : prop;
+                if (data[prop] instanceof Array) {
+                    data[prop].forEach(element => {
+                        exports.applyProjections(element, keys, depth, parent);
+                    });
+                }
+                else {
+                    exports.applyProjections(data[prop], keys, depth, parent);
+                }
+            }
+        }
+    }
+};
