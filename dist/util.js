@@ -92,8 +92,8 @@ exports.difference = (obj, baseObj) => {
 exports.applyProjections = (data, keys, depth, parent) => {
     for (let prop in data) {
         if (prop === keys[depth] && keys.length - 1 === depth) {
-            let field = keys.slice(-1).pop();
-            let array = keys;
+            let array = keys.slice(0);
+            let field = array.slice(-1).pop();
             array.pop();
             if ((array.join('.')) === parent)
                 delete data[field];
