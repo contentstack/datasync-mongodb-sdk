@@ -1,10 +1,8 @@
 const Contentstack = require('../dist').Contentstack
 
 const Stack = Contentstack.Stack({
-  locale: 'en-us',
   contentStore: {
-    dbName: 'snippet-contentstack-db',
-    
+    dbName: 'contentstack-db', 
   }
 })
 
@@ -16,12 +14,12 @@ function close () {
   return Stack.close()
 }
 
-function find (contentType = 'dinu1996') {
+function find (contentType = 'authors') {
   return Stack.contentType(contentType)
     .entries()
     //.includeReferences()
     //.except(['image_thumbnails.title', 'image_thumbnails._internal_url'])
-    .limit(1)
+    //.limit(3)
     .find()
 }
 
