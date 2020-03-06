@@ -1081,16 +1081,7 @@ class Stack {
         if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
             throw new Error('Kindly provide valid \'field\' values for \'except()\'');
         }
-        //this.internal.nested = false 
-        // this.internal.except = this.internal.except || {}
-        // fields.forEach((field) => {
-        //   if (typeof field === 'string') {
-        //     this.internal.except[field] = 0
-        //   }
-        // })
-        // this.internal.except = merge(this.contentStore.projections, this.internal.except)
         this.internal.except = [];
-        //this.internal.only._id = 0
         fields.forEach((field) => {
             if (typeof field === 'string') {
                 this.internal.except.push(field);
@@ -1169,7 +1160,6 @@ class Stack {
         if (!values || typeof values !== 'object' || !(values instanceof Array)) {
             throw new Error('Kindly provide valid \'field\' values for \'tags()\'');
         }
-        // filter non-string keys
         lodash_1.remove(values, (value) => {
             return typeof value !== 'string';
         });
@@ -1737,19 +1727,6 @@ class Stack {
                     });
                 });
             }
-            //if(this.internal.nested){
-            if (this.internal.only) {
-                // this.internal.only = Object.keys(this.internal.only)
-                // const only = this.internal.only.toString().replace(/\./g, '/')
-                // output[type] = mask(output[type], only)
-            }
-            else if (this.internal.except) {
-                // this.internal.except = Object.keys(this.internal.except)
-                // const bukcet = this.internal.except.toString().replace(/\./g, '/')
-                // const except = mask(output[type], bukcet)
-                // output[type] = difference(output[type], except)
-            }
-            //}
             if (this.internal.includeCount) {
                 output.count = yield this.db.collection(util_1.getCollectionName({
                     content_type_uid: this.q.content_type_uid,

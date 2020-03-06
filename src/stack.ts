@@ -3,7 +3,7 @@
  * Copyright (c) 2019 Contentstack LLC
  * MIT Licensed
  */
-//import mask from 'json-mask'
+// import mask from 'json-mask'
 import {
   merge,
   remove,
@@ -17,11 +17,11 @@ import {
   config,
 } from './config'
 import {
+  applyProjections,
   difference,
   getCollectionName,
   validateConfig,
   validateURI,
-  applyProjections
 } from './util'
 
 interface IShelf {
@@ -1109,7 +1109,7 @@ export class Stack {
       throw new Error('Kindly provide valid \'field\' values for \'only()\'')
     }
     this.internal.only = []
-    //this.internal.only._id = 0
+    // this.internal.only._id = 0
     fields.forEach((field) => {
       if (typeof field === 'string') {
         this.internal.only.push(field)
@@ -1145,16 +1145,7 @@ export class Stack {
     if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
       throw new Error('Kindly provide valid \'field\' values for \'except()\'')
     }
-    //this.internal.nested = false 
-    // this.internal.except = this.internal.except || {}
-    // fields.forEach((field) => {
-    //   if (typeof field === 'string') {
-    //     this.internal.except[field] = 0
-    //   }
-    // })
-    // this.internal.except = merge(this.contentStore.projections, this.internal.except)
     this.internal.except = []
-    //this.internal.only._id = 0
     fields.forEach((field) => {
       if (typeof field === 'string') {
         this.internal.except.push(field)
@@ -1236,7 +1227,7 @@ export class Stack {
     if (!values || typeof values !== 'object' || !(values instanceof Array)) {
       throw new Error('Kindly provide valid \'field\' values for \'tags()\'')
     }
-    // filter non-string keys
+
     remove(values, (value) => {
       return typeof value !== 'string'
     })
@@ -1762,7 +1753,7 @@ export class Stack {
    */
   private async postProcess(result) {
     const count = (result === null) ? 0 : result.length
-    let output: any = {
+    const output: any = {
       locale: this.q.locale,
     }
     if (this.internal.onlyCount) {
@@ -1805,51 +1796,38 @@ export class Stack {
       output.content_type_uid = this.q.content_type_uid
       break
     }
-    
+
     if (this.internal.only) {
-      const bukcet = JSON.parse(JSON.stringify(output[type]));
-      this.internal.only.forEach(field=>{
-        let splittedField = field.split('.')
-        bukcet.forEach(obj =>{
-          if(obj.hasOwnProperty(field)){
+      const bukcet = JSON.parse(JSON.stringify(output[type]))
+      this.internal.only.forEach((field) => {
+        const splittedField = field.split('.')
+        bukcet.forEach((obj) => {
+          if (obj.hasOwnProperty(field)){
             delete obj[field]
           } else {
-            let depth=0
-            let parent= ''
+            const depth = 0
+            const parent = ''
             applyProjections(obj, splittedField, depth, parent)
           }
         })
       })
-      
+
       output[type] = difference(output[type], bukcet)
     } else if (this.internal.except) {
-      this.internal.except.forEach(field=>{
-        let splittedField = field.split('.')
-        output[type].forEach(obj =>{
-          if(obj.hasOwnProperty(field)){
+      this.internal.except.forEach((field) => {
+        const splittedField = field.split('.')
+        output[type].forEach((obj) => {
+          if (obj.hasOwnProperty(field)){
             delete obj[field]
           } else {
-            let depth=0
-            let parent= ''
+            const depth = 0
+            const parent = ''
             applyProjections(obj, splittedField, depth, parent)
           }
         })
       })
     }
-    //if(this.internal.nested){
-    if (this.internal.only) {
-      // this.internal.only = Object.keys(this.internal.only)
-      // const only = this.internal.only.toString().replace(/\./g, '/')
-      // output[type] = mask(output[type], only)
 
-    } else if (this.internal.except) {
-      // this.internal.except = Object.keys(this.internal.except)
-      // const bukcet = this.internal.except.toString().replace(/\./g, '/')
-      // const except = mask(output[type], bukcet)
-      // output[type] = difference(output[type], except)
-    }
-    //}
-    
     if (this.internal.includeCount) {
       output.count = await this.db.collection(getCollectionName({
         content_type_uid: this.q.content_type_uid,
@@ -1894,7 +1872,7 @@ export class Stack {
         _id: 0,
       })
 
-     
+
     if (schema === null || typeof schema[this.types.assets] !== 'object') {
       return
     }
