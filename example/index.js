@@ -1,14 +1,8 @@
 const Contentstack = require('../dist').Contentstack
 
 const Stack = Contentstack.Stack({
-  locale: 'en-us',
   contentStore: {
-    dbName: 'references',
-    collection: {
-      entry: 'contents',
-      asset: 'contents',
-      schema: 'content_types'
-    }
+    dbName: 'contentstack-db', 
   }
 })
 
@@ -20,9 +14,12 @@ function close () {
   return Stack.close()
 }
 
-function find (contentType = 'blog') {
+function find (contentType = 'authors') {
   return Stack.contentType(contentType)
     .entries()
+    //.includeReferences()
+    //.except(['image_thumbnails.title', 'image_thumbnails._internal_url'])
+    //.limit(3)
     .find()
 }
 

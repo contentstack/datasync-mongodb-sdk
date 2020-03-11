@@ -9,7 +9,7 @@ export const config = {
     collection: {
       asset: 'contents',
       entry: 'contents',
-      schema: 'content_types',
+      schema: 'contents',
     },
     dbName: 'contentstack-db',
     indexes: {

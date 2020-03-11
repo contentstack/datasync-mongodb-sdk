@@ -4,7 +4,11 @@
  * MIT Licensed
  */
 
-import { uniq } from 'lodash'
+import {
+  isEqual,
+  isObject,
+  transform,
+  uniq } from 'lodash'
 
 /**
  * @private
@@ -89,5 +93,43 @@ export const getCollectionName = ({locale, content_type_uid}, collection) => {
       return `${locale}.${collection.schema}`
     default:
       return `${locale}.${collection.entry}`
+  }
+}
+
+export const difference = (obj, baseObj) => {
+  const changes = (data, base) => {
+    return transform(data, (result, value, key) => {
+      if (!isEqual(value, base[key])) {
+        result[key] = (isObject(value) && isObject(base[key])) ? changes(value, base[key]) : value
+      }
+    })
+  }
+
+  return changes(obj, baseObj)
+}
+
+
+export const applyProjections = (data, keys, depth, parent) => {
+  for (const prop in data){
+      if (prop === keys[depth] && keys.length - 1 === depth){
+        const array  = keys.slice(0)
+        const field = array.slice(-1).pop()
+        array.pop()
+        if ( (array.join('.')) === parent) {
+          delete data[field]
+        }
+      } else if (typeof data[prop] === 'object'){
+          if (prop === keys[depth]){
+              depth = depth + 1
+              parent = parent !== '' ? parent + '.' + prop : prop
+              if (data[prop] instanceof Array){
+                  data[prop].forEach((element) => {
+                    applyProjections(element, keys, depth, parent)
+                  })
+              } else {
+                applyProjections(data[prop], keys, depth, parent)
+              }
+          }
+      }
   }
 }

@@ -79,3 +79,38 @@ exports.getCollectionName = ({ locale, content_type_uid }, collection) => {
             return `${locale}.${collection.entry}`;
     }
 };
+exports.difference = (obj, baseObj) => {
+    const changes = (data, base) => {
+        return lodash_1.transform(data, (result, value, key) => {
+            if (!lodash_1.isEqual(value, base[key])) {
+                result[key] = (lodash_1.isObject(value) && lodash_1.isObject(base[key])) ? changes(value, base[key]) : value;
+            }
+        });
+    };
+    return changes(obj, baseObj);
+};
+exports.applyProjections = (data, keys, depth, parent) => {
+    for (let prop in data) {
+        if (prop === keys[depth] && keys.length - 1 === depth) {
+            let array = keys.slice(0);
+            let field = array.slice(-1).pop();
+            array.pop();
+            if ((array.join('.')) === parent)
+                delete data[field];
+        }
+        else if (typeof data[prop] === 'object') {
+            if (prop === keys[depth]) {
+                depth = depth + 1;
+                parent = parent !== '' ? parent + '.' + prop : prop;
+                if (data[prop] instanceof Array) {
+                    data[prop].forEach(element => {
+                        exports.applyProjections(element, keys, depth, parent);
+                    });
+                }
+                else {
+                    exports.applyProjections(data[prop], keys, depth, parent);
+                }
+            }
+        }
+    }
+};
