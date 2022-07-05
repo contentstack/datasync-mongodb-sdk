@@ -3,7 +3,7 @@
  * Copyright (c) 2019 Contentstack LLC
  * MIT Licensed
  */
-
+// import mask from 'json-mask'
 import {
   merge,
   remove,
@@ -17,6 +17,8 @@ import {
   config,
 } from './config'
 import {
+  applyProjections,
+  difference,
   getCollectionName,
   validateConfig,
   validateURI,
@@ -1106,12 +1108,11 @@ export class Stack {
     if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
       throw new Error('Kindly provide valid \'field\' values for \'only()\'')
     }
-    this.internal.only = this.internal.only || {}
-    this.internal.only._id = 0
-
+    this.internal.only = []
+    // this.internal.only._id = 0
     fields.forEach((field) => {
       if (typeof field === 'string') {
-        this.internal.only[field] = 1
+        this.internal.only.push(field)
       }
     })
 
@@ -1144,14 +1145,13 @@ export class Stack {
     if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
       throw new Error('Kindly provide valid \'field\' values for \'except()\'')
     }
-    this.internal.except = this.internal.except || {}
+    this.internal.except = []
     fields.forEach((field) => {
       if (typeof field === 'string') {
-        this.internal.except[field] = 0
+        this.internal.except.push(field)
       }
     })
 
-    this.internal.except = merge(this.contentStore.projections, this.internal.except)
 
     return this
   }
@@ -1227,7 +1227,7 @@ export class Stack {
     if (!values || typeof values !== 'object' || !(values instanceof Array)) {
       throw new Error('Kindly provide valid \'field\' values for \'tags()\'')
     }
-    // filter non-string keys
+
     remove(values, (value) => {
       return typeof value !== 'string'
     })
@@ -1547,11 +1547,11 @@ export class Stack {
 
       if (this.internal.queryReferences) {
         this.collection = this.collection
-          .project(this.internal.projections)
+          .project(this.contentStore.projections)
           .toArray()
       } else {
         this.collection = this.collection
-          .project(this.internal.projections)
+          .project(this.contentStore.projections)
           .limit(this.internal.limit)
           .skip(this.internal.skip)
           .toArray()
@@ -1681,12 +1681,6 @@ export class Stack {
     // tslint:disable-next-line: max-line-length
     this.q.referenceDepth = (typeof this.q.referenceDepth === 'number') ? this.q.referenceDepth : this.contentStore.referenceDepth
 
-    if (this.internal.only) {
-      this.internal.projections = this.internal.only
-    } else {
-      this.internal.projections = merge(this.contentStore.projections, this.internal.except)
-    }
-
     // set default limit, if .limit() hasn't been called
     if (!(this.internal.limit)) {
       this.internal.limit = this.contentStore.limit
@@ -1769,32 +1763,69 @@ export class Stack {
 
       return output
     }
-
+    let type
     switch (this.q.content_type_uid) {
     case this.types.assets:
       if (this.internal.single) {
         output.asset = (result === null) ? result : result[0]
+        type = 'asset'
       } else {
         output.assets = result
+        type = 'assets'
       }
       output.content_type_uid = 'assets'
       break
     case this.types.content_types:
       if (this.internal.single) {
         output.content_type = (result === null) ? result : result[0]
+        type = 'content_type'
       } else {
         output.content_types = result
+        type = 'content_types'
       }
       output.content_type_uid = 'content_types'
       break
     default:
       if (this.internal.single) {
         output.entry = (result === null) ? result : result[0]
+        type = 'entry'
       } else {
         output.entries = result
+        type = 'entries'
       }
       output.content_type_uid = this.q.content_type_uid
       break
+    }
+
+    if (this.internal.only) {
+      const bukcet = JSON.parse(JSON.stringify(output[type]))
+      this.internal.only.forEach((field) => {
+        const splittedField = field.split('.')
+        bukcet.forEach((obj) => {
+          if (obj.hasOwnProperty(field)){
+            delete obj[field]
+          } else {
+            const depth = 0
+            const parent = ''
+            applyProjections(obj, splittedField, depth, parent)
+          }
+        })
+      })
+
+      output[type] = difference(output[type], bukcet)
+    } else if (this.internal.except) {
+      this.internal.except.forEach((field) => {
+        const splittedField = field.split('.')
+        output[type].forEach((obj) => {
+          if (obj.hasOwnProperty(field)){
+            delete obj[field]
+          } else {
+            const depth = 0
+            const parent = ''
+            applyProjections(obj, splittedField, depth, parent)
+          }
+        })
+      })
     }
 
     if (this.internal.includeCount) {
@@ -1841,7 +1872,8 @@ export class Stack {
         _id: 0,
       })
 
-    if (schema === null || schema[this.types.assets] !== 'object') {
+
+    if (schema === null || typeof schema[this.types.assets] !== 'object') {
       return
     }
 

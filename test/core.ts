@@ -11,6 +11,8 @@ import { entries as blogs } from './data/blog'
 import { entries as categories } from './data/category'
 import { content_types } from './data/content_types'
 import { entries as products } from './data/products'
+import { entries as snippets } from './data/snippets'
+import { schema as snippetSchema } from './data/snippetSchema'
 
 const scriptConfig = cloneDeep(config)
 const collNameConfig: any = scriptConfig.contentStore.collection
@@ -70,8 +72,10 @@ describe('# Core', () => {
     await db.collection(collection.entry).insertMany(blogs)
     await db.collection(collection.entry).insertMany(categories)
     await db.collection(collection.entry).insertMany(products)
+    await db.collection(collection.entry).insertMany(snippets)
     await db.collection(collection.asset).insertMany(assets)
     await db.collection(collection.schema).insertMany(content_types)
+    await db.collection(collection.schema).insertOne(snippetSchema,{ checkKeys: false })
 
     await db.collection(collection2.entry).insertMany(authors)
     await db.collection(collection2.entry).insertMany(blogs)
@@ -84,11 +88,11 @@ describe('# Core', () => {
 
   afterAll(async () => {
     await db.collection(collection.entry).drop()
-    // await db.collection(collection.asset).drop()
+    await db.collection(collection.asset).drop()
     await db.collection(collection.schema).drop()
 
     await db.collection(collection2.entry).drop()
-    // await db.collection(collection.asset).drop()
+    await db.collection(collection2.asset).drop()
     await db.collection(collection2.schema).drop()
 
     return Stack.close()
@@ -329,5 +333,30 @@ describe('# Core', () => {
         })
     })
   })
+
+  describe('snippet test', () => {
+    test('find', () => {
+      return Stack.contentType('snippets')
+        .entry()
+        .find()
+        .then((result: any) => {
+          console.log(JSON.stringify(result))
+          expect(result).toHaveProperty('entry')
+          expect(result).toHaveProperty('content_type_uid')
+          expect(result).toHaveProperty('locale')
+          expect(result.content_type_uid).toEqual('snippets')
+          expect(result.locale).toEqual('en-us')
+          expect(result.entry).toHaveProperty('title')
+          expect(result.entry).not.toHaveProperty('content_type_uid')
+          expect(result.entry).toHaveProperty('snippet_test')
+          expect(result.entry.snippet_test).toHaveProperty('img')
+          expect(result.entry.snippet_test.img).toHaveProperty('url')
+        }).catch((error) => {
+          expect(error).toBeNull()
+        })
+    })
+  })
 })
+
+
 

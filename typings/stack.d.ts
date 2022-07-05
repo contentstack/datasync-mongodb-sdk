@@ -1,8 +1,3 @@
-/*!
- * Contentstack DataSync Mongodb SDK
- * Copyright (c) 2019 Contentstack LLC
- * MIT Licensed
- */
 /**
  * @class Stack
  * @descriptionExpose SDK query methods on Stack
