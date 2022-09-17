@@ -18,7 +18,7 @@
   "license": "MIT",
   "dependencies": {
     "lodash": "4.17.15",
-    "mongodb": "3.1.12",
+    "mongodb": "4.9.0",
     "sift": "8.5.0"
   },
   "devDependencies": {
