@@ -1815,10 +1815,12 @@ export class Stack {
         .findOne({
           uid: this.q.content_type_uid,
         }, {
-          _assets: 0,
-          _content_type_uid: 0,
-          _id: 0,
-          _references: 0,
+          projection: {
+            _assets: 0,
+            _content_type_uid: 0,
+            _id: 0,
+            _references: 0,
+          }
         })
     }
 
@@ -1837,8 +1839,10 @@ export class Stack {
         _content_type_uid: this.types.content_types,
         uid: contentTypeUid,
       }, {
-        _assets: 1,
-        _id: 0,
+        projection: {
+          _assets: 1,
+          _id: 0,
+        }
       })
 
     if (schema === null || schema[this.types.assets] !== 'object') {
