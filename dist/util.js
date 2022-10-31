@@ -5,6 +5,7 @@
  * MIT Licensed
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getCollectionName = exports.validateConfig = exports.checkCyclic = exports.validateURI = void 0;
 const lodash_1 = require("lodash");
 /**
  * @private
@@ -14,12 +15,13 @@ const lodash_1 = require("lodash");
  * @param {string} uri - Mongodb connection 'uri' string
  * @returns {string} - Returns the `uri` after validating it, else throws an error
  */
-exports.validateURI = (uri) => {
+const validateURI = (uri) => {
     if (typeof uri !== 'string' || uri.length === 0) {
         throw new Error(`Mongodb connection url: ${uri} must be of type string`);
     }
     return uri;
 };
+exports.validateURI = validateURI;
 /**
  * @private
  * @method checkCyclic
@@ -28,7 +30,7 @@ exports.validateURI = (uri) => {
  * @param {object} mapping Map of the uids tracked thusfar
  * @returns {boolean} Returns `true` if the `uid` is part of the map (i.e. cyclic)
  */
-exports.checkCyclic = (uid, mapping) => {
+const checkCyclic = (uid, mapping) => {
     let flag = false;
     let list = [uid];
     // tslint:disable-next-line: prefer-for-of
@@ -38,10 +40,11 @@ exports.checkCyclic = (uid, mapping) => {
             flag = true;
             break;
         }
-        list = lodash_1.uniq(list.concat(parent));
+        list = (0, lodash_1.uniq)(list.concat(parent));
     }
     return flag;
 };
+exports.checkCyclic = checkCyclic;
 const getParents = (child, mapping) => {
     const parents = [];
     for (const key in mapping) {
@@ -65,11 +68,12 @@ const validateContentStore = (contentStore) => {
     }
     return;
 };
-exports.validateConfig = (config) => {
+const validateConfig = (config) => {
     validateContentStore(config.contentStore);
     return;
 };
-exports.getCollectionName = ({ locale, content_type_uid }, collection) => {
+exports.validateConfig = validateConfig;
+const getCollectionName = ({ locale, content_type_uid }, collection) => {
     switch (content_type_uid) {
         case '_assets':
             return `${locale}.${collection.asset}`;
@@ -79,3 +83,4 @@ exports.getCollectionName = ({ locale, content_type_uid }, collection) => {
             return `${locale}.${collection.entry}`;
     }
 };
+exports.getCollectionName = getCollectionName;
