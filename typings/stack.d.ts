@@ -3,6 +3,7 @@
  * Copyright (c) 2019 Contentstack LLC
  * MIT Licensed
  */
+import { Db } from 'mongodb';
 /**
  * @class Stack
  * @descriptionExpose SDK query methods on Stack
@@ -90,7 +91,7 @@ export declare class Stack {
      *
      * @returns {object} Mongodb 'db' instance
      */
-    connect(overrides?: {}): Promise<any>;
+    connect(overrides?: {}): Promise<Db>;
     /**
      * @public
      * @method close

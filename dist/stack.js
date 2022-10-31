@@ -5,10 +5,11 @@
  * MIT Licensed
  */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -16,6 +17,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Stack = void 0;
 const lodash_1 = require("lodash");
 const mongodb_1 = require("mongodb");
 const sift_1 = __importDefault(require("sift"));
@@ -30,9 +32,9 @@ const util_1 = require("./util");
  */
 class Stack {
     constructor(stackConfig, existingDB) {
-        this.config = lodash_1.merge(config_1.config, stackConfig);
+        this.config = (0, lodash_1.merge)(config_1.config, stackConfig);
         // validates config.locales property
-        util_1.validateConfig(this.config);
+        (0, util_1.validateConfig)(this.config);
         this.contentStore = this.config.contentStore;
         this.collectionNames = this.contentStore.collection;
         this.types = this.contentStore.internal.types;
@@ -137,8 +139,8 @@ class Stack {
      */
     connect(overrides = {}) {
         return __awaiter(this, void 0, void 0, function* () {
-            const dbConfig = lodash_1.merge({}, this.config, overrides).contentStore;
-            const url = util_1.validateURI(dbConfig.url);
+            const dbConfig = (0, lodash_1.merge)({}, this.config, overrides).contentStore;
+            const url = (0, util_1.validateURI)(dbConfig.url);
             const options = dbConfig.options;
             const dbName = dbConfig.dbName;
             const client = new mongodb_1.MongoClient(url, options);
@@ -218,7 +220,7 @@ class Stack {
             throw new Error('Kindly provide valid parameters for .and()!');
         }
         else if (this.q.query && typeof this.q.query === 'object') {
-            this.q.query = lodash_1.merge(this.q.query, {
+            this.q.query = (0, lodash_1.merge)(this.q.query, {
                 $and: queries,
             });
         }
@@ -262,7 +264,7 @@ class Stack {
             throw new Error('Kindly provide valid parameters for .or()!');
         }
         else if (this.q.query && typeof this.q.query === 'object') {
-            this.q.query = lodash_1.merge(this.q.query, {
+            this.q.query = (0, lodash_1.merge)(this.q.query, {
                 $or: queries,
             });
         }
@@ -1011,7 +1013,7 @@ class Stack {
      */
     query(queryObject = {}) {
         if (this.q.query && typeof this.q.query === 'object') {
-            this.q.query = lodash_1.merge(this.q.query, queryObject);
+            this.q.query = (0, lodash_1.merge)(this.q.query, queryObject);
         }
         else {
             this.q.query = queryObject;
@@ -1086,7 +1088,7 @@ class Stack {
                 this.internal.except[field] = 0;
             }
         });
-        this.internal.except = lodash_1.merge(this.contentStore.projections, this.internal.except);
+        this.internal.except = (0, lodash_1.merge)(this.contentStore.projections, this.internal.except);
         return this;
     }
     /**
@@ -1118,7 +1120,7 @@ class Stack {
             throw new Error('Kindly provide a valid field and pattern value for \'.regex()\'');
         }
         else if (this.q.query && typeof this.q.query === 'object') {
-            this.q.query = lodash_1.merge(this.q.query, {
+            this.q.query = (0, lodash_1.merge)(this.q.query, {
                 [field]: {
                     $options: options,
                     $regex: pattern,
@@ -1161,7 +1163,7 @@ class Stack {
             throw new Error('Kindly provide valid \'field\' values for \'tags()\'');
         }
         // filter non-string keys
-        lodash_1.remove(values, (value) => {
+        (0, lodash_1.remove)(values, (value) => {
             return typeof value !== 'string';
         });
         this.q.query = this.q.query || {};
@@ -1217,7 +1219,7 @@ class Stack {
             if (typeof expr === 'function') {
                 expr = expr.toString();
             }
-            this.q.query = lodash_1.merge(this.q.query, {
+            this.q.query = (0, lodash_1.merge)(this.q.query, {
                 $where: expr,
             });
         }
@@ -1489,7 +1491,7 @@ class Stack {
                     yield this.includeAssetsOnly(result, this.q.content_type_uid, this.q.locale);
                 }
                 if (this.internal.queryReferences) {
-                    result = result.filter(sift_1.default(this.internal.queryReferences));
+                    result = result.filter((0, sift_1.default)(this.internal.queryReferences));
                     if (this.internal.skip) {
                         result = result.splice(this.internal.skip, this.internal.limit);
                     }
@@ -1583,7 +1585,7 @@ class Stack {
     preProcess(query) {
         let queryFilters;
         if (this.q.query && typeof this.q.query === 'object') {
-            this.q.query = lodash_1.merge(this.q.query, query);
+            this.q.query = (0, lodash_1.merge)(this.q.query, query);
         }
         else {
             this.q.query = {};
@@ -1594,7 +1596,7 @@ class Stack {
             this.internal.projections = this.internal.only;
         }
         else {
-            this.internal.projections = lodash_1.merge(this.contentStore.projections, this.internal.except);
+            this.internal.projections = (0, lodash_1.merge)(this.contentStore.projections, this.internal.except);
         }
         // set default limit, if .limit() hasn't been called
         if (!(this.internal.limit)) {
@@ -1631,7 +1633,7 @@ class Stack {
         else {
             queryFilters = filters;
         }
-        this.collection = this.db.collection(util_1.getCollectionName({
+        this.collection = this.db.collection((0, util_1.getCollectionName)({
             content_type_uid: this.q.content_type_uid,
             locale: this.q.locale,
         }, this.collectionNames));
@@ -1696,7 +1698,7 @@ class Stack {
                     break;
             }
             if (this.internal.includeCount) {
-                output.count = yield this.db.collection(util_1.getCollectionName({
+                output.count = yield this.db.collection((0, util_1.getCollectionName)({
                     content_type_uid: this.q.content_type_uid,
                     locale: this.q.locale,
                 }, this.collectionNames))
@@ -1705,17 +1707,19 @@ class Stack {
                 });
             }
             if (this.internal.includeSchema) {
-                output.content_type = yield this.db.collection(util_1.getCollectionName({
+                output.content_type = yield this.db.collection((0, util_1.getCollectionName)({
                     content_type_uid: this.types.content_types,
                     locale: this.q.locale,
                 }, this.collectionNames))
                     .findOne({
                     uid: this.q.content_type_uid,
                 }, {
-                    _assets: 0,
-                    _content_type_uid: 0,
-                    _id: 0,
-                    _references: 0,
+                    projection: {
+                        _assets: 0,
+                        _content_type_uid: 0,
+                        _id: 0,
+                        _references: 0,
+                    }
                 });
             }
             this.cleanup();
@@ -1725,7 +1729,7 @@ class Stack {
     includeAssetsOnly(entries, contentTypeUid, locale) {
         return __awaiter(this, void 0, void 0, function* () {
             const schema = yield this.db
-                .collection(util_1.getCollectionName({
+                .collection((0, util_1.getCollectionName)({
                 content_type_uid: this.types.content_types,
                 locale,
             }, this.collectionNames))
@@ -1733,8 +1737,10 @@ class Stack {
                 _content_type_uid: this.types.content_types,
                 uid: contentTypeUid,
             }, {
-                _assets: 1,
-                _id: 0,
+                projection: {
+                    _assets: 1,
+                    _id: 0,
+                }
             });
             if (schema === null || schema[this.types.assets] !== 'object') {
                 return;
@@ -1750,7 +1756,7 @@ class Stack {
             if (shelf.length === 0) {
                 return;
             }
-            const assets = yield this.db.collection(util_1.getCollectionName({
+            const assets = yield this.db.collection((0, util_1.getCollectionName)({
                 content_type_uid: this.types.assets,
                 locale,
             }, this.collectionNames))
@@ -1788,7 +1794,8 @@ class Stack {
             };
             const { paths, // ref. fields in the current content types
             pendingPath, // left over of *paths*
-            schemaList, } = yield this.getReferencePath(ctQuery, locale, include);
+            schemaList, // list of content type uids, the current content types refer to
+             } = yield this.getReferencePath(ctQuery, locale, include);
             const queries = {
                 $or: [],
             }; // reference field paths
@@ -1892,7 +1899,7 @@ class Stack {
     bindLeftoverAssets(queries, locale, pointerList) {
         return __awaiter(this, void 0, void 0, function* () {
             // const contents = await readFile(getAssetsPath(locale) + '.json')
-            const filteredAssets = yield this.db.collection(util_1.getCollectionName({
+            const filteredAssets = yield this.db.collection((0, util_1.getCollectionName)({
                 content_type_uid: this.types.assets,
                 locale,
             }, this.collectionNames))
@@ -1955,7 +1962,7 @@ class Stack {
     }
     getReferencePath(query, locale, currentInclude) {
         return __awaiter(this, void 0, void 0, function* () {
-            const schemas = yield this.db.collection(util_1.getCollectionName({
+            const schemas = yield this.db.collection((0, util_1.getCollectionName)({
                 content_type_uid: this.types.content_types,
                 locale,
             }, this.collectionNames))
@@ -1982,7 +1989,7 @@ class Stack {
             let entryReferences = {};
             schemas.forEach((schema) => {
                 // Entry references
-                entryReferences = lodash_1.merge(entryReferences, schema[this.types.references]);
+                entryReferences = (0, lodash_1.merge)(entryReferences, schema[this.types.references]);
                 // tslint:disable-next-line: forin
                 for (const path in schema[this.types.assets]) {
                     paths.push(path);
@@ -2035,7 +2042,7 @@ class Stack {
     }
     fetchEntries(query, locale, paths, include, includeAll = false) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.db.collection(util_1.getCollectionName({
+            const result = yield this.db.collection((0, util_1.getCollectionName)({
                 content_type_uid: 'entries',
                 locale,
             }, this.collectionNames))
@@ -2085,7 +2092,8 @@ class Stack {
                     }],
             };
             const { paths, // ref. fields in the current content types
-            ctQueries, } = yield this.getAllReferencePaths(ctQuery, locale);
+            ctQueries, // list of content type uids, the current content types refer to
+             } = yield this.getAllReferencePaths(ctQuery, locale);
             const queries = {
                 $or: [],
             }; // reference field paths
@@ -2151,7 +2159,7 @@ class Stack {
     getAllReferencePaths(contentTypeQueries, locale) {
         return __awaiter(this, void 0, void 0, function* () {
             const contents = yield this.db
-                .collection(util_1.getCollectionName({
+                .collection((0, util_1.getCollectionName)({
                 content_type_uid: this.types.content_types,
                 locale,
             }, this.collectionNames))

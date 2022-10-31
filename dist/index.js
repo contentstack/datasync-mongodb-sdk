@@ -5,6 +5,7 @@
  * MIT Licensed
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Contentstack = void 0;
 const stack_1 = require("./stack");
 /**
  * @class Stack
