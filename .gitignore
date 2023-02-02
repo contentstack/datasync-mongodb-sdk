@@ -12,3 +12,4 @@ example/**/*
 playground
 newQueryBuilder.ts
 query-builder.ts
+dist
