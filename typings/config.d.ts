@@ -27,12 +27,9 @@ export declare const config: {
         limit: number;
         locale: string;
         options: {
-            autoReconnect: boolean;
             connectTimeoutMS: number;
             keepAlive: boolean;
             noDelay: boolean;
-            reconnectInterval: number;
-            reconnectTries: number;
             useNewUrlParser: boolean;
         };
         projections: {
