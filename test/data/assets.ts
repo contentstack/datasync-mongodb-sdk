@@ -8,7 +8,7 @@ export const assets = [
     title: 'A 1',
     uid: 'a1',
     url:
-    'https://images.contentstack.io/v3/assets/***REMOVED***/blt6788d40f2aaaab9a/5c5aae49005d89b20bb85c21/cnn.png',
+    'https://images.contentstack.io/v3/assets/blt44d99c34b040fa61/blt6788d40f2aaaab9a/5c5aae49005d89b20bb85c21/cnn.png',
   },
   {
     _version: 1,
@@ -19,7 +19,7 @@ export const assets = [
     title: 'A 2',
     uid: 'a2',
     url:
-    'https://images.contentstack.io/v3/assets/***REMOVED***/blt6788d40f2aaaab9a/5c5aae49005d89b20bb85c21/cnn.png',
+    'https://images.contentstack.io/v3/assets/blt44d99c34b040fa61/blt6788d40f2aaaab9a/5c5aae49005d89b20bb85c21/cnn.png',
   },
   {
     _version: 2,
@@ -30,6 +30,6 @@ export const assets = [
     title: 'A 3',
     uid: 'a3',
     url:
-    'https://images.contentstack.io/v3/assets/***REMOVED***/blt6788d40f2aaaab9a/5c5aae49005d89b20bb85c21/cnn.png',
+    'https://images.contentstack.io/v3/assets/blt44d99c34b040fa61/blt6788d40f2aaaab9a/5c5aae49005d89b20bb85c21/cnn.png',
   },
 ]
