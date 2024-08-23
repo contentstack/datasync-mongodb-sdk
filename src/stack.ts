@@ -6,6 +6,7 @@
 
 import {
   merge,
+  mergeWith,
   remove,
 } from 'lodash'
 import {
@@ -2125,7 +2126,7 @@ export class Stack {
 
     schemas.forEach((schema) => {
       // Entry references
-      entryReferences = merge(entryReferences, schema[this.types.references])
+      entryReferences = mergeWith(entryReferences, schema[this.types.references])
       // tslint:disable-next-line: forin
       for (const path in schema[this.types.assets]) {
         paths.push(path)
