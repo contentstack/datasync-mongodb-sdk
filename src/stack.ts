@@ -8,6 +8,7 @@ import {
   merge,
   mergeWith,
   remove,
+  isArray
 } from 'lodash'
 import {
   Db,
@@ -2126,11 +2127,12 @@ export class Stack {
 
     schemas.forEach((schema) => {
       // Entry references
-      entryReferences = mergeWith(entryReferences, schema[this.types.references])
-      // tslint:disable-next-line: forin
-      for (const path in schema[this.types.assets]) {
-        paths.push(path)
-      }
+      entryReferences = mergeWith(entryReferences, schema[this.types.references], (existingReferences, newReferences) => {
+        if (isArray(existingReferences)) { 
+          return Array.from(new Set(existingReferences.concat(newReferences))); 
+        }
+        return existingReferences;
+      });
     })
 
     for (let i = 0, j = currentInclude.length; i < j; i++) {
