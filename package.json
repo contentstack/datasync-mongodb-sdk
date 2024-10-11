@@ -1,7 +1,7 @@
 {
   "author": "Contentstack Ecosystem <ecosystem@contentstack.com>",
   "name": "datasync-mongodb-sdk",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Mongodb query wrapper around contents synced via @contentstack/content-store-mongodb",
   "main": "dist/index.js",
   "scripts": {
@@ -18,7 +18,7 @@
   "license": "MIT",
   "dependencies": {
     "lodash": "^4.17.21",
-    "mongodb": "^4.17.0",
+    "mongodb": "^6.0.0",
     "sift": "^8.5.0"
   },
   "devDependencies": {
