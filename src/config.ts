@@ -30,7 +30,7 @@ export const config = {
     // http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html
     options: {
       connectTimeoutMS: 15000,
-      keepAlive: true,
+      // keepAlive: true, // keepAlive is not supported in later versions of mongodb
       noDelay: true,
       useNewUrlParser: true,
     },
