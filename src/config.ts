@@ -30,7 +30,7 @@ export const config = {
     // http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html
     options: {
       connectTimeoutMS: 15000,
-      // keepAlive: true, // keepAlive is not supported in later versions of mongodb
+      // keepAlive: true, // The keepAlive option was deprecated in the Node.js Driver starting from version 5.3. In version 6.0 of the driver, the keepAlive option is permanently set to true
       noDelay: true,
       useNewUrlParser: true,
     },
