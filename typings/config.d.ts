@@ -28,7 +28,6 @@ export declare const config: {
         locale: string;
         options: {
             connectTimeoutMS: number;
-            keepAlive: boolean;
             noDelay: boolean;
             useNewUrlParser: boolean;
         };
