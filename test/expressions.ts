@@ -90,7 +90,7 @@ describe('# Expressional Operators', () => {
     test('.regex()', () => {
       return Stack.contentType('blog')
         .entries()
-        .regex('title', '/^Blog Two$/', 'g')
+        .regex('title', '/^Blog Two$/', 'i')
         .find()
         .then((result: any) => {
           checkEntries(result)
