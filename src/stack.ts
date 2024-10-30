@@ -2017,9 +2017,6 @@ export class Stack {
 
   private async bindLeftoverAssets(queries: IQuery, locale: string, pointerList: IShelf[]) {
     // const contents = await readFile(getAssetsPath(locale) + '.json')
-    if (!this.sanitizeIQuery(queries)) {
-      throw new Error('Invalid queries provided');
-    }
     const filteredAssets = await this.db.collection(getCollectionName({
       content_type_uid: this.types.assets,
       locale,
@@ -2099,9 +2096,6 @@ export class Stack {
   }
 
   private async getReferencePath(query, locale, currentInclude) {
-    if (!this.sanityQueryAny(query)) {
-      throw new Error('Invalid query provided');
-    }
     const schemas = await this.db.collection(getCollectionName({
         content_type_uid: this.types.content_types,
         locale,
@@ -2190,9 +2184,6 @@ export class Stack {
 
   private async fetchEntries(query: IQuery, locale: string, paths: string[], include: string[], includeAll:
     boolean = false) {
-    if (!this.sanitizeIQuery(query)) {
-      throw new Error('Invalid queries provided');
-    }
     const result = await this.db.collection(getCollectionName({
         content_type_uid: 'entries',
         locale,
@@ -2385,30 +2376,5 @@ export class Stack {
       paths,
     }
   }
-
-  private sanitizeIQuery(query: IQuery): boolean {
-    if (!query || typeof query !== 'object' || Array.isArray(query)) {
-      return false;
-    }
-    if (!query || !Array.isArray(query.$or)) {
-      return false;
-    }
-    for (const item of query.$or) {
-      if (
-        typeof item._content_type_uid !== 'string' ||
-        typeof item.uid !== 'string' ||
-        (item._version && typeof item._version.$exists !== 'boolean') ||
-        (item.locale && typeof item.locale !== 'string')
-      ) {
-        return false;
-      }
-    }
-    return true;
-  }
-  private sanityQueryAny(query: any): boolean {
-    if (!query || typeof query !== 'object' || Array.isArray(query)) {
-      return false;
-    }
-    return true;
-  }
+  // tslint:disable-next-line: max-file-line-count
 }

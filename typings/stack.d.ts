@@ -1092,6 +1092,4 @@ export declare class Stack {
     private bindReferences;
     private includeAllReferencesIteration;
     private getAllReferencePaths;
-    private sanitizeIQuery;
-    private sanityQueryAny;
 }
