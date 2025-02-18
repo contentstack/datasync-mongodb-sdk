@@ -2391,19 +2391,38 @@ export class Stack {
   }
 
   private sanitizeIQuery(query: IQuery): boolean {
+    const allowedKeys = {
+      _content_type_uid: 'string',
+      uid: 'string',
+      _version: {
+        $exists: 'boolean'
+      },
+      locale: 'string'
+    };
+
+    const validateObject = (obj: any, schema: any): boolean => {
+      for (const key in obj) {
+        if (!schema.hasOwnProperty(key)) {
+          return false;
+        }
+        if (typeof schema[key] === 'object') {
+          if (!validateObject(obj[key], schema[key])) {
+            return false;
+          }
+        } else if (typeof obj[key] !== schema[key]) {
+          return false;
+        }
+      }
+      return true;
+    };
     if (!query || typeof query !== 'object' || Array.isArray(query)) {
       return false;
     }
-    if (!query || !Array.isArray(query.$or)) {
+    if (!query.$or || !Array.isArray(query.$or)) {
       return false;
     }
     for (const item of query.$or) {
-      if (
-        typeof item._content_type_uid !== 'string' ||
-        typeof item.uid !== 'string' ||
-        (item._version && typeof item._version.$exists !== 'boolean') ||
-        (item.locale && typeof item.locale !== 'string')
-      ) {
+      if (!validateObject(item, allowedKeys)) {
         return false;
       }
     }
