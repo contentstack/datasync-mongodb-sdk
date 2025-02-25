@@ -8,10 +8,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: "16.x"
+          node-version: "22.x"
       - run: npm install
 
       - name: get-package-details
@@ -28,7 +28,7 @@ jobs:
           tag_prefix: "v"
       - name: Create Release
         if: steps.update_tag.outputs.tagname
-        uses: actions/create-release@v1
+        uses: actions/create-release@v4
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
@@ -40,7 +40,7 @@ jobs:
       - name: Upload Release Asset
         if: steps.update_tag.outputs.tagname
         id: upload-release-asset
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
