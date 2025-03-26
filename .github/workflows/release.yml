@@ -8,43 +8,70 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Setup Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: "22.x"
-      - run: npm install
 
-      - name: get-package-details
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Fetch package details (name and version)
+      - name: Get package details
         id: package
         uses: codex-team/action-nodejs-package-info@v1.1
-      - name: install npm packall
+
+      # Install npm-pack-all to create a package archive
+      - name: Install npm-pack-all
         run: npm install npm-pack-all
 
-      - run: node node_modules/.bin/npm-pack-all
-      - uses: Klemensas/action-autotag@stable
+      # Pack the package into a .tgz archive
+      - name: Pack the npm package
+        run: node node_modules/.bin/npm-pack-all
+
+      # Publish the package to npm
+      - name: Publish to npm
+        id: publish_npm
+        uses: JS-DevTools/npm-publish@v3
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          # access: public # Uncomment this line if you want to publish the package as public for first time
+
+      # Auto-tag the new version if a change is detected
+      - name: Auto-tag new version
         id: update_tag
+        uses: Klemensas/action-autotag@stable
         with:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           tag_prefix: "v"
-      - name: Create Release
-        if: steps.update_tag.outputs.tagname
+
+      # Create a new GitHub Release
+      - name: Create GitHub Release
+        if: steps.update_tag.outputs.tagname != ''
         uses: actions/create-release@v1
         id: create_release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.update_tag.outputs.tagname }}
           release_name: Release ${{ steps.update_tag.outputs.tagname }}
-          draft: false # Default value, but nice to set explicitly
-          prerelease: false # Default value, but nice to set explicitly
+          draft: false
+          prerelease: false
+
+      # Upload the packaged .tgz file as a release asset
       - name: Upload Release Asset
-        if: steps.update_tag.outputs.tagname
-        id: upload-release-asset
+        if: steps.update_tag.outputs.tagname != ''
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing its ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./${{ steps.package.outputs.name }}-${{ steps.package.outputs.version }}.tgz
-          asset_name: ${{ steps.package.outputs.name }}-${{ steps.package.outputs.version }}.tgz
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "./contentstack-datasync-mongodb-sdk-${{ steps.package.outputs.version }}.tgz"
+          asset_name: "contentstack-datasync-mongodb-sdk-${{ steps.package.outputs.version }}.tgz"
           asset_content_type: application/tgz
