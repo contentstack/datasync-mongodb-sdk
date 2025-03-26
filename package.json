@@ -1,7 +1,7 @@
 {
   "author": "Contentstack Ecosystem <ecosystem@contentstack.com>",
-  "name": "datasync-mongodb-sdk",
-  "version": "1.0.9",
+  "name": "@contentstack/datasync-mongodb-sdk",
+  "version": "1.0.9-beta.1",
   "description": "Mongodb query wrapper around contents synced via @contentstack/content-store-mongodb",
   "main": "dist/index.js",
   "scripts": {
