@@ -1857,9 +1857,8 @@ export class Stack {
       $or: [],
     }
 
-    const sanitizedQueryBucket = this.sanitizeQueryBucket(queryBucket);
     for (let i = 0, j = paths.length; i < j; i++) {
-      this.fetchPathDetails(entries, locale, paths[i].split('.'), sanitizedQueryBucket, shelf, true, entries, 0)
+      this.fetchPathDetails(entries, locale, paths[i].split('.'), queryBucket, shelf, true, entries, 0)
     }
 
     if (shelf.length === 0) {
@@ -1870,7 +1869,7 @@ export class Stack {
         content_type_uid: this.types.assets,
         locale,
       }, this.collectionNames))
-      .find(sanitizedQueryBucket)  // Use sanitized query here
+      .find(queryBucket)
       .project({
         _content_type_uid: 0,
         _id: 0,
@@ -1934,6 +1933,7 @@ export class Stack {
   private fetchPathDetails(data: any, locale: string, pathArr: string[], queryBucket: IQuery, shelf,
                            assetsOnly = false, parent, pos, counter = 0) {
     if (counter === (pathArr.length)) {
+      queryBucket = this.sanitizeQueryBucket(queryBucket)    
       if (data && typeof data === 'object') {
         if (data instanceof Array && data.length) {
           data.forEach((elem, idx) => {
@@ -2000,13 +2000,13 @@ export class Stack {
         // tslint:disable-next-line: prefer-for-of
         for (let i = 0; i < data.length; i++) {
           if (data[i][currentField]) {
-            this.fetchPathDetails(data[i][currentField], locale, pathArr, queryBucket, shelf, assetsOnly, data[i],
+            this.fetchPathDetails(data[i][currentField], locale, pathArr, this.sanitizeQueryBucket(queryBucket)  , shelf, assetsOnly, data[i],
               currentField, counter)
           }
         }
       } else {
         if (data[currentField]) {
-          this.fetchPathDetails(data[currentField], locale, pathArr, queryBucket, shelf, assetsOnly, data,
+          this.fetchPathDetails(data[currentField], locale, pathArr, this.sanitizeQueryBucket(queryBucket), shelf, assetsOnly, data,
             currentField, counter)
         }
       }
@@ -2101,11 +2101,12 @@ export class Stack {
     if (!this.sanityQueryAny(query)) {
       throw new Error('Invalid query provided');
     }
+    const querySanitize = this.sanitizeQueryBucket(query)
     const schemas = await this.db.collection(getCollectionName({
         content_type_uid: this.types.content_types,
         locale,
       }, this.collectionNames))
-      .find(query)
+      .find(querySanitize)
       .project({
         _assets: 1,
         _id: 0,
@@ -2196,11 +2197,12 @@ export class Stack {
     if (!this.sanitizeIQuery(query)) {
       throw new Error('Invalid queries provided');
     }
+    const sanitizeQuery = this.sanitizeQueryBucket(query)
     const result = await this.db.collection(getCollectionName({
         content_type_uid: 'entries',
         locale,
       }, this.collectionNames))
-      .find(query)
+      .find(sanitizeQuery)
       .project({
         _content_type_uid: 0,
         _id: 0,
@@ -2261,7 +2263,7 @@ export class Stack {
     // iterate over each path in the entries and fetch the references
     // while fetching, keep track of their location
     for (let i = 0, j = paths.length; i < j; i++) {
-      this.fetchPathDetails(entries, locale, paths[i].split('.'), queries, objectPointerList, true, entries, 0)
+      this.fetchPathDetails(entries, locale, paths[i].split('.'), this.sanitizeQueryBucket(queries), objectPointerList, true, entries, 0)
     }
 
     // even after traversing, if no references were found, simply return the entries found thusfar
@@ -2437,7 +2439,7 @@ export class Stack {
   private sanitizeQueryBucket(queryBucket: any): any {
     // Validate basic structure
     if (!queryBucket || typeof queryBucket !== 'object') {
-      return { $or: [] };
+      return { $or: [{ _id: { $exists: true } }] }; // Default query that matches all documents
     }
     
     // Create a new sanitized query object
@@ -2445,7 +2447,7 @@ export class Stack {
     
     // Ensure $or is an array
     if (!Array.isArray(queryBucket.$or)) {
-      return sanitized;
+      return { $or: [{ _id: { $exists: true } }] }; // Default query that matches all documents
     }
     
     // Process each item in the $or array
@@ -2479,6 +2481,12 @@ export class Stack {
         sanitized.$or.push(safeItem);
       }
     }
+    
+    // If sanitized.$or is empty, use a default query that matches all documents
+    if (sanitized.$or.length === 0) {
+      return { $or: [{ _id: { $exists: true } }] };
+    }
+    
     return sanitized;
   }
 }
