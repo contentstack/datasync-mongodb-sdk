@@ -1857,8 +1857,9 @@ export class Stack {
       $or: [],
     }
 
+    const sanitizedQueryBucket = this.sanitizeQueryBucket(queryBucket);
     for (let i = 0, j = paths.length; i < j; i++) {
-      this.fetchPathDetails(entries, locale, paths[i].split('.'), queryBucket, shelf, true, entries, 0)
+      this.fetchPathDetails(entries, locale, paths[i].split('.'), sanitizedQueryBucket, shelf, true, entries, 0)
     }
 
     if (shelf.length === 0) {
@@ -1869,7 +1870,7 @@ export class Stack {
         content_type_uid: this.types.assets,
         locale,
       }, this.collectionNames))
-      .find(queryBucket)
+      .find(sanitizedQueryBucket)  // Use sanitized query here
       .project({
         _content_type_uid: 0,
         _id: 0,
@@ -2017,14 +2018,12 @@ export class Stack {
 
   private async bindLeftoverAssets(queries: IQuery, locale: string, pointerList: IShelf[]) {
     // const contents = await readFile(getAssetsPath(locale) + '.json')
-    if (!this.sanitizeIQuery(queries)) {
-      throw new Error('Invalid queries provided');
-    }
+    const queriesSanitize = this.sanitizeQueryBucket(queries)
     const filteredAssets = await this.db.collection(getCollectionName({
       content_type_uid: this.types.assets,
       locale,
     }, this.collectionNames))
-    .find(queries)
+    .find(queriesSanitize)
     .project({
       _content_type_uid: 0,
       _id: 0,
@@ -2433,5 +2432,53 @@ export class Stack {
       return false;
     }
     return true;
+  }
+
+  private sanitizeQueryBucket(queryBucket: any): any {
+    // Validate basic structure
+    if (!queryBucket || typeof queryBucket !== 'object') {
+      return { $or: [] };
+    }
+    
+    // Create a new sanitized query object
+    const sanitized = { $or: [] };
+    
+    // Ensure $or is an array
+    if (!Array.isArray(queryBucket.$or)) {
+      return sanitized;
+    }
+    
+    // Process each item in the $or array
+    for (const item of queryBucket.$or) {
+      if (!item || typeof item !== 'object') {
+        continue;
+      }
+      
+      const safeItem: any = {};
+      
+      // Only allow specific fields with proper type validation
+      if (typeof item._content_type_uid === 'string') {
+        safeItem._content_type_uid = item._content_type_uid;
+      }
+      
+      if (typeof item.uid === 'string') {
+        safeItem.uid = item.uid;
+      }
+      
+      if (typeof item.locale === 'string') {
+        safeItem.locale = item.locale;
+      }
+      
+      if (item._version && typeof item._version === 'object' && 
+          typeof item._version.$exists === 'boolean') {
+        safeItem._version = { $exists: item._version.$exists };
+      }
+      
+      // Only add if required fields are present
+      if (safeItem._content_type_uid && safeItem.uid) {
+        sanitized.$or.push(safeItem);
+      }
+    }
+    return sanitized;
   }
 }
