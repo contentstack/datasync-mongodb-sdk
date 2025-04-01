@@ -1930,8 +1930,8 @@ export class Stack {
     return this.includeReferenceIteration(queries, schemaList, locale, pendingPath, shelf)
   }
 
-  private fetchPathDetails(data: any, locale: string, pathArr: string[], queryBucket: IQuery, shelf,
-                           assetsOnly = false, parent, pos, counter = 0) {
+  private fetchPathDetails(data: any = {}, locale, pathArr, queryBucket: IQuery, shelf: any = [],
+                            assetsOnly = false, parent: any = {}, pos, counter = 0) {
     if (counter === (pathArr.length)) {
       queryBucket = this.sanitizeQueryBucket(queryBucket)    
       if (data && typeof data === 'object') {
@@ -2437,28 +2437,19 @@ export class Stack {
   }
 
   private sanitizeQueryBucket(queryBucket: any): any {
-    // Validate basic structure
     if (!queryBucket || typeof queryBucket !== 'object') {
-      return { $or: [{ _id: { $exists: true } }] }; // Default query that matches all documents
+      return { $or: [{ _id: { $exists: true } }] };
     }
-    
-    // Create a new sanitized query object
     const sanitized = { $or: [] };
-    
-    // Ensure $or is an array
     if (!Array.isArray(queryBucket.$or)) {
-      return { $or: [{ _id: { $exists: true } }] }; // Default query that matches all documents
+      return { $or: [{ _id: { $exists: true } }] };
     }
-    
-    // Process each item in the $or array
     for (const item of queryBucket.$or) {
       if (!item || typeof item !== 'object') {
         continue;
       }
       
       const safeItem: any = {};
-      
-      // Only allow specific fields with proper type validation
       if (typeof item._content_type_uid === 'string') {
         safeItem._content_type_uid = item._content_type_uid;
       }
@@ -2475,14 +2466,10 @@ export class Stack {
           typeof item._version.$exists === 'boolean') {
         safeItem._version = { $exists: item._version.$exists };
       }
-      
-      // Only add if required fields are present
       if (safeItem._content_type_uid && safeItem.uid) {
         sanitized.$or.push(safeItem);
       }
     }
-    
-    // If sanitized.$or is empty, use a default query that matches all documents
     if (sanitized.$or.length === 0) {
       return { $or: [{ _id: { $exists: true } }] };
     }
