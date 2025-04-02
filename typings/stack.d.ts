@@ -1094,4 +1094,5 @@ export declare class Stack {
     private getAllReferencePaths;
     private sanitizeIQuery;
     private sanityQueryAny;
+    private sanitizeQueryBucket;
 }
