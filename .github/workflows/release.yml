@@ -28,12 +28,12 @@ jobs:
         uses: codex-team/action-nodejs-package-info@v1.1
 
       # Install npm-pack-all to create a package archive
-      - name: Install npm-pack-all
-        run: npm install npm-pack-all
-
+      - name: Install npm pack
+        run: npm install npm-pack
+        
       # Pack the package into a .tgz archive
       - name: Pack the npm package
-        run: node node_modules/.bin/npm-pack-all
+        run: npm pack
 
       # Publish the package to npm
       - name: Publish to npm
