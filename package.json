@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "scripts": {
     "clean": "rimraf dist typings coverage",
-    "build-ts": "npm run clean && tsc && husky && chmod +x .husky/pre-commit",
+    "build-ts": "npm run clean && tsc && husky install && husky && chmod +x .husky/pre-commit",
     "build-doc": "npm run build-ts && ./node_modules/.bin/jsdoc dist/ -r -R README.md -d docs",
     "watch-ts": "npm run clean && tsc -w",
     "compile": "tsc",
