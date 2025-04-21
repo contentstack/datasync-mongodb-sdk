@@ -1930,9 +1930,10 @@ export class Stack {
     return this.includeReferenceIteration(queries, schemaList, locale, pendingPath, shelf)
   }
 
-  private fetchPathDetails(data: any, locale: string, pathArr: string[], queryBucket: IQuery, shelf,
-                           assetsOnly = false, parent, pos, counter = 0) {
+  private fetchPathDetails(data: any = {}, locale, pathArr, queryBucket: IQuery, shelf: any = [],
+                            assetsOnly = false, parent: any = {}, pos, counter = 0) {
     if (counter === (pathArr.length)) {
+      queryBucket = this.sanitizeQueryBucket(queryBucket)    
       if (data && typeof data === 'object') {
         if (data instanceof Array && data.length) {
           data.forEach((elem, idx) => {
@@ -1999,13 +2000,13 @@ export class Stack {
         // tslint:disable-next-line: prefer-for-of
         for (let i = 0; i < data.length; i++) {
           if (data[i][currentField]) {
-            this.fetchPathDetails(data[i][currentField], locale, pathArr, queryBucket, shelf, assetsOnly, data[i],
+            this.fetchPathDetails(data[i][currentField], locale, pathArr, this.sanitizeQueryBucket(queryBucket)  , shelf, assetsOnly, data[i],
               currentField, counter)
           }
         }
       } else {
         if (data[currentField]) {
-          this.fetchPathDetails(data[currentField], locale, pathArr, queryBucket, shelf, assetsOnly, data,
+          this.fetchPathDetails(data[currentField], locale, pathArr, this.sanitizeQueryBucket(queryBucket), shelf, assetsOnly, data,
             currentField, counter)
         }
       }
@@ -2017,14 +2018,12 @@ export class Stack {
 
   private async bindLeftoverAssets(queries: IQuery, locale: string, pointerList: IShelf[]) {
     // const contents = await readFile(getAssetsPath(locale) + '.json')
-    if (!this.sanitizeIQuery(queries)) {
-      throw new Error('Invalid queries provided');
-    }
+    const queriesSanitize = this.sanitizeQueryBucket(queries)
     const filteredAssets = await this.db.collection(getCollectionName({
       content_type_uid: this.types.assets,
       locale,
     }, this.collectionNames))
-    .find(queries)
+    .find(queriesSanitize)
     .project({
       _content_type_uid: 0,
       _id: 0,
@@ -2102,11 +2101,12 @@ export class Stack {
     if (!this.sanityQueryAny(query)) {
       throw new Error('Invalid query provided');
     }
+    const querySanitize = this.sanitizeQueryBucket(query)
     const schemas = await this.db.collection(getCollectionName({
         content_type_uid: this.types.content_types,
         locale,
       }, this.collectionNames))
-      .find(query)
+      .find(querySanitize)
       .project({
         _assets: 1,
         _id: 0,
@@ -2197,11 +2197,12 @@ export class Stack {
     if (!this.sanitizeIQuery(query)) {
       throw new Error('Invalid queries provided');
     }
+    const sanitizeQuery = this.sanitizeQueryBucket(query)
     const result = await this.db.collection(getCollectionName({
         content_type_uid: 'entries',
         locale,
       }, this.collectionNames))
-      .find(query)
+      .find(sanitizeQuery)
       .project({
         _content_type_uid: 0,
         _id: 0,
@@ -2262,7 +2263,7 @@ export class Stack {
     // iterate over each path in the entries and fetch the references
     // while fetching, keep track of their location
     for (let i = 0, j = paths.length; i < j; i++) {
-      this.fetchPathDetails(entries, locale, paths[i].split('.'), queries, objectPointerList, true, entries, 0)
+      this.fetchPathDetails(entries, locale, paths[i].split('.'), this.sanitizeQueryBucket(queries), objectPointerList, true, entries, 0)
     }
 
     // even after traversing, if no references were found, simply return the entries found thusfar
@@ -2433,5 +2434,46 @@ export class Stack {
       return false;
     }
     return true;
+  }
+
+  private sanitizeQueryBucket(queryBucket: any): any {
+    if (!queryBucket || typeof queryBucket !== 'object') {
+      return { $or: [{ _id: { $exists: true } }] };
+    }
+    const sanitized = { $or: [] };
+    if (!Array.isArray(queryBucket.$or)) {
+      return { $or: [{ _id: { $exists: true } }] };
+    }
+    for (const item of queryBucket.$or) {
+      if (!item || typeof item !== 'object') {
+        continue;
+      }
+      
+      const safeItem: any = {};
+      if (typeof item._content_type_uid === 'string') {
+        safeItem._content_type_uid = item._content_type_uid;
+      }
+      
+      if (typeof item.uid === 'string') {
+        safeItem.uid = item.uid;
+      }
+      
+      if (typeof item.locale === 'string') {
+        safeItem.locale = item.locale;
+      }
+      
+      if (item._version && typeof item._version === 'object' && 
+          typeof item._version.$exists === 'boolean') {
+        safeItem._version = { $exists: item._version.$exists };
+      }
+      if (safeItem._content_type_uid && safeItem.uid) {
+        sanitized.$or.push(safeItem);
+      }
+    }
+    if (sanitized.$or.length === 0) {
+      return { $or: [{ _id: { $exists: true } }] };
+    }
+    
+    return sanitized;
   }
 }
