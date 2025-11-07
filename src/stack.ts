@@ -23,6 +23,10 @@ import {
   validateConfig,
   validateURI,
 } from './util'
+import {
+  ErrorMessages,
+  WarningMessages,
+} from './messages'
 
 interface IShelf {
   path: string,
@@ -102,7 +106,7 @@ export class Stack {
    */
   public ascending(field) {
     if (typeof this.q.content_type_uid !== 'string' || typeof field !== 'string' || field.length === 0) {
-      throw new Error('Kindly provide valid parameters for .ascending!')
+      throw new Error(ErrorMessages.INVALID_ASCENDING_PARAMS)
     } else if (this.internal.sort && typeof this.internal.sort === 'object') {
       this.internal.sort[field] = 1
     } else {
@@ -140,7 +144,7 @@ export class Stack {
    */
   public descending(field) {
     if (typeof this.q.content_type_uid !== 'string' || typeof field !== 'string' || field.length === 0) {
-      throw new Error('Kindly provide valid parameters for .descending()!')
+      throw new Error(ErrorMessages.INVALID_DESCENDING_PARAMS)
     } else if (this.internal.sort && typeof this.internal.sort === 'object') {
       this.internal.sort[field] = -1
     } else {
@@ -220,7 +224,7 @@ export class Stack {
    */
   public language(code) {
     if (typeof code !== 'string' || code.length === 0) {
-      throw new Error('Kindly pass valid parameters for .language()!')
+      throw new Error(ErrorMessages.INVALID_LANGUAGE_PARAMS)
     }
     this.q.locale = code
 
@@ -257,7 +261,7 @@ export class Stack {
    */
   public and(queries) {
     if (typeof queries !== 'object' || !Array.isArray(queries)) {
-      throw new Error('Kindly provide valid parameters for .and()!')
+      throw new Error(ErrorMessages.INVALID_AND_PARAMS)
     } else if (this.q.query && typeof this.q.query === 'object') {
       this.q.query = merge(this.q.query, {
         $and: queries,
@@ -301,7 +305,7 @@ export class Stack {
    */
   public or(queries) {
     if (typeof queries !== 'object' || !Array.isArray(queries)) {
-      throw new Error('Kindly provide valid parameters for .or()!')
+      throw new Error(ErrorMessages.INVALID_OR_PARAMS)
     } else if (this.q.query && typeof this.q.query === 'object') {
       this.q.query = merge(this.q.query, {
         $or: queries,
@@ -343,7 +347,7 @@ export class Stack {
    */
   public lessThan(key, value) {
     if (typeof key !== 'string' || typeof value === 'undefined') {
-      throw new Error('Kindly pass valid key and value parameters for \'.lessThan()\'')
+      throw new Error(ErrorMessages.INVALID_LESSTHAN_PARAMS)
     } else if (this.q.query && typeof this.q.query === 'object') {
       this.q.query[key] = {
         $lt: value,
@@ -387,7 +391,7 @@ export class Stack {
    */
   public lessThanOrEqualTo(key, value) {
     if (typeof key !== 'string' || typeof value === 'undefined') {
-      throw new Error('Kindly pass valid key and value parameters for \'.lessThanOrEqualTo()\'')
+      throw new Error(ErrorMessages.INVALID_LESSTHAN_OR_EQUAL_PARAMS)
     } else if (this.q.query && typeof this.q.query === 'object') {
       this.q.query[key] = {
         $lte: value,
@@ -431,7 +435,7 @@ export class Stack {
    */
   public greaterThan(key, value) {
     if (typeof key !== 'string' || typeof value === 'undefined') {
-      throw new Error('Kindly pass valid key and value parameters for \'.greaterThan()\'')
+      throw new Error(ErrorMessages.INVALID_GREATERTHAN_PARAMS)
     } else if (this.q.query && typeof this.q.query === 'object') {
       this.q.query[key] = {
         $gt: value,
@@ -475,7 +479,7 @@ export class Stack {
    */
   public greaterThanOrEqualTo(key, value) {
     if (typeof key !== 'string' || typeof value === 'undefined') {
-      throw new Error('Kindly pass valid key and value parameters for \'.greaterThanOrEqualTo()\'')
+      throw new Error(ErrorMessages.INVALID_GREATERTHAN_OR_EQUAL_PARAMS)
     } else if (this.q.query && typeof this.q.query === 'object') {
       this.q.query[key] = {
         $gte: value,
@@ -524,7 +528,7 @@ export class Stack {
    */
   public notEqualTo(key, value) {
     if (typeof key !== 'string' || typeof value === 'undefined') {
-      throw new Error('Kindly pass valid key and value parameters for \'.notEqualTo()\'')
+      throw new Error(ErrorMessages.INVALID_NOTEQUAL_PARAMS)
     } else if (this.q.query && typeof this.q.query === 'object') {
       this.q.query[key] = {
         $ne: value,
@@ -574,7 +578,7 @@ export class Stack {
    */
   public containedIn(key, value) {
     if (typeof key !== 'string' || typeof value !== 'object' || !(value instanceof Array)) {
-      throw new Error('Kindly pass valid key and value parameters for \'.containedIn()\'')
+      throw new Error(ErrorMessages.INVALID_CONTAINED_IN_PARAMS)
     } else if (this.q.query && typeof this.q.query === 'object') {
       this.q.query[key] = {
         $in: value,
@@ -624,7 +628,7 @@ export class Stack {
    */
   public notContainedIn(key, value) {
     if (typeof key !== 'string' || typeof value !== 'object' || !(value instanceof Array)) {
-      throw new Error('Kindly pass valid key and value parameters for \'.notContainedIn()\'')
+      throw new Error(ErrorMessages.INVALID_NOT_CONTAINED_IN_PARAMS)
     } else if (this.q.query && typeof this.q.query === 'object') {
       this.q.query[key] = {
         $nin: value,
@@ -674,7 +678,7 @@ export class Stack {
    */
   public exists(key) {
     if (typeof key !== 'string') {
-      throw new Error('Kindly pass valid key for \'.exists()\'')
+      throw new Error(ErrorMessages.INVALID_EXISTS_PARAMS)
     } else if (this.q.query && typeof this.q.query === 'object') {
       this.q.query[key] = {
         $exists: true,
@@ -723,7 +727,7 @@ export class Stack {
    */
   public notExists(key) {
     if (typeof key !== 'string') {
-      throw new Error('Kindly pass valid key for \'.notExists()\'')
+      throw new Error(ErrorMessages.INVALID_NOT_EXISTS_PARAMS)
     } else if (this.q.query && typeof this.q.query === 'object') {
       this.q.query[key] = {
         $exists: false,
@@ -766,7 +770,7 @@ export class Stack {
 
       return stack
     }
-    throw new Error('Kindly pass the content type\'s uid')
+    throw new Error(ErrorMessages.MISSING_CONTENT_TYPE_UID)
   }
 
   /**
@@ -793,7 +797,7 @@ export class Stack {
    */
   public entry(uid ? ) {
     if (!(this.q.content_type_uid)) {
-      throw new Error('Kindly call \'contentType()\' before \'entry()\'!')
+      throw new Error(ErrorMessages.MISSING_CONTENT_TYPE_FOR_ENTRY)
     }
     if (uid && typeof uid === 'string') {
       this.q.query = this.q.query || {}
@@ -830,7 +834,7 @@ export class Stack {
 
       return this
     }
-    throw new Error('Kindly call \'contentType()\' before \'entries()\'!')
+    throw new Error(ErrorMessages.MISSING_CONTENT_TYPE_FOR_ENTRIES)
   }
 
   /**
@@ -1013,7 +1017,7 @@ export class Stack {
 
       return this
     }
-    throw new Error('Kindly provide a valid \'numeric\' value for \'limit()\'')
+    throw new Error(ErrorMessages.INVALID_LIMIT_VALUE)
   }
 
   /**
@@ -1046,7 +1050,7 @@ export class Stack {
 
       return this
     }
-    throw new Error('Kindly provide a valid \'numeric\' value for \'skip()\'')
+    throw new Error(ErrorMessages.INVALID_SKIP_VALUE)
   }
 
   /**
@@ -1106,7 +1110,7 @@ export class Stack {
    */
   public only(fields) {
     if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
-      throw new Error('Kindly provide valid \'field\' values for \'only()\'')
+      throw new Error(ErrorMessages.INVALID_ONLY_PARAMS)
     }
     this.internal.only = this.internal.only || {}
     this.internal.only._id = 0
@@ -1144,7 +1148,7 @@ export class Stack {
    */
   public except(fields) {
     if (!fields || typeof fields !== 'object' || !(fields instanceof Array) || fields.length === 0) {
-      throw new Error('Kindly provide valid \'field\' values for \'except()\'')
+      throw new Error(ErrorMessages.INVALID_EXCEPT_PARAMS)
     }
     this.internal.except = this.internal.except || {}
     fields.forEach((field) => {
@@ -1184,7 +1188,7 @@ export class Stack {
    */
   public regex(field, pattern, options = 'i') {
     if (!(field) || !(pattern) || typeof field !== 'string' || typeof pattern !== 'string') {
-      throw new Error('Kindly provide a valid field and pattern value for \'.regex()\'')
+      throw new Error(ErrorMessages.INVALID_REGEX_PARAMS)
     } else if (this.q.query && typeof this.q.query === 'object') {
       this.q.query = merge(this.q.query, {
         [field]: {
@@ -1227,7 +1231,7 @@ export class Stack {
    */
   public tags(values) {
     if (!values || typeof values !== 'object' || !(values instanceof Array)) {
-      throw new Error('Kindly provide valid \'field\' values for \'tags()\'')
+      throw new Error(ErrorMessages.INVALID_TAGS_PARAMS)
     }
     // filter non-string keys
     remove(values, (value) => {
@@ -1282,7 +1286,7 @@ export class Stack {
    */
   public where(expr) {
     if (!(expr)) {
-      throw new Error('Kindly provide a valid field and expr/fn value for \'.where()\'')
+      throw new Error(ErrorMessages.INVALID_WHERE_PARAMS)
     } else if (this.q.query && typeof this.q.query === 'object') {
       if (typeof expr === 'function') {
         expr = expr.toString()
@@ -1440,7 +1444,7 @@ export class Stack {
       return this
     }
 
-    throw new Error('Kindly pass a query object for \'.queryReferences()\'')
+    throw new Error(ErrorMessages.INVALID_QUERY_REFERENCES_PARAMS)
   }
 
   /**
@@ -1477,7 +1481,7 @@ export class Stack {
    * @returns {Stack} Returns 'this' instance (of Stack)
    */
   public includeReferences(depth?: number) {
-    console.warn('.includeReferences() is a relatively slow query..!')
+    console.warn(WarningMessages.SLOW_INCLUDE_REFERENCES)
     if (typeof depth === 'number') {
       this.q.referenceDepth = depth
     }
@@ -1501,7 +1505,7 @@ export class Stack {
    */
   public include(fields) {
     if (fields.length === 0) {
-      throw new Error('Kindly pass a valid reference field path to \'.include()\' ')
+      throw new Error(ErrorMessages.INVALID_INCLUDE_PARAMS)
     } else if (typeof fields === 'string') {
       this.internal.includeSpecificReferences = [fields]
     } else {
@@ -2099,7 +2103,7 @@ export class Stack {
 
   private async getReferencePath(query, locale, currentInclude) {
     if (!this.sanityQueryAny(query)) {
-      throw new Error('Invalid query provided');
+      throw new Error(ErrorMessages.INVALID_QUERY)
     }
     const querySanitize = this.sanitizeQueryBucket(query)
     const schemas = await this.db.collection(getCollectionName({
@@ -2195,7 +2199,7 @@ export class Stack {
   private async fetchEntries(query: IQuery, locale: string, paths: string[], include: string[], includeAll:
     boolean = false) {
     if (!this.sanitizeIQuery(query)) {
-      throw new Error('Invalid queries provided');
+      throw new Error(ErrorMessages.INVALID_QUERIES)
     }
     const sanitizeQuery = this.sanitizeQueryBucket(query)
     const result = await this.db.collection(getCollectionName({
