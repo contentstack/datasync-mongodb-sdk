@@ -5,6 +5,7 @@
  */
 
 import { uniq } from 'lodash'
+import { ErrorMessages } from './messages'
 
 /**
  * @private
@@ -16,7 +17,7 @@ import { uniq } from 'lodash'
  */
 export const validateURI = (uri) => {
   if (typeof uri !== 'string' || uri.length === 0) {
-    throw new Error(`Mongodb connection url: ${uri} must be of type string`)
+    throw new Error(ErrorMessages.INVALID_MONGODB_URI(uri))
   }
 
   return uri
@@ -59,7 +60,7 @@ const getParents = (child, mapping) => {
 
 const validateContentStore = (contentStore) => {
   if (typeof contentStore.dbName !== 'string' || contentStore.dbName.length === 0) {
-    throw new Error('Contentstore dbName should be of type string and not empty!')
+    throw new Error(ErrorMessages.INVALID_DBNAME)
   }
 
   if (typeof contentStore.collectionName === 'string') {
