@@ -1,0 +1,41 @@
+---
+description: PR review checklist for DataSync MongoDB SDK — API docs, compatibility, errors, tests, dependencies.
+alwaysApply: true
+---
+
+# Code review checklist
+
+## Product terminology
+
+- This repo is the **DataSync MongoDB SDK** (local MongoDB over synced content). Do **not** describe changes as **CDA** (Delivery API) or **CMA** (Management API) unless the PR explicitly integrates separate HTTP clients — that is not the core of this package.
+
+## Public API and docs
+
+- New or changed **public** methods on `Contentstack` / `Stack` should have accurate **JSDoc** consistent with existing files.
+- README / example snippets should stay aligned with **`Stack.connect()`** and config shape in `src/config.ts`.
+
+## Backward compatibility
+
+- Avoid breaking changes to method names, config keys, and default behaviors without a semver-major plan.
+- Consider existing synced MongoDB document shapes and locale/collection naming.
+
+## Errors and behavior
+
+- Prefer consistent error messages via **`src/messages.ts`** where applicable.
+- Preserve null/undefined handling consistent with MongoDB driver and existing query chains.
+
+## Dependencies and security
+
+- New dependencies need justification (bundle size, maintenance, overlap with `lodash` / `mongodb` / `sift`).
+- Be mindful of **SCA** / supply-chain expectations (Snyk runs in husky pre-commit for many devs).
+
+## Tests
+
+- Meaningful **Jest** coverage for new branches; run **`npm test`** with MongoDB available.
+- Update or add fixtures under **`test/data/`** when adding query scenarios.
+
+## Severity (optional)
+
+- **Blocker:** Crashes, data corruption risk, security issues, broken public API contract.
+- **Major:** Incorrect results, missing tests for critical paths, breaking changes without version strategy.
+- **Minor:** Style, small refactors, doc typos.
