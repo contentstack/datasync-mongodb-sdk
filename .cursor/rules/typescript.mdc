@@ -1,0 +1,28 @@
+---
+description: TypeScript conventions for this repo — compiler settings, TSLint, and src/ layout.
+globs:
+  - src/**/*.ts
+  - typings/**/*.ts
+alwaysApply: false
+---
+
+# TypeScript — datasync-mongodb-sdk
+
+## Toolchain
+
+- **TypeScript** ~4.9 (`package.json` / `tsconfig.json`).
+- **Module:** CommonJS, `target` ES6, `moduleResolution` node. Declarations emit to `typings/`, JS to `dist/`.
+- **Strictness:** `alwaysStrict`, `noImplicitReturns`, `noUnusedLocals`, `noUnusedParameters`, `noFallthroughCasesInSwitch`.
+
+## Style (TSLint)
+
+Align with `tslint.json`: **2-space** indent, **single quotes**, **no semicolons** (`semicolon: never`), **max line length 120**, `only-arrow-functions`, `ordered-imports`, `interface-name` with `I` prefix where used, `no-default-export` (prefer named exports from modules — entry re-exports via `src/index.ts`).
+
+## Layout
+
+- Keep new logic in `src/`; avoid expanding `example/` for core behavior.
+- Match existing patterns: JSDoc blocks on public classes/methods where the file already uses them.
+
+## Logging
+
+- Avoid adding `console.log` / noisy logging in library paths; TSLint warns on several `console` methods.

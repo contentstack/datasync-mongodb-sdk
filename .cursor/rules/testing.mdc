@@ -1,0 +1,35 @@
+---
+description: Jest tests, MongoDB integration requirements, and test data layout for datasync-mongodb-sdk.
+globs:
+  - test/**/*.ts
+  - jest.config.js
+alwaysApply: false
+---
+
+# Testing
+
+## Runner and config
+
+- **Jest** with **`ts-jest`** preset (`jest.config.js`).
+- **Environment:** `node`.
+- **Match:** `**/test/**/*.ts` (and `.js` if present).
+- **Coverage:** collected to `coverage/` (JSON + HTML reporters). `test/data/*` paths are ignored per `testPathIgnorePatterns`.
+
+## Integration vs unit
+
+- Tests are largely **integration**: they connect to a **real MongoDB** via `Stack.connect()`, insert fixtures, assert query results, then tear down collections / close the client.
+- There is no separate `test/integration` folder; behavior is split by topic files (e.g. `core.ts`, `queries.ts`, `references.ts`).
+
+## Fixtures
+
+- Shared sample documents: `test/data/*.ts` (e.g. `blog.ts`, `author.ts`, `content_types.ts`).
+- Stack config for tests: **`test/config.ts`** (e.g. `dbName: 'sync-test'`).
+
+## Environment
+
+- Default Mongo URL comes from merged **`src/config.ts`** (`contentStore.url`) unless tests override `contentStore` in the config object passed to `Contentstack.Stack(...)`.
+- No standard **`env` file** is defined in-repo for tests; use local MongoDB or explicitly pass `contentStore.url` in test configs.
+
+## Naming
+
+- Test files use descriptive topic names (`comparison-operators.ts`, `skip-limit.ts`, etc.), not `*.test.ts` — Jest picks them up via `testMatch`.
