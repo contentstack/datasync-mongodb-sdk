@@ -1,14 +1,18 @@
-# Agent skills — `@contentstack/datasync-mongodb-sdk`
+# Skills — `@contentstack/datasync-mongodb-sdk`
 
-Short index of per-topic folders containing **SKILL.md** files. Use them for deeper context than the Cursor rules alone.
+**This directory is the source of truth** for detailed conventions (workflow, TypeScript/TSLint, DataSync MongoDB SDK behavior, tests, code review). Read **[`AGENTS.md`](../AGENTS.md)** at the repo root for the index, identity, and command tables; each skill is a folder with **`SKILL.md`** (YAML frontmatter: `name`, `description`).
 
-| Skill folder | When to use it |
-|--------------|----------------|
-| [code-review](./code-review/SKILL.md) | PR preparation, review criteria, severity labels, terminology (DataSync vs CDA/CMA). |
-| [testing](./testing/SKILL.md) | Running Jest, MongoDB prerequisites, fixtures, test naming. |
-| [contentstack-typescript-datasync-mongodb](./contentstack-typescript-datasync-mongodb/SKILL.md) | SDK mental model (`Stack`, config, MongoDB), where to change query or connection behavior. |
+## When to use which skill
 
-## Related
+| Skill folder | Use when |
+|--------------|----------|
+| [`dev-workflow/`](dev-workflow/SKILL.md) | Branches, `npm` scripts, Husky, CI, version bumps |
+| [`typescript/`](typescript/SKILL.md) | `tsconfig`, TSLint, `src/` layout, JSDoc |
+| [`datasync-mongodb/`](datasync-mongodb/SKILL.md) | `Stack`, MongoDB config, queries — DataSync vs CDA/CMA |
+| [`testing/`](testing/SKILL.md) | Jest, MongoDB test setup, fixtures, `jest.config.js` |
+| [`code-review/`](code-review/SKILL.md) | PR checklist, semver, terminology |
 
-- [AGENTS.md](../AGENTS.md) — single entry point for tools, paths, and commands.
-- [.cursor/rules/README.md](../.cursor/rules/README.md) — rule index and globs.
+## How to use these docs
+
+- **Humans / any tool:** Start at **`AGENTS.md`**, then open the relevant **`skills/<name>/SKILL.md`**.
+- **Cursor users:** **[`.cursor/rules/README.md`](../.cursor/rules/README.md)** (the only file under **`.cursor/rules/`**) points at **`AGENTS.md`** and **`skills/`**.

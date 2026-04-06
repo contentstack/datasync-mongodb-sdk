@@ -1,101 +1,92 @@
-# Agent guidance — `@contentstack/datasync-mongodb-sdk`
+# AI agent docs — `@contentstack/datasync-mongodb-sdk`
+
+You are working on the **Contentstack DataSync MongoDB SDK** — a library that queries **MongoDB** (or a Mongo-compatible store) holding content synced via **Contentstack DataSync**, **not** the Content **Delivery** (CDA) or **Management** (CMA) HTTP SDKs. Core behavior uses the **MongoDB driver** and queries against **persisted sync data**, not live stack REST calls for normal reads.
 
 ## Single source of truth
 
-Use this file and **`skills/`** as the **canonical** place for project context, workflows, and review standards so contributors get consistent guidance in any IDE or agent (Cursor, Copilot, CLI, others).
-
 | Layer | Role |
 |-------|------|
-| **`AGENTS.md`** (this file) | Entry point: package identity, repo links, tech stack, source layout, commands, and skills index |
-| **`skills/<topic>/SKILL.md`** | Full detail: SDK mental model, testing, and code review checklists |
-| **`.cursor/rules/`** | Cursor-only scoped pointers (`description` / `globs` / `alwaysApply`) that reference this file and `skills/` |
+| **[`.cursor/rules/README.md`](.cursor/rules/README.md)** | Optional Cursor pointer (the **only** file under `.cursor/rules/`); links to **`AGENTS.md`** and **`skills/`** |
+| **`AGENTS.md`** (this file) | Universal entry: identity, out-of-scope, links, tech stack, commands, skills index |
+| **`skills/<name>/SKILL.md`** | Full conventions and checklists (source of truth for depth) |
 
-**Flow:** Cursor rules → **`AGENTS.md`** → **`skills/*.md`**
+**Flow:** [`.cursor/rules/README.md`](.cursor/rules/README.md) → **`AGENTS.md`** → **`skills/<name>/SKILL.md`**
 
-## What this package is
+## Out of scope (unless comparing or documenting migration)
 
-**Contentstack DataSync MongoDB SDK** is a **Node.js/TypeScript** library that **queries MongoDB** holding content synced from Contentstack DataSync (per `package.json`, contents synced via **`@contentstack/content-store-mongodb`**). It uses the **MongoDB Node.js driver**, **lodash**, and **sift** over **local collections**.
-
-It is **not** the Contentstack **Delivery** (CDA) SDK or **Management** (CMA) SDK, and it does **not** call Contentstack REST APIs for core behavior.
+- **Not** the CDA or CMA **HTTP** client SDKs.
+- **Not** live Contentstack **REST** reads for normal query paths — this SDK targets **synced data in MongoDB**.
 
 ## Repository
 
-- **Git:** [https://github.com/contentstack/datasync-mongodb-sdk](https://github.com/contentstack/datasync-mongodb-sdk)
-- **Product docs:** [https://www.contentstack.com/docs/guide/synchronization/contentstack-datasync](https://www.contentstack.com/docs/guide/synchronization/contentstack-datasync)
+| | |
+|--|--|
+| **npm** | `@contentstack/datasync-mongodb-sdk` |
+| **Git** | [https://github.com/contentstack/datasync-mongodb-sdk](https://github.com/contentstack/datasync-mongodb-sdk) |
+| **Product docs** | [Contentstack DataSync](https://www.contentstack.com/docs/guide/synchronization/contentstack-datasync) |
 
 ## Tech stack
 
 | Area | Details |
 |------|---------|
-| Language/runtime | TypeScript (`typescript` `^4.9.5` in `package.json`); Node.js `>=8` (`engines`); README may recommend a newer Node for local dev |
-| Compilation/build | `tsc` (`npm run compile`); clean + `tsc` via `npm run build-ts`; output to `dist/` and `typings/` |
-| Test framework | Jest + ts-jest (`jest.config.js`, Node test environment, coverage enabled). `npm test` runs Jest only (no `pretest` script in `package.json`) |
-| Lint/tooling | `npm run tslint` runs TSLint via `tslint.json` on `src/**/*.ts` — this repo does **not** define `npm run lint` or ESLint |
-| Core query/data libs | `lodash`, `sift`, `mongodb` (runtime `dependencies`) |
-| Docs generation | JSDoc via `npm run build-doc` (builds TS then runs JSDoc into `docs/`) |
+| Language | TypeScript `^4.9.5` (`package.json`); `tsc` → `dist/`, declarations `typings/` (`tsconfig.json`) |
+| Runtime | Node `>=8` (`engines`); README may suggest a newer Node for local dev |
+| Build | `npm run compile` (`tsc`); `npm run build-ts` (`clean` + `tsc`) |
+| Test | Jest `^29` + ts-jest, Node env, coverage on (`jest.config.js`). **`npm test` is `jest` only** — no `pretest` in `package.json` |
+| Lint | **TSLint** — `npm run tslint` + `tslint.json` on `src/**/*.ts`. **No ESLint** / no `npm run lint` in this repo |
+| Runtime deps | `mongodb`, `lodash`, `sift` |
+| Docs | `npm run build-doc` (builds then JSDoc → `docs/`) |
 
 ## Source layout and public entry points
 
 | Role | Path |
 |------|------|
-| Package runtime entry | `dist/index.js` (`main` in `package.json`) |
-| TS public facade | `src/index.ts` (`Contentstack`, `Contentstack.Stack`) |
-| User-visible messages | `src/messages.ts` |
-| Query builder / core behavior | `src/stack.ts` |
-| Defaults + validation helpers | `src/config.ts`, `src/util.ts` |
-| Tests and fixtures | `test/` with fixtures in `test/data/` |
-| Generated declarations | `typings/*.d.ts` |
-| Example (non-published root) | `example/index.js` |
+| Package entry | `dist/index.js` (`main`) |
+| Public API | `src/index.ts` — `Contentstack`, `Contentstack.Stack(config, db?)` |
+| Query / connection | `src/stack.ts` |
+| Defaults + validation | `src/config.ts`, `src/util.ts` |
+| Messages | `src/messages.ts` |
+| Tests + fixtures | `test/`, `test/data/` |
+| Declarations | `typings/*.d.ts` |
+| Example | `example/index.js` |
 
-## Common commands
+## Commands
 
 | Command | Purpose |
 |---------|---------|
-| `npm run build-ts` | Clean `dist`, `typings`, `coverage`, then compile TypeScript |
-| `npm run compile` | Compile TypeScript only |
-| `npm test` | Jest with coverage (`jest.config.js`) |
-| `npm run tslint` | TSLint on `src/**/*.ts` (`tslint.json`) |
-| `npm run clean` | Remove `dist/`, `typings/`, `coverage/` |
-| `npm run build-doc` | Build TS then generate JSDoc under `docs/` |
+| `npm run build-ts` | Clean `dist/`, `typings/`, `coverage/`, then `tsc` |
+| `npm run compile` | `tsc` only |
+| `npm test` | Jest (coverage per `jest.config.js`) |
+| `npm run tslint` | TSLint `src/**/*.ts` |
+| `npm run clean` | Rimraf `dist`, `typings`, `coverage` |
+| `npm run build-doc` | Full build + JSDoc to `docs/` |
 
-## Test model and env/credentials
+## Test model and credentials
 
-- Tests are **integration-style** against a **real MongoDB** (e.g. `Stack.connect()`); they are **not** live Contentstack HTTP API calls.
-- Test suites live in `test/`; `jest.config.js` controls matches/ignores. Fixture data: `test/data/`.
-- Default connection comes from merged config in **`src/config.ts`** (e.g. **`mongodb://localhost:27017`** unless tests override `contentStore.url`). Typical test DB name: **`sync-test`** (`test/config.ts`).
-- No Delivery/Management API credentials are required for core tests. There is **no** committed `.env` contract; pass **`contentStore`** (including `url`) in config when you need non-default hosts or auth.
+- **Integration-style** tests against a **real MongoDB** (`Stack.connect()`, inserts, queries, teardown). **Not** live Contentstack HTTP API calls.
+- Default URI from merged **`src/config.ts`** (e.g. `mongodb://localhost:27017`); tests often use **`test/config.ts`** (`dbName` e.g. `sync-test`).
+- **No** committed `.env` for tests; override via **`contentStore`** (including `url`) in code. **Do not** commit production Mongo URIs or secrets.
+- **No** Testcontainers or CI Mongo service defined in-repo — local MongoDB is the documented path for developers running tests.
 
 ## Skills index
 
-- Skills index: [`skills/README.md`](skills/README.md)
-- Key skills:
-  - [`skills/code-review/SKILL.md`](skills/code-review/SKILL.md)
-  - [`skills/testing/SKILL.md`](skills/testing/SKILL.md)
-  - [`skills/contentstack-typescript-datasync-mongodb/SKILL.md`](skills/contentstack-typescript-datasync-mongodb/SKILL.md)
+Canonical detail lives under **`skills/<kebab-case>/SKILL.md`**. See **[`skills/README.md`](skills/README.md)**.
 
-## Cursor rules
+| Skill | `SKILL.md` |
+|-------|------------|
+| Dev workflow, hooks, CI | [`skills/dev-workflow/SKILL.md`](skills/dev-workflow/SKILL.md) |
+| TypeScript / TSLint / `src/` layout | [`skills/typescript/SKILL.md`](skills/typescript/SKILL.md) |
+| DataSync MongoDB SDK behavior | [`skills/datasync-mongodb/SKILL.md`](skills/datasync-mongodb/SKILL.md) |
+| Testing | [`skills/testing/SKILL.md`](skills/testing/SKILL.md) |
+| Code review | [`skills/code-review/SKILL.md`](skills/code-review/SKILL.md) |
 
-- Cursor rules overview: [`.cursor/rules/README.md`](.cursor/rules/README.md)
-- Treat `.cursor/rules/` as scoped pointers; do not treat them as a second source of truth.
-- Update policy and standards primarily in `AGENTS.md` and `skills/`, then keep rule pointers aligned.
+## Using Cursor
+
+- Open **[`.cursor/rules/README.md`](.cursor/rules/README.md)** — the sole file in **`.cursor/rules/`** — for pointers to **`AGENTS.md`** and **`skills/`**.
+- Full guidance: **`skills/<name>/SKILL.md`** (attach or `@`-reference those paths in chat per your Cursor setup); there are **no** `.cursor/rules/*.mdc` files in this repo.
 
 ## Contributor workflow (concise)
 
-- **`.husky/pre-commit`** runs **Snyk** and **Talisman** when installed; bypass only as documented locally (e.g. `SKIP_HOOK`).
-- **Releases:** version in **`package.json`**. CI may enforce version bumps (see `.github/workflows/check-version-bump.yml`).
-
-## Cursor-specific quick references
-
-For Cursor workflows, reference these scoped rules:
-
-- `@typescript` → [`.cursor/rules/typescript.mdc`](.cursor/rules/typescript.mdc)
-- `@testing` → [`.cursor/rules/testing.mdc`](.cursor/rules/testing.mdc)
-- `@datasync-mongodb` → [`.cursor/rules/datasync-mongodb.mdc`](.cursor/rules/datasync-mongodb.mdc)
-- `@code-review` → [`.cursor/rules/code-review.mdc`](.cursor/rules/code-review.mdc)
-- `@dev-workflow` → [`.cursor/rules/dev-workflow.md`](.cursor/rules/dev-workflow.md)
-
-Related skills:
-
-- [`skills/contentstack-typescript-datasync-mongodb/SKILL.md`](skills/contentstack-typescript-datasync-mongodb/SKILL.md)
-- [`skills/testing/SKILL.md`](skills/testing/SKILL.md)
-- [`skills/code-review/SKILL.md`](skills/code-review/SKILL.md)
+- **`.husky/pre-commit`:** **Snyk** + **Talisman** when installed; `SKIP_HOOK=1` only if your team allows.
+- **CI:** `.github/workflows/` includes CodeQL, SCA, policy scans, **check-version-bump** — see each file for triggers.
+- **Version bump workflow** path filters may **not** list `src/`; maintainers may need to align the workflow with this layout (see [`skills/dev-workflow/SKILL.md`](skills/dev-workflow/SKILL.md)).
