@@ -1,41 +1,53 @@
 ---
 name: testing
-description: How to run and extend Jest tests for the DataSync MongoDB SDK — MongoDB, fixtures, and jest.config.js behavior.
+description: Jest + ts-jest for DataSync MongoDB SDK — real MongoDB integration tests, fixtures, jest.config.js, no live Contentstack HTTP
 ---
 
-# Skill: Testing (datasync-mongodb-sdk)
+# Testing — `@contentstack/datasync-mongodb-sdk`
 
-## Commands
+## When to use
 
-```bash
-npm test
-```
+- Adding or changing tests under `test/`
+- Debugging failures after `src/` changes
+- Understanding Jest ignores, coverage, or fixture layout
 
-Uses **Jest** with **`ts-jest`** (`jest.config.js`). There is no separate `test:unit` vs `test:integration` script in `package.json` — all tests live under **`test/`** and typically require a real database.
+## Instructions
 
-## Prerequisites
+### Commands
 
-- **MongoDB** running and reachable at the URL used by tests (defaults to **`mongodb://localhost:27017`** via merged `src/config.ts`, unless your test overrides `contentStore.url`).
-- Test database name is commonly **`sync-test`** per **`test/config.ts`**.
+- **`npm test`** — runs **`jest`** only (`package.json`). **No `pretest`** — run **`npm run build-ts`** or **`npm run compile`** first if `dist/` / imports require it.
+- **`npm run build-ts`** — use when you need a clean compile before debugging.
 
-## Layout
+### Runner and config
+
+- **Jest** + **ts-jest**, **Node** environment (`jest.config.js`).
+- **`collectCoverage: true`** — reports under **`coverage/`** (JSON + HTML).
+- **`testMatch`:** `**/test/**/*.ts` (and `.js`).
+- **`testPathIgnorePatterns`:** `/test/data/*`, `/test/.*config.ts` — fixture/config paths are not treated as test files.
+- **`notify: true`** — may use `node-notifier` locally; optional in headless CI.
+
+### Layout
 
 | Path | Role |
 |------|------|
-| `test/*.ts` | Topic suites (e.g. `core.ts`, `queries.ts`) |
-| `test/data/*.ts` | Fixture documents imported into collections in `beforeAll` |
-| `jest.config.js` | `testMatch`, coverage, `testPathIgnorePatterns` (e.g. `test/data`) |
+| `test/**/*.ts` | Topic suites (`core.ts`, `queries.ts`, …) |
+| `test/data/*.ts` | Fixture documents imported into collections |
+| `test/config.ts` | Shared stack test config (e.g. `dbName`) |
+| `jest.config.js` | Match, ignore, coverage, transform |
 
-## Patterns
+### Patterns
 
-- Tests obtain **`db`** from **`Stack.connect()`**, insert fixtures with the MongoDB driver, run Stack queries, assert, then **`Stack.close()`** in `afterAll` where used.
-- File names are **topic-based**, not `*.spec.ts` — Jest discovers them via glob.
+- Tests typically **`Stack.connect()`**, insert fixtures via MongoDB driver, run Stack queries, assert, drop collections / **`Stack.close()`** in `afterAll` where used.
+- File names are **topic-based** (not required `*.test.ts`).
 
-## Environment
+### Environment and credentials
 
-- No committed `.env` contract for this repo; pass **`contentStore`** (including `url`) in the config object when you need non-default hosts or auth.
+- **Real MongoDB** at URL from merged config — default **`mongodb://localhost:27017`** in **`src/config.ts`** unless tests override **`contentStore.url`**.
+- **No** Delivery/Management API keys for core tests.
+- **No** `.env` contract in-repo; pass **`contentStore`** in code. **Do not** put production URIs in tests or CI secrets in the repo.
+- **No** Testcontainers / dockerized Mongo in this repo’s scripts — document **local MongoDB** for developers unless CI is extended.
 
-## Related
+## References
 
-- Cursor rule: [`.cursor/rules/testing.mdc`](../../.cursor/rules/testing.mdc)
-- Entry point: [`AGENTS.md`](../../AGENTS.md)
+- [`../datasync-mongodb/SKILL.md`](../datasync-mongodb/SKILL.md)
+- [`../../AGENTS.md`](../../AGENTS.md)

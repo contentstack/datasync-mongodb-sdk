@@ -1,52 +1,59 @@
 ---
 name: code-review
-description: PR review checklist for the Contentstack DataSync MongoDB SDK — JSDoc, compatibility, errors, tests, dependencies, and DataSync-vs-CDA/CMA terminology.
+description: PR review for DataSync MongoDB SDK — JSDoc, compatibility, errors, tests, deps/SCA; terminology DataSync MongoDB SDK not CDA/CMA HTTP
 ---
 
-# Skill: Code review (datasync-mongodb-sdk)
+# Code review — `@contentstack/datasync-mongodb-sdk`
 
-Use this skill when preparing or reviewing pull requests for **@contentstack/datasync-mongodb-sdk**.
+## When to use
 
-## Scope reminder
+- Reviewing a PR that touches `src/`, `test/`, or public docs
+- Self-checking before request for review
+- Judging semver impact for Stack / config / query behavior
 
-This package implements **DataSync** queries against **MongoDB** (synced content). It is **not** the Contentstack **Delivery API (CDA)** or **Management API (CMA)** HTTP SDK. Reviews should use **DataSync** / **MongoDB Stack** terminology unless the change explicitly touches another system.
+## Instructions
 
-## Checklist
+### Scope and terminology
 
-### Public API and documentation
+- This package is the **DataSync MongoDB SDK** (MongoDB over **synced** content). Do **not** call it the **CDA** or **CMA** **HTTP** SDK unless the change explicitly compares or documents migration.
+- Behavior should be validated with **MongoDB + Jest** tests, not live stack REST calls, unless the PR is explicitly about integration docs.
 
-- New or changed public surface on `Contentstack` / `Stack` has accurate **JSDoc** and matches behavior in `src/stack.ts`.
-- README or `example/` updates reflect required **`Stack.connect()`** usage and realistic `contentStore` config.
+### Public API and docs
+
+- **`Contentstack` / `Stack`** public surface should have accurate **JSDoc** consistent with `src/stack.ts`.
+- **README** / **`example/`** must match **`Stack.connect()`** and **`contentStore`** keys from **`src/config.ts`** and real usage.
 
 ### Backward compatibility
 
-- Avoid breaking changes to exported names, config keys, default limits/skip/locale behavior, or query result shapes without a major version plan.
-- Call out any change that affects **collection naming**, **locale** handling, or **reference depth** behavior for consumers.
+- Avoid breaking query result shape, **config** schema, or public method signatures without a **semver-major** plan.
+- Watch **locale**, **collection naming**, **reference depth**, **limit/skip** defaults.
 
-### Errors and robustness
+### Errors and messages
 
-- Errors should flow through established patterns; prefer centralized copy in **`src/messages.ts`** where the codebase already does.
-- Avoid leaking internal MongoDB details in thrown messages unless intentional.
+- Prefer centralized strings in **`src/messages.ts`** where the codebase already does.
+
+### Correctness and null safety
+
+- Align with MongoDB driver and existing null checks in query chains.
 
 ### Dependencies and security
 
-- Justify new packages; prefer existing **lodash**, **mongodb**, **sift** usage patterns.
-- Consider **Snyk**/SCA impact and supply-chain expectations.
+- New dependencies need justification; align with **`lodash` / `mongodb` / `sift`** patterns and **Snyk**/SCA expectations.
 
 ### Tests
 
-- Add or update **Jest** tests with **MongoDB** running locally (default URL from config).
-- Use **`test/data/`** fixtures for new document shapes; keep `test/config.ts` consistent with inserted collections.
+- Behavioral changes in **`src/`** need matching **`test/`** updates and **`test/data/`** fixtures when document shapes change.
 
 ### Optional severity
 
 | Level | Examples |
 |-------|----------|
-| Blocker | Data loss, security issue, broken connect/query for supported config |
-| Major | Wrong query results, missing tests for new feature, accidental breaking change |
-| Minor | Typos, non-functional cleanup, comment-only |
+| Blocker | Wrong query results, data corruption risk, security issue, broken public API contract |
+| Major | Missing tests for core behavior, breaking change without version/docs strategy |
+| Minor | Style, non-user-facing refactors, doc nits |
 
-## Related
+## References
 
-- Cursor rule: [`.cursor/rules/code-review.mdc`](../../.cursor/rules/code-review.mdc)
-- Entry point: [`AGENTS.md`](../../AGENTS.md)
+- [`../testing/SKILL.md`](../testing/SKILL.md)
+- [`../datasync-mongodb/SKILL.md`](../datasync-mongodb/SKILL.md)
+- [`../../AGENTS.md`](../../AGENTS.md)
