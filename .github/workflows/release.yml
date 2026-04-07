@@ -1,8 +1,8 @@
 name: Release
 
 on:
-  push:
-    branches: [master]
+  release:
+    types: [created]
 
 jobs:
   build:
@@ -43,35 +43,13 @@ jobs:
           token: ${{ secrets.NPM_TOKEN }}
           # access: public # Uncomment this line if you want to publish the package as public for first time
 
-      # Auto-tag the new version if a change is detected
-      - name: Auto-tag new version
-        id: update_tag
-        uses: Klemensas/action-autotag@stable
-        with:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          tag_prefix: "v"
-
-      # Create a new GitHub Release
-      - name: Create GitHub Release
-        if: steps.update_tag.outputs.tagname != ''
-        uses: actions/create-release@v1
-        id: create_release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.update_tag.outputs.tagname }}
-          release_name: Release ${{ steps.update_tag.outputs.tagname }}
-          draft: false
-          prerelease: false
-
-      # Upload the packaged .tgz file as a release asset
+      # Upload the packaged .tgz to the release that triggered this workflow
       - name: Upload Release Asset
-        if: steps.update_tag.outputs.tagname != ''
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ github.event.release.upload_url }}
           asset_path: "./contentstack-datasync-mongodb-sdk-${{ steps.package.outputs.version }}.tgz"
           asset_name: "contentstack-datasync-mongodb-sdk-${{ steps.package.outputs.version }}.tgz"
           asset_content_type: application/tgz
